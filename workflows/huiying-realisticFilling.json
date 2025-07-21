@@ -1,0 +1,322 @@
+{
+  "1": {
+    "inputs": {
+      "conditioning": [
+        "31",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "条件零化"
+    }
+  },
+  "5": {
+    "inputs": {
+      "block_number": 3,
+      "downscale_factor": 2.0000000000000004,
+      "start_percent": 0,
+      "end_percent": 0.3500000000000001,
+      "downscale_after_skip": true,
+      "downscale_method": "bicubic",
+      "upscale_method": "bicubic",
+      "model": [
+        "84",
+        0
+      ]
+    },
+    "class_type": "PatchModelAddDownscale",
+    "_meta": {
+      "title": "收缩模型UNET"
+    }
+  },
+  "12": {
+    "inputs": {
+      "noise_mask": false,
+      "positive": [
+        "31",
+        0
+      ],
+      "negative": [
+        "1",
+        0
+      ],
+      "vae": [
+        "18",
+        0
+      ],
+      "pixels": [
+        "41",
+        1
+      ],
+      "mask": [
+        "41",
+        2
+      ]
+    },
+    "class_type": "InpaintModelConditioning",
+    "_meta": {
+      "title": "内补模型条件"
+    }
+  },
+  "17": {
+    "inputs": {
+      "seed": 7580062291163,
+      "steps": 10,
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "5",
+        0
+      ],
+      "positive": [
+        "12",
+        0
+      ],
+      "negative": [
+        "12",
+        1
+      ],
+      "latent_image": [
+        "12",
+        2
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "18": {
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "VAE加载器"
+    }
+  },
+  "19": {
+    "inputs": {
+      "clip_name1": "clip_l.safetensors",
+      "clip_name2": "t5xxl_fp8_e4m3fn.safetensors",
+      "type": "flux",
+      "device": "default"
+    },
+    "class_type": "DualCLIPLoader",
+    "_meta": {
+      "title": "双CLIP加载器"
+    }
+  },
+  "25": {
+    "inputs": {
+      "image": "clipspace/clipspace-mask-2422931.7.png [input]"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "27": {
+    "inputs": {
+      "samples": [
+        "17",
+        0
+      ],
+      "vae": [
+        "18",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "30": {
+    "inputs": {
+      "value": 1280
+    },
+    "class_type": "ImpactInt",
+    "_meta": {
+      "title": "整数"
+    }
+  },
+  "31": {
+    "inputs": {
+      "clip_l": [
+        "77",
+        0
+      ],
+      "t5xxl": [
+        "77",
+        0
+      ],
+      "guidance": 30,
+      "clip": [
+        "19",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncodeFlux",
+    "_meta": {
+      "title": "CLIP文本编码Flux"
+    }
+  },
+  "35": {
+    "inputs": {
+      "rescale_algorithm": "bislerp",
+      "stitch": [
+        "41",
+        0
+      ],
+      "inpainted_image": [
+        "39",
+        0
+      ]
+    },
+    "class_type": "InpaintStitch",
+    "_meta": {
+      "title": "局部重绘（接缝）"
+    }
+  },
+  "39": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "width": [
+        "42",
+        0
+      ],
+      "height": [
+        "42",
+        1
+      ],
+      "crop": "disabled",
+      "image": [
+        "27",
+        0
+      ]
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "图像缩放"
+    }
+  },
+  "41": {
+    "inputs": {
+      "context_expand_pixels": 80,
+      "context_expand_factor": 2.0000000000000004,
+      "fill_mask_holes": true,
+      "blur_mask_pixels": 16,
+      "invert_mask": false,
+      "blend_pixels": 16,
+      "rescale_algorithm": "bicubic",
+      "mode": "forced size",
+      "force_width": [
+        "30",
+        0
+      ],
+      "force_height": [
+        "30",
+        0
+      ],
+      "rescale_factor": 1.0000000000000002,
+      "min_width": 512,
+      "min_height": 512,
+      "max_width": 768,
+      "max_height": 768,
+      "padding": 32,
+      "image": [
+        "25",
+        0
+      ],
+      "mask": [
+        "25",
+        1
+      ]
+    },
+    "class_type": "InpaintCrop",
+    "_meta": {
+      "title": "局部重绘（裁剪）"
+    }
+  },
+  "42": {
+    "inputs": {
+      "image": [
+        "41",
+        1
+      ]
+    },
+    "class_type": "easy imageSize",
+    "_meta": {
+      "title": "图像尺寸"
+    }
+  },
+  "77": {
+    "inputs": {
+      "from_translate": "auto",
+      "to_translate": "en",
+      "baidu_appid": "20250329002318943",
+      "baidu_appkey": "cy0JJrqyNJHCsKjfTE9_",
+      "text": [
+        "86",
+        0
+      ]
+    },
+    "class_type": "BaiduTranslateNode",
+    "_meta": {
+      "title": "Baidu Translate"
+    }
+  },
+  "82": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "35",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  },
+  "84": {
+    "inputs": {
+      "model_type": "flux",
+      "rel_l1_thresh": 0.20000000000000004,
+      "start_percent": 0,
+      "end_percent": 1,
+      "cache_device": "cuda",
+      "model": [
+        "85",
+        0
+      ]
+    },
+    "class_type": "TeaCache",
+    "_meta": {
+      "title": "TeaCache"
+    }
+  },
+  "85": {
+    "inputs": {
+      "unet_name": "flux1-FillDevFp8_v10.safetensors",
+      "weight_dtype": "fp8_e4m3fn"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "UNET加载器"
+    }
+  },
+  "86": {
+    "inputs": {
+      "text": "太阳镜"
+    },
+    "class_type": "CR Text",
+    "_meta": {
+      "title": "文本"
+    }
+  }
+}

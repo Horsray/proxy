@@ -1,0 +1,356 @@
+{
+  "3": {
+    "inputs": {
+      "anything": [
+        "13",
+        2
+      ]
+    },
+    "class_type": "Anything Everywhere",
+    "_meta": {
+      "title": "全局输入"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": " Ultra high quality，natural lighting、subtle colors、realistic skin texture、natural imperfections、soft focus background、less saturated colors、"
+    },
+    "class_type": "CR Text",
+    "_meta": {
+      "title": "文本"
+    }
+  },
+  "12": {
+    "inputs": {
+      "brushnet": "brushnet\\segmentation_mask.safetensors",
+      "dtype": "float16"
+    },
+    "class_type": "BrushNetLoader",
+    "_meta": {
+      "title": "BrushNet加载器"
+    }
+  },
+  "13": {
+    "inputs": {
+      "ckpt_name": "SD1.5_【写实摄影】通用写实.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Checkpoint加载器(简易)"
+    }
+  },
+  "16": {
+    "inputs": {
+      "scale": 1,
+      "start_at": 0,
+      "end_at": 10000,
+      "model": [
+        "117",
+        0
+      ],
+      "vae": [
+        "13",
+        2
+      ],
+      "image": [
+        "64",
+        0
+      ],
+      "mask": [
+        "22",
+        0
+      ],
+      "brushnet": [
+        "12",
+        0
+      ],
+      "positive": [
+        "21",
+        0
+      ],
+      "negative": [
+        "74",
+        0
+      ]
+    },
+    "class_type": "BrushNet",
+    "_meta": {
+      "title": "BrushNet"
+    }
+  },
+  "20": {
+    "inputs": {
+      "delimiter": ", ",
+      "clean_whitespace": "true",
+      "text_a": [
+        "124",
+        0
+      ],
+      "text_b": [
+        "7",
+        0
+      ]
+    },
+    "class_type": "Text Concatenate",
+    "_meta": {
+      "title": "文本连锁"
+    }
+  },
+  "21": {
+    "inputs": {
+      "text": [
+        "20",
+        0
+      ],
+      "clip": [
+        "13",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "22": {
+    "inputs": {
+      "expand": -2,
+      "incremental_expandrate": 0,
+      "tapered_corners": true,
+      "flip_input": false,
+      "blur_radius": 1,
+      "lerp_alpha": 1,
+      "decay_factor": 1,
+      "fill_holes": true,
+      "mask": [
+        "64",
+        1
+      ]
+    },
+    "class_type": "GrowMaskWithBlur",
+    "_meta": {
+      "title": "遮罩模糊生长"
+    }
+  },
+  "25": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "width": [
+        "55",
+        0
+      ],
+      "height": [
+        "55",
+        1
+      ],
+      "crop": "disabled",
+      "image": [
+        "29",
+        0
+      ]
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "图像缩放"
+    }
+  },
+  "26": {
+    "inputs": {
+      "expand": 10,
+      "incremental_expandrate": 0,
+      "tapered_corners": true,
+      "flip_input": false,
+      "blur_radius": 0.4,
+      "lerp_alpha": 1,
+      "decay_factor": 1,
+      "fill_holes": false,
+      "mask": [
+        "22",
+        0
+      ]
+    },
+    "class_type": "GrowMaskWithBlur",
+    "_meta": {
+      "title": "遮罩模糊生长"
+    }
+  },
+  "29": {
+    "inputs": {
+      "samples": [
+        "53",
+        0
+      ],
+      "vae": [
+        "13",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "53": {
+    "inputs": {
+      "seed": 666784111762668,
+      "steps": 25,
+      "cfg": 6,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "16",
+        0
+      ],
+      "positive": [
+        "16",
+        1
+      ],
+      "negative": [
+        "16",
+        2
+      ],
+      "latent_image": [
+        "16",
+        3
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "55": {
+    "inputs": {
+      "image": [
+        "129",
+        0
+      ]
+    },
+    "class_type": "GetImageSize+",
+    "_meta": {
+      "title": "获取图像尺寸"
+    }
+  },
+  "64": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "shortest",
+      "scale_to_length": 1024,
+      "background_color": "#000000",
+      "image": [
+        "129",
+        0
+      ],
+      "mask": [
+        "129",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "70": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1.0000000000000002,
+      "width": 512,
+      "height": 512,
+      "x_offset": 0,
+      "y_offset": 0,
+      "rotation": 9.992007221626409e-15,
+      "opacity": 0,
+      "base_image": [
+        "129",
+        0
+      ],
+      "overlay_image": [
+        "25",
+        0
+      ],
+      "optional_mask": [
+        "26",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "74": {
+    "inputs": {
+      "text": "nsfw,worst quality, low quality, normal quality, lowres, low details, over saturated、oversharpened、cartoonish、plastic、fake、digital art、painting、3D render ",
+      "clip": [
+        "13",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "117": {
+    "inputs": {
+      "block_number": 3,
+      "downscale_factor": 2.0000000000000004,
+      "start_percent": 0,
+      "end_percent": 0.3500000000000001,
+      "downscale_after_skip": true,
+      "downscale_method": "bicubic",
+      "upscale_method": "bicubic",
+      "model": [
+        "13",
+        0
+      ]
+    },
+    "class_type": "PatchModelAddDownscale",
+    "_meta": {
+      "title": "收缩模型UNET"
+    }
+  },
+  "124": {
+    "inputs": {
+      "from_translate": "auto",
+      "to_translate": "en",
+      "baidu_appid": "20250329002318943",
+      "baidu_appkey": "cy0JJrqyNJHCsKjfTE9_",
+      "text": "玩具熊"
+    },
+    "class_type": "BaiduTranslateNode",
+    "_meta": {
+      "title": "Baidu Translate"
+    }
+  },
+  "126": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "70",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  },
+  "129": {
+    "inputs": {
+      "image": "clipspace/clipspace-mask-1044614.3999999994.png [input]"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  }
+}

@@ -1,0 +1,435 @@
+{
+  "24": {
+    "inputs": {
+      "fitting": 1,
+      "function": "object removal",
+      "scale": 1,
+      "start_at": 0,
+      "end_at": 10000,
+      "save_memory": "none",
+      "model": [
+        "41",
+        0
+      ],
+      "vae": [
+        "41",
+        2
+      ],
+      "image": [
+        "47",
+        1
+      ],
+      "mask": [
+        "47",
+        2
+      ],
+      "powerpaint": [
+        "45",
+        0
+      ],
+      "clip": [
+        "26",
+        0
+      ],
+      "positive": [
+        "29",
+        0
+      ],
+      "negative": [
+        "70",
+        0
+      ]
+    },
+    "class_type": "PowerPaint",
+    "_meta": {
+      "title": "PowerPaint（应用）"
+    }
+  },
+  "26": {
+    "inputs": {
+      "base": "ViT-L-14-TEXT-detail-improved-hiT-GmP-HF.safetensors",
+      "powerpaint": "powerpaint\\pytorch_model.bin"
+    },
+    "class_type": "PowerPaintCLIPLoader",
+    "_meta": {
+      "title": "PowerPaintCLIP加载器"
+    }
+  },
+  "29": {
+    "inputs": {
+      "text": "empty scene blur",
+      "clip": [
+        "41",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "40": {
+    "inputs": {
+      "seed": 294484827175937,
+      "steps": 25,
+      "cfg": 4,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1,
+      "model": [
+        "24",
+        0
+      ],
+      "positive": [
+        "24",
+        1
+      ],
+      "negative": [
+        "24",
+        2
+      ],
+      "latent_image": [
+        "24",
+        3
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "41": {
+    "inputs": {
+      "ckpt_name": "SD1.5【麦橘写实】_v7.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Checkpoint加载器(简易)"
+    }
+  },
+  "42": {
+    "inputs": {
+      "samples": [
+        "40",
+        0
+      ],
+      "vae": [
+        "41",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "45": {
+    "inputs": {
+      "brushnet": "powerpaint\\powerpaint_v2_1.safetensors",
+      "dtype": "float16"
+    },
+    "class_type": "BrushNetLoader",
+    "_meta": {
+      "title": "BrushNet加载器"
+    }
+  },
+  "47": {
+    "inputs": {
+      "context_expand_pixels": 50,
+      "context_expand_factor": 2.0000000000000004,
+      "fill_mask_holes": true,
+      "blur_mask_pixels": 16,
+      "invert_mask": false,
+      "blend_pixels": 16,
+      "rescale_algorithm": "bicubic",
+      "mode": "forced size",
+      "force_width": 512,
+      "force_height": 512,
+      "rescale_factor": 1.0000000000000002,
+      "min_width": 512,
+      "min_height": 512,
+      "max_width": 2048,
+      "max_height": 2048,
+      "padding": 32,
+      "image": [
+        "134",
+        0
+      ],
+      "mask": [
+        "134",
+        1
+      ]
+    },
+    "class_type": "InpaintCrop",
+    "_meta": {
+      "title": "局部重绘（裁剪）"
+    }
+  },
+  "54": {
+    "inputs": {
+      "rescale_algorithm": "bislerp",
+      "stitch": [
+        "47",
+        0
+      ],
+      "inpainted_image": [
+        "60",
+        0
+      ]
+    },
+    "class_type": "InpaintStitch",
+    "_meta": {
+      "title": "局部重绘（接缝）"
+    }
+  },
+  "59": {
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "VAE加载器"
+    }
+  },
+  "60": {
+    "inputs": {
+      "samples": [
+        "63",
+        0
+      ],
+      "vae": [
+        "59",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "61": {
+    "inputs": {
+      "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
+      "clip_name2": "clip_l.safetensors",
+      "type": "flux",
+      "device": "default"
+    },
+    "class_type": "DualCLIPLoader",
+    "_meta": {
+      "title": "双CLIP加载器"
+    }
+  },
+  "63": {
+    "inputs": {
+      "seed": 106287793524338,
+      "steps": 10,
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "beta",
+      "denoise": 0.4000000000000001,
+      "model": [
+        "127",
+        0
+      ],
+      "positive": [
+        "67",
+        0
+      ],
+      "negative": [
+        "65",
+        0
+      ],
+      "latent_image": [
+        "64",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "64": {
+    "inputs": {
+      "pixels": [
+        "42",
+        0
+      ],
+      "vae": [
+        "59",
+        0
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE编码"
+    }
+  },
+  "65": {
+    "inputs": {
+      "conditioning": [
+        "66",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "条件零化"
+    }
+  },
+  "66": {
+    "inputs": {
+      "text": "",
+      "clip": [
+        "126",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "67": {
+    "inputs": {
+      "guidance": 3.5,
+      "conditioning": [
+        "66",
+        0
+      ]
+    },
+    "class_type": "FluxGuidance",
+    "_meta": {
+      "title": "Flux引导"
+    }
+  },
+  "70": {
+    "inputs": {
+      "text": [
+        "140",
+        0
+      ],
+      "clip": [
+        "41",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "104": {
+    "inputs": {
+      "anything": [
+        "42",
+        0
+      ]
+    },
+    "class_type": "easy cleanGpuUsed",
+    "_meta": {
+      "title": "清理GPU占用"
+    }
+  },
+  "108": {
+    "inputs": {
+      "expand": 0,
+      "incremental_expandrate": 0,
+      "tapered_corners": true,
+      "flip_input": false,
+      "blur_radius": 0,
+      "lerp_alpha": 1,
+      "decay_factor": 1,
+      "fill_holes": false
+    },
+    "class_type": "GrowMaskWithBlur",
+    "_meta": {
+      "title": "遮罩模糊生长"
+    }
+  },
+  "125": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "54",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  },
+  "126": {
+    "inputs": {
+      "lora_name": "FLUX.1_8step_Lora.safetensors",
+      "strength_model": 1.0000000000000002,
+      "strength_clip": 1.0000000000000002,
+      "model": [
+        "128",
+        0
+      ],
+      "clip": [
+        "61",
+        0
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "LoRA加载器"
+    }
+  },
+  "127": {
+    "inputs": {
+      "model_type": "flux",
+      "rel_l1_thresh": 0.25000000000000006,
+      "start_percent": 0,
+      "end_percent": 1,
+      "cache_device": "cuda",
+      "model": [
+        "126",
+        0
+      ]
+    },
+    "class_type": "TeaCache",
+    "_meta": {
+      "title": "TeaCache"
+    }
+  },
+  "128": {
+    "inputs": {
+      "unet_name": "flux1-dev-fp8.safetensors",
+      "weight_dtype": "fp8_e4m3fn"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "UNET加载器"
+    }
+  },
+  "134": {
+    "inputs": {
+      "image": "clipspace/clipspace-mask-391650.09999999404.png [input]"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "140": {
+    "inputs": {
+      "from_translate": "auto",
+      "to_translate": "english",
+      "add_proxies": false,
+      "proxies": "",
+      "auth_data": "",
+      "service": "GoogleTranslator [free]",
+      "text": "杯子",
+      "Show proxy": "proxy_hide",
+      "Show authorization": "authorization_hide"
+    },
+    "class_type": "DeepTranslatorTextNode",
+    "_meta": {
+      "title": "翻译文本(高级)"
+    }
+  }
+}

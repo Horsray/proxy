@@ -1,0 +1,110 @@
+{
+  "27": {
+    "inputs": {
+      "image": "WechatIMG227.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "241": {
+    "inputs": {
+      "supir_model": "SUPIR-v0Q_fp16.safetensors",
+      "sdxl_model": "HelloWorld 新世界 _ SDXL放大模型_v7.0.safetensors",
+      "seed": 316975931132044,
+      "resize_method": "lanczos",
+      "scale_by": 1.5000000000000002,
+      "steps": 45,
+      "restoration_scale": -1,
+      "cfg_scale": 5.000000000000001,
+      "a_prompt": "high quality, detailed",
+      "n_prompt": "bad quality, blurry, messy",
+      "s_churn": 5,
+      "s_noise": 1.0030000000000003,
+      "control_scale": 1.0000000000000002,
+      "cfg_scale_start": 4.000000000000001,
+      "control_scale_start": 0,
+      "color_fix_type": "None",
+      "keep_model_loaded": true,
+      "use_tiled_vae": true,
+      "encoder_tile_size_pixels": 512,
+      "decoder_tile_size_latent": 96,
+      "diffusion_dtype": "auto",
+      "encoder_dtype": "auto",
+      "batch_size": 1,
+      "use_tiled_sampling": false,
+      "sampler_tile_size": 1024,
+      "sampler_tile_stride": 512,
+      "fp8_unet": false,
+      "fp8_vae": false,
+      "sampler": "RestoreEDMSampler",
+      "image": [
+        "244",
+        0
+      ]
+    },
+    "class_type": "SUPIR_Upscale",
+    "_meta": {
+      "title": "SUPIR放大"
+    }
+  },
+  "244": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "longest",
+      "scale_to_length": [
+        "248",
+        0
+      ],
+      "background_color": "#000000",
+      "image": [
+        "27",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "247": {
+    "inputs": {
+      "anything": [
+        "241",
+        0
+      ]
+    },
+    "class_type": "easy cleanGpuUsed",
+    "_meta": {
+      "title": "清理GPU占用"
+    }
+  },
+  "248": {
+    "inputs": {
+      "value": 1024
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "Int"
+    }
+  },
+  "249": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "241",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  }
+}

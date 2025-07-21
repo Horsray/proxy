@@ -1,0 +1,395 @@
+{
+  "workflow_mappings": {
+    "huiying-AIRemoval": {
+      "description": "AI移除功能",
+      "node_count": 26,
+        "param_mappings": {
+            "fileName": [ "134", "inputs", "image" ],
+            "prompt": [ "140", "inputs", "text" ],
+            "scaleToLength": [ "47", "inputs", "force_width" ],
+            "scaleToHeight": [ "47", "inputs", "force_height" ],
+
+            "denoise": [ "40", "inputs", "denoise" ],
+            "steps": [ "40", "inputs", "steps" ],
+            "cfg": [ "40", "inputs", "cfg" ],
+            "sampler_name": [ "40", "inputs", "sampler_name" ],
+            "scheduler": [ "40", "inputs", "scheduler" ],
+            "seed": [ "40", "inputs", "seed" ],
+            "selectedCheckpoint": [ "41", "inputs", "ckpt_name" ],
+            "filename_prefix": [ "125", "inputs", "filename_prefix" ]
+
+        }
+    },
+
+ "huiying-AIAgent": {
+      "description": "AI智能体",
+      "node_count": 20,
+      "param_mappings": {
+        "fileName": ["133", "inputs", "image"],
+        "prompt": ["175", "inputs", "text"],
+        "negative_prompt": ["19", "inputs", "text"],
+        "denoise": ["17", "inputs", "denoise"],
+        "steps": ["17", "inputs", "steps"],
+        "cfg": ["17", "inputs", "cfg"],
+        "sampler_name": ["17", "inputs", "sampler_name"],
+        "scheduler": ["17", "inputs", "scheduler"],
+        "seed": ["17", "inputs", "seed"],
+        "selectedLora": ["83", "inputs", "lora_name"],
+        "loraStrength": ["83", "inputs", "strength_model"],
+        "filename_prefix": ["188", "inputs", "filename_prefix"],
+        "scaleToLength": ["191", "inputs", "scaleToLength"],
+        "scaleToHeight": ["39", "inputs", "height"]
+      }
+    },
+    
+    "huiying-artisticFilling": {
+      "description": "艺术填充功能",
+      "node_count": 20,
+      "param_mappings": {
+        "fileName": ["129", "inputs", "image"],
+        "prompt": ["124", "inputs", "text"],
+        "negative_prompt": ["19", "inputs", "text"],
+        "denoise": ["17", "inputs", "denoise"],
+        "steps": ["17", "inputs", "steps"],
+        "cfg": ["17", "inputs", "cfg"],
+        "sampler_name": ["17", "inputs", "sampler_name"],
+        "scheduler": ["17", "inputs", "scheduler"],
+        "seed": ["17", "inputs", "seed"],
+        "selectedLora": ["83", "inputs", "lora_name"],
+        "loraStrength": ["83", "inputs", "strength_model"],
+        "filename_prefix": ["82", "inputs", "filename_prefix"],
+        "scaleToLength": ["64", "inputs", "scaleToLength"],
+        "scaleToHeight": ["39", "inputs", "height"]
+      }
+    },
+    "huiying-assetGenerationText": {
+      "description": "素材生成-文本模式",
+      "node_count": 10,
+      "param_mappings": {
+        "prompt": ["108", "inputs", "text"],
+        "negative_prompt": ["23", "inputs", "text"],
+        "denoise": ["6", "inputs", "denoise"],
+        "steps": ["6", "inputs", "steps"],
+        "cfg": ["6", "inputs", "cfg"],
+        "sampler_name": ["6", "inputs", "sampler_name"],
+        "scheduler": ["6", "inputs", "scheduler"],
+        "seed": ["6", "inputs", "seed"],
+        "selectedCheckpoint": ["4", "inputs", "ckpt_name"],
+        "selectedLora": ["5", "inputs", "lora_name"],
+        "loraStrength": ["5", "inputs", "strength_model"],
+        "filename_prefix": ["57", "inputs", "filename_prefix"],
+        "width":    ["18",  "inputs", "width"],
+        "height":   ["18",  "inputs", "height"]
+      }
+    },
+    "huiying-assetGenerationRefer": {
+      "description": "素材生成-参考图模式",
+      "node_count": 19,
+      "param_mappings": {
+        "fileName": ["102 ", "inputs", "image"],
+        "referenceImage": ["42", "inputs", "image"],   
+        "prompt": ["98", "inputs", "text"],
+        "negative_prompt": ["23", "inputs", "text"],
+        "denoise": ["6", "inputs", "denoise"],
+        "steps": ["6", "inputs", "steps"],
+        "cfg": ["6", "inputs", "cfg"],
+        "sampler_name": ["6", "inputs", "sampler_name"],
+        "scheduler": ["6", "inputs", "scheduler"],
+        "seed": ["6", "inputs", "seed"],
+        "selectedCheckpoint": ["4", "inputs", "ckpt_name"],
+        "selectedLora": ["5", "inputs", "lora_name"],
+        "loraStrength": ["5", "inputs", "strength_model"],
+        "filename_prefix": ["57", "inputs", "filename_prefix"],
+        "widtht": ["18", "inputs", "weight"],
+        "height":   ["18",  "inputs", "height"]
+      }
+    },
+    "huiying-backReplaceText": {
+      "description": "背景替换-文本模式",
+      "node_count": 35,
+      "param_mappings": {
+        "fileName": ["45", "inputs", "image"],
+        "prompt": ["19", "inputs", "text"],
+        "negative_prompt": ["19", "inputs", "text"],
+        "denoise": ["32", "inputs", "denoise"],
+        "steps": ["32", "inputs", "steps"],
+        "cfg": ["32", "inputs", "cfg"],
+        "sampler_name": ["32", "inputs", "sampler_name"],
+        "scheduler": ["32", "inputs", "scheduler"],
+        "seed": ["32", "inputs", "seed"],
+        "selectedCheckpoint": ["21", "inputs", "ckpt_name"],
+        "selectedLora": ["43", "inputs", "lora_name"],
+        "loraStrength": ["43", "inputs", "strength_model"],
+        "selectedExpendModel": ["53", "inputs", "filename_prefix"],
+        "scaleToLength": ["244", "inputs", "scale_to_length"]
+      }
+    },
+    "huiying-backReplace": {
+      "description": "背景替换-参考图模式",
+      "node_count": 40,
+      "param_mappings": {
+        "fileName": ["45", "inputs", "image"],
+        "prompt": ["19 ", "inputs", "text"],
+        "negative_prompt": ["19", "inputs", "text"],
+        "referenceImage": ["33", "inputs", "image"],
+        "referStrength": ["12", "inputs", "strength"],
+        "denoise": ["32", "inputs", "denoise"],
+        "steps": ["32", "inputs", "steps"],
+        "cfg": ["32", "inputs", "cfg"],
+        "sampler_name": ["32", "inputs", "sampler_name"],
+        "scheduler": ["32", "inputs", "scheduler"],
+        "seed": ["32", "inputs", "seed"],
+        "selectedCheckpoint": ["21", "inputs", "ckpt_name"],
+        "selectedLora": ["43", "inputs", "lora_name"],
+        "loraStrength": ["43", "inputs", "strength_model"],
+        "filename_prefix": ["41", "inputs", "filename_prefix"],
+        "scaleToLength": ["38", "inputs", "scale_to_length"]
+      }
+    },
+    "huiying-imageExpansion": {
+      "description": "图像扩展功能",
+      "node_count": 20,
+      "param_mappings": {
+        "fileName": ["124", "inputs", "image"],
+        "prompt": ["97", "inputs", "text"],
+        "negative_prompt": ["97", "inputs", "text"],
+        "selectedLora": ["127", "inputs", "lora_name"],
+        "loraStrength": ["127", "inputs", "strength_model"],
+        "filename_prefix": ["133", "inputs", "filename_prefix"],
+        "scaleToLength": ["118", "inputs", "scale_to_length"],
+        "width": ["110", "inputs", "width"],
+        "height": ["110", "inputs", "height"]
+      }
+    },
+    "huiying-imageRestoration": {
+      "description": "图像修复-标准模式",
+      "node_count": 6,
+      "param_mappings": {
+        "fileName": ["27", "inputs", "image"],
+        "scaleToLength": ["248", "inputs", "value"]
+      }
+    },
+    "huiying-imageRestorationHD": {
+      "description": "图像修复-高清模式",
+      "node_count": 38,
+      "param_mappings": {
+        "fileName": ["40", "inputs", "image"],
+        "prompt": ["15", "inputs", "text"],
+        "negative_prompt": ["19", "inputs", "text"],
+        "denoise": ["32", "inputs", "denoise"],
+        "steps": ["32", "inputs", "steps"],
+        "cfg": ["32", "inputs", "cfg"],
+        "sampler_name": ["32", "inputs", "sampler_name"],
+        "scheduler": ["32", "inputs", "scheduler"],
+        "seed": ["32", "inputs", "seed"],
+        "selectedCheckpoint": ["21", "inputs", "ckpt_name"],
+        "selectedLora": ["43", "inputs", "lora_name"],
+        "loraStrength": ["43", "inputs", "strength_model"],
+        "multiple": ["27", "inputs", "upscale_by"]
+      }
+    },
+    "huiying-portraitRetouching": {
+      "description": "人像修饰-标准模式",
+      "node_count": 21,
+      "param_mappings": {
+        "fileName": ["255", "inputs", "image"],
+        "prompt": ["238", "inputs", "text"],
+        "negative_prompt": ["24", "inputs", "text"],
+        "denoise": ["2", "inputs", "denoise"],
+        "steps": ["2", "inputs", "steps"],
+        "cfg": ["2", "inputs", "cfg"],
+        "selectedSampler": ["2", "inputs", "sampler_name"],
+        "selectedScheduler": ["2", "inputs", "scheduler"],
+        "seed": ["2", "inputs", "seed"],
+        "selectedCheckpoint": ["1", "inputs", "ckpt_name"],
+        "selectedLora": ["43", "inputs", "lora_name"],
+        "loraStrength": ["43", "inputs", "strength_model"],
+        "filename_prefix": ["258", "inputs", "filename_prefix"],
+        "scaleToLength": ["120", "inputs", "scale_to_length"],
+        "selectedMakeupStyle": ["86", "inputs", "makeup_style"],
+        "makeupColor": ["86", "inputs", "makeup_color"],
+        "eyeshadow": ["86", "inputs", "eyeshadow"],
+        "eyeliner": ["86", "inputs", "eyeliner"],
+        "mascara": ["86", "inputs", "mascara"],
+        "blush": ["86", "inputs", "blush"],
+        "lipstick": ["86", "inputs", "lipstick"],
+        "lipGloss": ["86", "inputs", "lip_gloss"],
+        "naturalSkin": ["87", "inputs", "natural_skin"],
+        "skinDetails": ["87", "inputs", "skin_details"],
+        "skinPores": ["87", "inputs", "skin_pores"],
+        "eyesDetails": ["87", "inputs", "eyes_details"],
+        "irisDetails": ["87", "inputs", "iris_details"]
+      }
+    },
+    "huiying-portraitRetouchingHD": {
+      "description": "人像修饰-高清模式",
+      "node_count": 23,
+      "param_mappings": {
+        "fileName": ["277", "inputs", "image"],
+        "image": ["277", "inputs", "image"],
+        "prompt": ["280", "inputs", "text"],
+        "negative_prompt": ["267", "inputs", "text"],
+        "denoise": ["273", "inputs", "denoise"],
+        "steps": ["273", "inputs", "steps"],
+        "cfg": ["273", "inputs", "cfg"],
+        "selectedSampler": ["273", "inputs", "sampler_name"],
+        "selectedScheduler": ["273", "inputs", "scheduler"],
+        "seed": ["273", "inputs", "seed"],
+        "selectedCheckpoint": ["266", "inputs", "ckpt_name"],
+        "selectedLora": ["260", "inputs", "lora_name"],
+        "loraStrength": ["260", "inputs", "strength_model"],
+        "filename_prefix": ["286", "inputs", "filename_prefix"],
+        "scaleToLength": ["278", "inputs", "scale_to_length"],
+        "selectedMakeupStyle": ["262", "inputs", "makeup_style"],
+        "makeupColor": ["262", "inputs", "makeup_color"],
+        "eyeshadow": ["262", "inputs", "eyeshadow"],
+        "eyeliner": ["262", "inputs", "eyeliner"],
+        "mascara": ["262", "inputs", "mascara"],
+        "blush": ["262", "inputs", "blush"],
+        "lipstick": ["262", "inputs", "lipstick"],
+        "lipGloss": ["262", "inputs", "lip_gloss"],
+        "naturalSkin": ["269", "inputs", "natural_skin"],
+        "skinDetails": ["269", "inputs", "skin_details"],
+        "skinPores": ["269", "inputs", "skin_pores"],
+        "eyesDetails": ["269", "inputs", "eyes_details"],
+        "irisDetails": ["269", "inputs", "iris_details"]
+      }
+    },
+    "huiying-realisticFilling": {
+      "description": "真实填充-标准模式",
+      "node_count": 20,
+      "param_mappings": {
+        "fileName": ["25", "inputs", "image"],
+        "prompt": ["86", "inputs", "text"],
+        "negative_prompt": ["19", "inputs", "text"],
+        "denoise": ["17", "inputs", "denoise"],
+        "steps": ["17", "inputs", "steps"],
+        "cfg": ["17", "inputs", "cfg"],
+        "sampler_name": ["17", "inputs", "sampler_name"],
+        "scheduler": ["17", "inputs", "scheduler"],
+        "seed": ["17", "inputs", "seed"],
+        "selectedLora": ["83", "inputs", "lora_name"],
+        "loraStrength": ["83", "inputs", "strength_model"],
+        "scaleToLength": ["30", "inputs", "value"],
+        "filename_prefix": ["82", "inputs", "images"]
+      }
+    },
+    "huiying-realisticFillingRefer": {
+      "description": "真实填充-参考图模式",
+      "node_count": 24,
+      "param_mappings": {
+        "fileName": ["25", "inputs", "image"],
+        "referenceImage": ["33", "inputs", "image"],
+        "prompt": ["90", "inputs", "text"],
+        "negative_prompt": ["19", "inputs", "text"],
+        "referenceImage": ["86", "inputs", "image"],
+        "denoise": ["17", "inputs", "denoise"],
+        "steps": ["17", "inputs", "steps"],
+        "cfg": ["17", "inputs", "cfg"],
+        "sampler_name": ["17", "inputs", "sampler_name"],
+        "scheduler": ["17", "inputs", "scheduler"],
+        "seed": ["17", "inputs", "seed"],
+        "selectedLora": ["87", "inputs", "lora_name"],
+        "loraStrength": ["87", "inputs", "strength_model"],
+        "filename_prefix": ["82", "inputs", "filename_prefix"],
+        "scaleToLength": ["30", "inputs", "value"]
+      }
+    }
+  },
+  "common_node_mappings": {
+    "sampler": {
+      "description": "采样器设置"
+    },
+    "scheduler": {
+      "description": "调度器设置"
+    },
+    "checkpoint": {
+      "description": "检查点模型"
+    },
+    "lora": {
+      "description": "LoRA模型"
+    },
+    "makeup": {
+      "description": "妆容设置"
+    },
+    "skin": {
+      "description": "皮肤细节设置"
+    }
+  },
+  "default_values": {
+    "steps": 25,
+    "cfg": 7.0,
+    "denoise": 1.0,
+    "seed": -1,
+    "sampler_name": "euler",
+    "scheduler": "normal",
+    "scaleToLength": 1024,
+    "multiple": 2.0,
+    "referStrength": 0.8,
+    "makeupStyle": "Classic Makeup",
+    "makeupColor": "random 🎲",
+    "eyeshadow": true,
+    "eyeliner": true,
+    "mascara": false,
+    "blush": true,
+    "lipstick": true,
+    "lipGloss": true,
+    "naturalSkin": 1.21,
+    "skinDetails": 0.77,
+    "skinPores": 0.51,
+    "eyesDetails": 0.56,
+    "irisDetails": 0.55,
+    "loraStrength": 0.6
+  },
+  "validation_rules": {
+    "steps": {"min": 1, "max": 150, "type": "int"},
+    "cfg": {"min": 1.0, "max": 30.0, "type": "float"},
+    "denoise": {"min": 0.0, "max": 1.0, "type": "float"},
+    "scaleToLength": {"values": [512, 768, 1024, 1280, 1408, 1536, 1728, 1856, 1920, 2048]},
+    "multiple": {"min": 1.0, "max": 8.0, "type": "float"},
+    "referStrength": {"min": 0.0, "max": 1.0, "type": "float"},
+    "loraStrength": {"min": 0.0, "max": 2.0, "type": "float"},
+    "naturalSkin": {"min": 0.0, "max": 2.0, "type": "float"},
+    "skinDetails": {"min": 0.0, "max": 2.0, "type": "float"},
+    "skinPores": {"min": 0.0, "max": 2.0, "type": "float"},
+    "eyesDetails": {"min": 0.0, "max": 2.0, "type": "float"},
+    "irisDetails": {"min": 0.0, "max": 2.0, "type": "float"}
+  },
+  "parameter_descriptions": {
+    "fileName": "输入图像文件名",
+    "image": "图像输入",
+    "mask": "蒙版输入",
+    "prompt": "正向提示词",
+    "negative_prompt": "负向提示词",
+    "referenceImage": "参考图像",
+    "denoise": "重绘幅度",
+    "steps": "采样步数",
+    "cfg": "CFG引导强度",
+    "sampler_name": "采样器名称",
+    "scheduler": "调度器类型",
+    "seed": "随机种子",
+    "selectedCheckpoint": "选择的检查点模型",
+    "selectedLora": "选择的LoRA模型",
+    "loraStrength": "LoRA强度",
+    "filename_prefix": "输出文件前缀",
+    "scaleToLength": "缩放到指定长度",
+    "scaleToHeight": "缩放到指定高度",
+    "width": "图像宽度",
+    "height": "图像高度",
+    "referStrength": "参考图强度",
+    "makeupStyle": "妆容风格",
+    "makeupColor": "妆容颜色",
+    "eyeshadow": "眼影",
+    "eyeliner": "眼线",
+    "mascara": "睫毛膏",
+    "blush": "腮红",
+    "lipstick": "口红",
+    "lipGloss": "唇彩",
+    "naturalSkin": "自然肌肤",
+    "skinDetails": "皮肤细节",
+    "skinPores": "皮肤毛孔",
+    "eyesDetails": "眼部细节",
+    "irisDetails": "虹膜细节"
+  }
+}
+

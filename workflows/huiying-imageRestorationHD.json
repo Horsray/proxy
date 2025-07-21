@@ -1,0 +1,651 @@
+{
+  "1": {
+    "inputs": {
+      "value": 2000
+    },
+    "class_type": "ImpactInt",
+    "_meta": {
+      "title": "整数"
+    }
+  },
+  "2": {
+    "inputs": {
+      "value": 1024
+    },
+    "class_type": "ImpactInt",
+    "_meta": {
+      "title": "整数"
+    }
+  },
+  "4": {
+    "inputs": {
+      "seed": 360809977821200,
+      "steps": 35,
+      "cfg_scale_start": 7.000000000000002,
+      "cfg_scale_end": 5.000000000000001,
+      "EDM_s_churn": 3,
+      "s_noise": 1.0020000000000002,
+      "DPMPP_eta": 0.8000000000000002,
+      "control_scale_start": 1.0000000000000002,
+      "control_scale_end": 1.0000000000000002,
+      "restore_cfg": 4.000000000000001,
+      "keep_model_loaded": false,
+      "sampler": "RestoreDPMPP2MSampler",
+      "sampler_tile_size": [
+        "2",
+        0
+      ],
+      "sampler_tile_stride": [
+        "15",
+        0
+      ],
+      "SUPIR_model": [
+        "22",
+        0
+      ],
+      "latents": [
+        "14",
+        0
+      ],
+      "positive": [
+        "13",
+        0
+      ],
+      "negative": [
+        "13",
+        1
+      ]
+    },
+    "class_type": "SUPIR_sample",
+    "_meta": {
+      "title": "SUPIR采样"
+    }
+  },
+  "5": {
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "VAE加载器"
+    }
+  },
+  "6": {
+    "inputs": {
+      "pixels": [
+        "20",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE编码"
+    }
+  },
+  "7": {
+    "inputs": {
+      "block_number": 3,
+      "downscale_factor": 2.0000000000000004,
+      "start_percent": 0,
+      "end_percent": 0.3500000000000001,
+      "downscale_after_skip": true,
+      "downscale_method": "bicubic",
+      "upscale_method": "bilinear",
+      "model": [
+        "37",
+        0
+      ]
+    },
+    "class_type": "PatchModelAddDownscale",
+    "_meta": {
+      "title": "收缩模型UNET"
+    }
+  },
+  "8": {
+    "inputs": {
+      "model": "wd-v1-4-convnextv2-tagger-v2",
+      "threshold": 0.3500000000000001,
+      "character_threshold": 0.8500000000000002,
+      "replace_underscore": "breasts,  large_breasts,medium_breasts, ",
+      "trailing_comma": false,
+      "exclude_tags": "",
+      "image": [
+        "20",
+        0
+      ]
+    },
+    "class_type": "WD14Tagger|pysssss",
+    "_meta": {
+      "title": "WD14反推提示词"
+    }
+  },
+  "9": {
+    "inputs": {
+      "text": [
+        "8",
+        0
+      ],
+      "clip": [
+        "43",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "10": {
+    "inputs": {
+      "conditioning": [
+        "9",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "条件零化"
+    }
+  },
+  "11": {
+    "inputs": {
+      "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
+      "clip_name2": "clip_l.safetensors",
+      "type": "flux",
+      "device": "default"
+    },
+    "class_type": "DualCLIPLoader",
+    "_meta": {
+      "title": "双CLIP加载器"
+    }
+  },
+  "12": {
+    "inputs": {
+      "guidance": 3.5,
+      "conditioning": [
+        "9",
+        0
+      ]
+    },
+    "class_type": "FluxGuidance",
+    "_meta": {
+      "title": "Flux引导"
+    }
+  },
+  "13": {
+    "inputs": {
+      "positive_prompt": " high quality, detailed",
+      "negative_prompt": "bad quality, blurry, messy",
+      "SUPIR_model": [
+        "22",
+        0
+      ],
+      "latents": [
+        "26",
+        2
+      ]
+    },
+    "class_type": "SUPIR_conditioner",
+    "_meta": {
+      "title": "SUPIR条件"
+    }
+  },
+  "14": {
+    "inputs": {
+      "use_tiled_vae": true,
+      "encoder_tile_size": [
+        "2",
+        0
+      ],
+      "encoder_dtype": "auto",
+      "SUPIR_VAE": [
+        "26",
+        0
+      ],
+      "image": [
+        "26",
+        1
+      ]
+    },
+    "class_type": "SUPIR_encode",
+    "_meta": {
+      "title": "SUPIR编码"
+    }
+  },
+  "15": {
+    "inputs": {
+      "value": 512
+    },
+    "class_type": "ImpactInt",
+    "_meta": {
+      "title": "整数"
+    }
+  },
+  "16": {
+    "inputs": {
+      "samples": [
+        "32",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "17": {
+    "inputs": {
+      "anything": [
+        "24",
+        0
+      ]
+    },
+    "class_type": "easy cleanGpuUsed",
+    "_meta": {
+      "title": "清理GPU占用"
+    }
+  },
+  "18": {
+    "inputs": {
+      "text": "Frosted makeup",
+      "clip": [
+        "21",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "19": {
+    "inputs": {
+      "text": "nsfw,worst quality, low quality, normal quality, lowres, low details, oversaturated, undersaturated, overexposed, underexposed, grayscale, bw, bad photo, bad photography, bad art, watermark, signature, text font, username, error, logo, words, letters, digits, autograph, trademark, name, blur, blurry, grainy, ugly, asymmetrical, poorly lit, bad shadow, draft, cropped, out of frame, cut off, censored, jpeg artifacts, out of focus, glitch, duplicate, text, watermark,\n(smooth material:1.1),(Highly reflective:1.2), (Material reflection:1.2),(nsfw:1.1)",
+      "clip": [
+        "21",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "20": {
+    "inputs": {
+      "image": "$20-0",
+      "block": false,
+      "restore_mask": "never",
+      "images": [
+        "24",
+        0
+      ]
+    },
+    "class_type": "PreviewBridge",
+    "_meta": {
+      "title": "桥接预览图像"
+    }
+  },
+  "21": {
+    "inputs": {
+      "ckpt_name": "SD1.5【麦橘写实】_v7.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Checkpoint加载器(简易)"
+    }
+  },
+  "22": {
+    "inputs": {
+      "supir_model": "SUPIR-v0Q_fp16.safetensors",
+      "sdxl_model": "HelloWorld 新世界 _ SDXL放大模型_v7.0.safetensors",
+      "fp8_unet": false,
+      "diffusion_dtype": "auto"
+    },
+    "class_type": "SUPIR_model_loader",
+    "_meta": {
+      "title": "SUPIR模型加载器"
+    }
+  },
+  "23": {
+    "inputs": {
+      "strength": 0.4000000000000001,
+      "start_percent": 0,
+      "end_percent": 0.4000000000000001,
+      "positive": [
+        "18",
+        0
+      ],
+      "negative": [
+        "19",
+        0
+      ],
+      "control_net": [
+        "29",
+        0
+      ],
+      "image": [
+        "20",
+        0
+      ],
+      "vae": [
+        "21",
+        2
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "ControlNet应用（旧版高级）"
+    }
+  },
+  "24": {
+    "inputs": {
+      "use_tiled_vae": true,
+      "decoder_tile_size": [
+        "2",
+        0
+      ],
+      "SUPIR_VAE": [
+        "22",
+        1
+      ],
+      "latents": [
+        "4",
+        0
+      ]
+    },
+    "class_type": "SUPIR_decode",
+    "_meta": {
+      "title": "SUPIR解码"
+    }
+  },
+  "25": {
+    "inputs": {
+      "width": [
+        "1",
+        0
+      ],
+      "height": [
+        "1",
+        0
+      ],
+      "interpolation": "lanczos",
+      "method": "keep proportion",
+      "condition": "always",
+      "multiple_of": 32,
+      "image": [
+        "40",
+        0
+      ]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "图像缩放"
+    }
+  },
+  "26": {
+    "inputs": {
+      "use_tiled_vae": true,
+      "encoder_tile_size": [
+        "2",
+        0
+      ],
+      "decoder_tile_size": [
+        "2",
+        0
+      ],
+      "encoder_dtype": "auto",
+      "SUPIR_VAE": [
+        "22",
+        1
+      ],
+      "image": [
+        "25",
+        0
+      ]
+    },
+    "class_type": "SUPIR_first_stage",
+    "_meta": {
+      "title": "SUPIR阶段一"
+    }
+  },
+  "27": {
+    "inputs": {
+      "upscale_by": 2.0000000000000004,
+      "seed": 702019200709095,
+      "steps": 20,
+      "cfg": 2,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.10000000000000002,
+      "mode_type": "Linear",
+      "tile_width": 512,
+      "tile_height": 512,
+      "mask_blur": 8,
+      "tile_padding": 32,
+      "seam_fix_mode": "None",
+      "seam_fix_denoise": 1,
+      "seam_fix_width": 0,
+      "seam_fix_mask_blur": 8,
+      "seam_fix_padding": 16,
+      "force_uniform_tiles": true,
+      "tiled_decode": false,
+      "image": [
+        "16",
+        0
+      ],
+      "model": [
+        "21",
+        0
+      ],
+      "positive": [
+        "23",
+        0
+      ],
+      "negative": [
+        "23",
+        1
+      ],
+      "vae": [
+        "21",
+        2
+      ],
+      "upscale_model": [
+        "31",
+        0
+      ]
+    },
+    "class_type": "UltimateSDUpscale",
+    "_meta": {
+      "title": "SD放大"
+    }
+  },
+  "29": {
+    "inputs": {
+      "control_net_name": "control_v11p_sd15_canny_fp16.safetensors"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": {
+      "title": "ControlNet加载器"
+    }
+  },
+  "31": {
+    "inputs": {
+      "model_name": "ESRGAN_4x.pth"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "放大模型加载器"
+    }
+  },
+  "32": {
+    "inputs": {
+      "seed": 842780285974791,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "beta",
+      "denoise": 0.20000000000000004,
+      "model": [
+        "7",
+        0
+      ],
+      "positive": [
+        "35",
+        0
+      ],
+      "negative": [
+        "35",
+        1
+      ],
+      "latent_image": [
+        "6",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "33": {
+    "inputs": {
+      "anything": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "easy cleanGpuUsed",
+    "_meta": {
+      "title": "清理GPU占用"
+    }
+  },
+  "34": {
+    "inputs": {
+      "control_net_name": "flux_dev_openpose_controlnet.safetensors"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": {
+      "title": "ControlNet加载器"
+    }
+  },
+  "35": {
+    "inputs": {
+      "strength": 0.8000000000000002,
+      "start_percent": 0,
+      "end_percent": 0.4000000000000001,
+      "positive": [
+        "9",
+        0
+      ],
+      "negative": [
+        "10",
+        0
+      ],
+      "control_net": [
+        "34",
+        0
+      ],
+      "image": [
+        "20",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "ControlNet应用（旧版高级）"
+    }
+  },
+  "37": {
+    "inputs": {
+      "model": [
+        "44",
+        0
+      ]
+    },
+    "class_type": "DifferentialDiffusion",
+    "_meta": {
+      "title": "差异扩散"
+    }
+  },
+  "40": {
+    "inputs": {
+      "image": "33fc4376eb9abcdcc4e512349353cd7a.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "41": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "27",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  },
+  "42": {
+    "inputs": {
+      "unet_name": "flux1-dev-fp8.safetensors",
+      "weight_dtype": "fp8_e4m3fn"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "UNET加载器"
+    }
+  },
+  "43": {
+    "inputs": {
+      "lora_name": "FLUX.1_8step_Lora.safetensors",
+      "strength_model": 1.0000000000000002,
+      "strength_clip": 1.0000000000000002,
+      "model": [
+        "42",
+        0
+      ],
+      "clip": [
+        "11",
+        0
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "LoRA加载器"
+    }
+  },
+  "44": {
+    "inputs": {
+      "model_type": "flux",
+      "rel_l1_thresh": 0.25000000000000006,
+      "start_percent": 0,
+      "end_percent": 1,
+      "cache_device": "cuda",
+      "model": [
+        "43",
+        0
+      ]
+    },
+    "class_type": "TeaCache",
+    "_meta": {
+      "title": "TeaCache"
+    }
+  }
+}

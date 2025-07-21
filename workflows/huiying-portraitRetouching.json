@@ -1,0 +1,398 @@
+{
+  "1": {
+    "inputs": {
+      "ckpt_name": "SD1.5_【写实摄影】通用写实.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Checkpoint加载器(简易)"
+    }
+  },
+  "2": {
+    "inputs": {
+      "seed": 695190488096302,
+      "steps": 25,
+      "cfg": 2,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.10000000000000002,
+      "model": [
+        "107",
+        0
+      ],
+      "positive": [
+        "23",
+        0
+      ],
+      "negative": [
+        "24",
+        0
+      ],
+      "latent_image": [
+        "22",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "22": {
+    "inputs": {
+      "pixels": [
+        "120",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE编码"
+    }
+  },
+  "23": {
+    "inputs": {
+      "text": [
+        "162",
+        0
+      ],
+      "speak_and_recognation": {
+        "__value__": [
+          false,
+          true
+        ]
+      },
+      "clip": [
+        "43",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "24": {
+    "inputs": {
+      "text": "(NSFW:1.3),teeth,(cleavage),(worst quality:1.65),(low quality:1.2),(normal quality:1.2),low resolution,watermark,dark spots,blemishes,dull eyes,wrong teeth,red teeth,bad tooth,Multiple people,broken eyelashes,(badhandv4-AnimeIllustDiffusion_badhandv4:1.2),(EasyNegative:1.2),",
+      "speak_and_recognation": {
+        "__value__": [
+          false,
+          true
+        ]
+      },
+      "clip": [
+        "43",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "25": {
+    "inputs": {
+      "samples": [
+        "2",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "30": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "width": [
+        "31",
+        0
+      ],
+      "height": [
+        "31",
+        1
+      ],
+      "crop": "disabled",
+      "image": [
+        "25",
+        0
+      ]
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "图像缩放"
+    }
+  },
+  "31": {
+    "inputs": {
+      "image": [
+        "255",
+        0
+      ]
+    },
+    "class_type": "GetImageSize+",
+    "_meta": {
+      "title": "获取图像尺寸"
+    }
+  },
+  "43": {
+    "inputs": {
+      "lora_name": "【人像摄影】少女梦境,人像写真lora_v2.0.safetensors",
+      "strength_model": 0.6000000000000001,
+      "strength_clip": 1.0000000000000002,
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "LoRA加载器"
+    }
+  },
+  "85": {
+    "inputs": {
+      "model": "wd-v1-4-convnextv2-tagger-v2",
+      "threshold": 0.3500000000000001,
+      "character_threshold": 0.8500000000000002,
+      "replace_underscore": "breasts,  large_breasts,medium_breasts, ",
+      "trailing_comma": false,
+      "exclude_tags": "",
+      "tags": "1girl, solo, long hair, black hair, hair ornament, dress, holding, jewelry, braid, flower, hair flower, bracelet, petals, single braid, chinese clothes, cherry blossoms, realistic, branch, hanfu",
+      "image": [
+        "120",
+        0
+      ]
+    },
+    "class_type": "WD14Tagger|pysssss",
+    "_meta": {
+      "title": "WD14反推提示词"
+    }
+  },
+  "86": {
+    "inputs": {
+      "makeup_style": "Classic Makeup",
+      "makeup_color": "random 🎲",
+      "eyeshadow": true,
+      "eyeliner": true,
+      "mascara": false,
+      "blush": true,
+      "lipstick": true,
+      "lip_gloss": true,
+      "active": true,
+      "seed": 1446,
+      "text_in": [
+        "87",
+        0
+      ]
+    },
+    "class_type": "PortraitMasterMakeup",
+    "_meta": {
+      "title": "人像大师：妆容"
+    }
+  },
+  "87": {
+    "inputs": {
+      "natural_skin": 1.2100000000000002,
+      "bare_face": 0,
+      "washed_face": 0,
+      "dried_face": 0,
+      "skin_details": 0.7700000000000001,
+      "skin_pores": 0.5100000000000001,
+      "dimples": 0,
+      "wrinkles": 0,
+      "freckles": 0,
+      "moles": 0,
+      "skin_imperfections": 0,
+      "skin_acne": 0,
+      "tanned_skin": 0,
+      "eyes_details": 0.56,
+      "iris_details": 0.5500000000000002,
+      "circular_iris": 0.4000000000000001,
+      "circular_pupil": 0.4900000000000001,
+      "active": true,
+      "seed": 1259,
+      "text_in": [
+        "85",
+        0
+      ]
+    },
+    "class_type": "PortraitMasterSkinDetails",
+    "_meta": {
+      "title": "人像大师：皮肤"
+    }
+  },
+  "107": {
+    "inputs": {
+      "block_number": 3,
+      "downscale_factor": 2.0000000000000004,
+      "start_percent": 0,
+      "end_percent": 0.3500000000000001,
+      "downscale_after_skip": true,
+      "downscale_method": "bicubic",
+      "upscale_method": "bicubic",
+      "model": [
+        "43",
+        0
+      ]
+    },
+    "class_type": "PatchModelAddDownscale",
+    "_meta": {
+      "title": "收缩模型UNET"
+    }
+  },
+  "120": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "longest",
+      "scale_to_length": 1024,
+      "background_color": "#000000",
+      "image": [
+        "255",
+        0
+      ],
+      "mask": [
+        "255",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "162": {
+    "inputs": {
+      "separator": "",
+      "text1": [
+        "86",
+        0
+      ],
+      "text2": [
+        "238",
+        0
+      ]
+    },
+    "class_type": "CR Text Concatenate",
+    "_meta": {
+      "title": "文本联结"
+    }
+  },
+  "238": {
+    "inputs": {
+      "from_translate": "auto",
+      "to_translate": "english",
+      "add_proxies": false,
+      "proxies": "",
+      "auth_data": "",
+      "service": "GoogleTranslator [free]",
+      "text": "",
+      "Show proxy": "proxy_hide",
+      "Show authorization": "authorization_hide",
+      "speak_and_recognation": {
+        "__value__": [
+          false,
+          true
+        ]
+      }
+    },
+    "class_type": "DeepTranslatorTextNode",
+    "_meta": {
+      "title": "翻译文本(高级)"
+    }
+  },
+  "242": {
+    "inputs": {
+      "width": 512,
+      "height": 512,
+      "gradient_side": "center",
+      "gradient_scale": 10,
+      "gradient_offset": 0,
+      "opacity": 100,
+      "size_as": [
+        "255",
+        1
+      ]
+    },
+    "class_type": "LayerMask: CreateGradientMask",
+    "_meta": {
+      "title": "生成渐变遮罩"
+    }
+  },
+  "243": {
+    "inputs": {
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "destination": [
+        "30",
+        0
+      ],
+      "source": [
+        "255",
+        0
+      ],
+      "mask": [
+        "244",
+        0
+      ]
+    },
+    "class_type": "ImageCompositeMasked",
+    "_meta": {
+      "title": "图像遮罩复合"
+    }
+  },
+  "244": {
+    "inputs": {
+      "mask": [
+        "242",
+        0
+      ]
+    },
+    "class_type": "InvertMask",
+    "_meta": {
+      "title": "遮罩反转"
+    }
+  },
+  "255": {
+    "inputs": {
+      "image": "clipspace/clipspace-mask-2167395.7.png [input]"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "258": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "243",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  }
+}

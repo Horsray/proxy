@@ -1,0 +1,311 @@
+{
+  "97": {
+    "inputs": {
+      "text": "",
+      "clip": [
+        "127",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "98": {
+    "inputs": {
+      "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
+      "clip_name2": "clip_l.safetensors",
+      "type": "flux",
+      "device": "default"
+    },
+    "class_type": "DualCLIPLoader",
+    "_meta": {
+      "title": "双CLIP加载器"
+    }
+  },
+  "99": {
+    "inputs": {
+      "conditioning": [
+        "97",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "条件零化"
+    }
+  },
+  "100": {
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "VAE加载器"
+    }
+  },
+  "108": {
+    "inputs": {
+      "guidance": 3.5,
+      "conditioning": [
+        "97",
+        0
+      ]
+    },
+    "class_type": "FluxGuidance",
+    "_meta": {
+      "title": "Flux引导"
+    }
+  },
+  "110": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "width": [
+        "111",
+        0
+      ],
+      "height": [
+        "111",
+        1
+      ],
+      "crop": "disabled",
+      "image": [
+        "112",
+        0
+      ]
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "图像缩放"
+    }
+  },
+  "111": {
+    "inputs": {
+      "image": [
+        "124",
+        0
+      ]
+    },
+    "class_type": "GetImageSize+",
+    "_meta": {
+      "title": "获取图像尺寸"
+    }
+  },
+  "112": {
+    "inputs": {
+      "samples": [
+        "117",
+        3
+      ],
+      "vae": [
+        "100",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "117": {
+    "inputs": {
+      "seed": 320303611579671,
+      "steps": 10,
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "beta",
+      "denoise": 1,
+      "preview_method": "auto",
+      "vae_decode": "true",
+      "model": [
+        "126",
+        0
+      ],
+      "positive": [
+        "121",
+        0
+      ],
+      "negative": [
+        "121",
+        1
+      ],
+      "latent_image": [
+        "121",
+        2
+      ],
+      "optional_vae": [
+        "100",
+        0
+      ]
+    },
+    "class_type": "KSampler (Efficient)",
+    "_meta": {
+      "title": "K采样器(效率)"
+    }
+  },
+  "118": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "shortest",
+      "scale_to_length": 1024,
+      "background_color": "#000000",
+      "image": [
+        "124",
+        0
+      ],
+      "mask": [
+        "124",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "119": {
+    "inputs": {
+      "mask": [
+        "118",
+        1
+      ]
+    },
+    "class_type": "InvertMask",
+    "_meta": {
+      "title": "遮罩反转"
+    }
+  },
+  "120": {
+    "inputs": {
+      "left": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "feathering": 0,
+      "image": [
+        "118",
+        0
+      ],
+      "mask": [
+        "119",
+        0
+      ]
+    },
+    "class_type": "ImagePadForOutpaintMasked",
+    "_meta": {
+      "title": "外补画板（遮罩）"
+    }
+  },
+  "121": {
+    "inputs": {
+      "noise_mask": false,
+      "positive": [
+        "108",
+        0
+      ],
+      "negative": [
+        "99",
+        0
+      ],
+      "vae": [
+        "100",
+        0
+      ],
+      "pixels": [
+        "120",
+        0
+      ],
+      "mask": [
+        "120",
+        1
+      ]
+    },
+    "class_type": "InpaintModelConditioning",
+    "_meta": {
+      "title": "内补模型条件"
+    }
+  },
+  "124": {
+    "inputs": {
+      "image": "clipspace/clipspace-mask-1959201.png [input]"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "126": {
+    "inputs": {
+      "model_type": "flux",
+      "rel_l1_thresh": 0.20000000000000004,
+      "start_percent": 0,
+      "end_percent": 1,
+      "cache_device": "cuda",
+      "model": [
+        "127",
+        0
+      ]
+    },
+    "class_type": "TeaCache",
+    "_meta": {
+      "title": "TeaCache"
+    }
+  },
+  "127": {
+    "inputs": {
+      "lora_name": "FLUX.1_8step_Lora.safetensors",
+      "strength_model": 1.0000000000000002,
+      "strength_clip": 1.0000000000000002,
+      "model": [
+        "128",
+        0
+      ],
+      "clip": [
+        "98",
+        0
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "LoRA加载器"
+    }
+  },
+  "128": {
+    "inputs": {
+      "unet_name": "flux1-FillDevFp8_v10.safetensors",
+      "weight_dtype": "fp8_e4m3fn"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "UNET加载器"
+    }
+  },
+  "133": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "110",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  },
+  "134": {
+    "inputs": {
+      "model_name": "4x-UltraSharp.pth"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "放大模型加载器"
+    }
+  }
+}

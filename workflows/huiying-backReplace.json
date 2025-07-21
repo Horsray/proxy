@@ -1,0 +1,674 @@
+{
+  "1": {
+    "inputs": {
+      "anything": [
+        "25",
+        2
+      ]
+    },
+    "class_type": "Anything Everywhere",
+    "_meta": {
+      "title": "全局输入"
+    }
+  },
+  "3": {
+    "inputs": {
+      "version": "BiRefNet-General"
+    },
+    "class_type": "LayerMask: LoadBiRefNetModelV2",
+    "_meta": {
+      "title": "图层遮罩：加载BiRefNet模型 V2（高级）"
+    }
+  },
+  "4": {
+    "inputs": {
+      "samples": [
+        "31",
+        0
+      ],
+      "vae": [
+        "25",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "5": {
+    "inputs": {
+      "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
+      "clip_name2": "clip_l.safetensors",
+      "type": "flux",
+      "device": "default"
+    },
+    "class_type": "DualCLIPLoader",
+    "_meta": {
+      "title": "双CLIP加载器"
+    }
+  },
+  "6": {
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "VAE加载器"
+    }
+  },
+  "8": {
+    "inputs": {
+      "text": [
+        "30",
+        0
+      ],
+      "clip": [
+        "59",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "9": {
+    "inputs": {
+      "pixels": [
+        "4",
+        0
+      ],
+      "vae": [
+        "6",
+        0
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE编码"
+    }
+  },
+  "10": {
+    "inputs": {
+      "guidance": 3.5,
+      "conditioning": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "FluxGuidance",
+    "_meta": {
+      "title": "Flux引导"
+    }
+  },
+  "11": {
+    "inputs": {
+      "conditioning": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "条件零化"
+    }
+  },
+  "14": {
+    "inputs": {
+      "brushnet": "brushnet_xl\\segmentation_mask_brushnet_ckpt_sdxl_v0.safetensors",
+      "dtype": "float16"
+    },
+    "class_type": "BrushNetLoader",
+    "_meta": {
+      "title": "BrushNet加载器"
+    }
+  },
+  "15": {
+    "inputs": {
+      "scale": 1,
+      "start_at": 0,
+      "end_at": 10000,
+      "model": [
+        "18",
+        0
+      ],
+      "vae": [
+        "25",
+        2
+      ],
+      "image": [
+        "35",
+        0
+      ],
+      "mask": [
+        "24",
+        1
+      ],
+      "brushnet": [
+        "14",
+        0
+      ],
+      "positive": [
+        "47",
+        0
+      ],
+      "negative": [
+        "23",
+        0
+      ]
+    },
+    "class_type": "BrushNet",
+    "_meta": {
+      "title": "BrushNet（应用）"
+    }
+  },
+  "16": {
+    "inputs": {
+      "preset": "PLUS (high strength)",
+      "model": [
+        "25",
+        0
+      ]
+    },
+    "class_type": "IPAdapterUnifiedLoader",
+    "_meta": {
+      "title": "IPAdapter加载器"
+    }
+  },
+  "17": {
+    "inputs": {
+      "weight": 0.7000000000000002,
+      "start_at": 0,
+      "end_at": 1,
+      "weight_type": "style transfer",
+      "model": [
+        "16",
+        0
+      ],
+      "ipadapter": [
+        "16",
+        1
+      ],
+      "image": [
+        "33",
+        0
+      ]
+    },
+    "class_type": "IPAdapter",
+    "_meta": {
+      "title": "应用IPAdapter"
+    }
+  },
+  "18": {
+    "inputs": {
+      "block_number": 3,
+      "downscale_factor": 2.0000000000000004,
+      "start_percent": 0,
+      "end_percent": 0.3500000000000001,
+      "downscale_after_skip": true,
+      "downscale_method": "bicubic",
+      "upscale_method": "bicubic",
+      "model": [
+        "17",
+        0
+      ]
+    },
+    "class_type": "PatchModelAddDownscale",
+    "_meta": {
+      "title": "收缩模型UNET"
+    }
+  },
+  "19": {
+    "inputs": {
+      "from_translate": "auto",
+      "to_translate": "en",
+      "baidu_appid": "20250329002318943",
+      "baidu_appkey": "cy0JJrqyNJHCsKjfTE9_",
+      "text": "桃花"
+    },
+    "class_type": "BaiduTranslateNode",
+    "_meta": {
+      "title": "Baidu Translate"
+    }
+  },
+  "21": {
+    "inputs": {
+      "text_input": "",
+      "task": "more_detailed_caption",
+      "fill_mask": true,
+      "keep_model_loaded": true,
+      "max_new_tokens": 1024,
+      "num_beams": 3,
+      "do_sample": true,
+      "output_mask_select": "",
+      "seed": 957782447219925,
+      "image": [
+        "33",
+        0
+      ],
+      "florence2_model": [
+        "27",
+        0
+      ]
+    },
+    "class_type": "Florence2Run",
+    "_meta": {
+      "title": "Florence2 执行"
+    }
+  },
+  "22": {
+    "inputs": {
+      "text": "Ultra high quality，natural lighting、subtle colors、realistic skin texture、natural imperfections、soft focus background、less saturated colors、"
+    },
+    "class_type": "CR Text",
+    "_meta": {
+      "title": "文本"
+    }
+  },
+  "23": {
+    "inputs": {
+      "text": "nsfw,worst quality, low quality, normal quality, lowres, low details, over saturated、oversharpened、cartoonish、plastic、fake、digital art、painting、3D render ",
+      "clip": [
+        "25",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "24": {
+    "inputs": {
+      "expand": -2,
+      "incremental_expandrate": 0,
+      "tapered_corners": true,
+      "flip_input": false,
+      "blur_radius": 1,
+      "lerp_alpha": 1,
+      "decay_factor": 1,
+      "fill_holes": false,
+      "mask": [
+        "35",
+        1
+      ]
+    },
+    "class_type": "GrowMaskWithBlur",
+    "_meta": {
+      "title": "遮罩模糊生长"
+    }
+  },
+  "25": {
+    "inputs": {
+      "ckpt_name": "XL_【真境写真】商业电商摄影_v4.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Checkpoint加载器(简易)"
+    }
+  },
+  "26": {
+    "inputs": {
+      "seed": 1024908034550672,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "beta",
+      "denoise": 0.4000000000000001,
+      "model": [
+        "58",
+        0
+      ],
+      "positive": [
+        "10",
+        0
+      ],
+      "negative": [
+        "11",
+        0
+      ],
+      "latent_image": [
+        "9",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "27": {
+    "inputs": {
+      "model": "base-PromptGen-v2.0",
+      "precision": "fp16",
+      "attention": "sdpa",
+      "convert_to_safetensors": false
+    },
+    "class_type": "Florence2ModelLoader",
+    "_meta": {
+      "title": "Florence2 模型加载器"
+    }
+  },
+  "30": {
+    "inputs": {
+      "delimiter": ", ",
+      "clean_whitespace": "true",
+      "text_a": [
+        "21",
+        2
+      ],
+      "text_b": [
+        "19",
+        0
+      ],
+      "text_c": [
+        "22",
+        0
+      ]
+    },
+    "class_type": "Text Concatenate",
+    "_meta": {
+      "title": "文本连锁"
+    }
+  },
+  "31": {
+    "inputs": {
+      "seed": 486420933423724,
+      "steps": 30,
+      "cfg": 4.5,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "15",
+        0
+      ],
+      "positive": [
+        "15",
+        1
+      ],
+      "negative": [
+        "15",
+        2
+      ],
+      "latent_image": [
+        "15",
+        3
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "33": {
+    "inputs": {
+      "image": "1 2.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "34": {
+    "inputs": {
+      "face": true,
+      "hair": false,
+      "body": true,
+      "clothes": false,
+      "accessories": false,
+      "background": false,
+      "confidence": 0.4000000000000001,
+      "detail_method": "VITMatte(local)",
+      "detail_erode": 6,
+      "detail_dilate": 6,
+      "black_point": 0.010000000000000002,
+      "white_point": 0.99,
+      "process_detail": true,
+      "device": "cuda",
+      "max_megapixels": 2,
+      "images": [
+        "35",
+        0
+      ]
+    },
+    "class_type": "LayerMask: PersonMaskUltra V2",
+    "_meta": {
+      "title": "人像遮罩 Ultra V2"
+    }
+  },
+  "35": {
+    "inputs": {
+      "detail_method": "VITMatte(local)",
+      "detail_erode": 4,
+      "detail_dilate": 2,
+      "black_point": 0.010000000000000002,
+      "white_point": 0.99,
+      "process_detail": false,
+      "device": "cuda",
+      "max_megapixels": 2,
+      "image": [
+        "38",
+        0
+      ],
+      "birefnet_model": [
+        "3",
+        0
+      ]
+    },
+    "class_type": "LayerMask: BiRefNetUltraV2",
+    "_meta": {
+      "title": "BiRefNet Ultra V2"
+    }
+  },
+  "36": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1.0000000000000002,
+      "width": 512,
+      "height": 512,
+      "x_offset": 0,
+      "y_offset": 0,
+      "rotation": 9.992007221626409e-15,
+      "opacity": 0,
+      "base_image": [
+        "34",
+        0
+      ],
+      "overlay_image": [
+        "39",
+        0
+      ],
+      "optional_mask": [
+        "34",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "38": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "width",
+      "scale_to_length": 1280,
+      "background_color": "#000000",
+      "image": [
+        "45",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "39": {
+    "inputs": {
+      "samples": [
+        "26",
+        0
+      ],
+      "vae": [
+        "6",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "41": {
+    "inputs": {
+      "image": [
+        "45",
+        0
+      ]
+    },
+    "class_type": "easy imageSize",
+    "_meta": {
+      "title": "图像尺寸"
+    }
+  },
+  "42": {
+    "inputs": {
+      "upscale_model": [
+        "53",
+        0
+      ],
+      "image": [
+        "36",
+        0
+      ]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": {
+      "title": "图像通过模型放大"
+    }
+  },
+  "43": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "width": [
+        "41",
+        0
+      ],
+      "height": [
+        "41",
+        1
+      ],
+      "crop": "disabled",
+      "image": [
+        "42",
+        0
+      ]
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "图像缩放"
+    }
+  },
+  "45": {
+    "inputs": {
+      "image": "83f94244fd97054f02d9f27114ec1cc1.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "47": {
+    "inputs": {
+      "text": [
+        "30",
+        0
+      ],
+      "clip": [
+        "25",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "53": {
+    "inputs": {
+      "model_name": "SwinIR_4x.pth"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "放大模型加载器"
+    }
+  },
+  "57": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "43",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  },
+  "58": {
+    "inputs": {
+      "model_type": "flux",
+      "rel_l1_thresh": 0.25000000000000006,
+      "start_percent": 0,
+      "end_percent": 1,
+      "cache_device": "cuda",
+      "model": [
+        "59",
+        0
+      ]
+    },
+    "class_type": "TeaCache",
+    "_meta": {
+      "title": "TeaCache"
+    }
+  },
+  "59": {
+    "inputs": {
+      "lora_name": "FLUX.1_8step_Lora.safetensors",
+      "strength_model": 1.0000000000000002,
+      "strength_clip": 1.0000000000000002,
+      "model": [
+        "60",
+        0
+      ],
+      "clip": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "LoRA加载器"
+    }
+  },
+  "60": {
+    "inputs": {
+      "unet_name": "flux1-dev-fp8.safetensors",
+      "weight_dtype": "fp8_e4m3fn"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "UNET加载器"
+    }
+  }
+}
