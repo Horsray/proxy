@@ -21,7 +21,7 @@ from flask_cors import CORS
 import websocket as ws_client
 from collections import defaultdict, deque
 # Default ComfyUI URL, will be overwritten by config on start
-COMFYUI_URL = "http://127.0.0.1:8188"
+COMFYUI_URL = ""
 
 logging.basicConfig(
     level=logging.DEBUG, 
@@ -365,7 +365,7 @@ def comfy_ws_listener():
     def on_open(ws):
         logger.info("🔗 [ComfyUI WS] 连接已建立")
 
-    ws_url = sanitize_url(proxy.config.get("local_comfyui_url", COMFYUI_URL))
+    ws_url = sanitize_url(proxy.config.get("comfyui_url", COMFYUI_URL))
     ws_url = ws_url.replace("http://", "ws://").replace("https://", "wss://") + "/ws"
     ws = websocket.WebSocketApp(
         ws_url,
@@ -430,11 +430,9 @@ class HuiYingProxy:
         
         default_config = {
             "workflow_dir": "workflows",
-            "local_comfyui_url": "http://127.0.0.1:8188",
+            "comfyui_url": "",
             "cloud_service_url": "proxy.hueying.cn",
-            "mode": "local",
             "proxy_port": 8080,
-            "enable_cloud_fallback": True,
             "load_from_cloud": False,
             "timeout": 30,
             "enable_parameter_validation": True,
@@ -457,15 +455,15 @@ class HuiYingProxy:
             with open(config_file, 'w', encoding='utf-8') as f:
                 json.dump(default_config, f, indent=2, ensure_ascii=False)
             logger.info(f"🆕 初始化默认配置文件成功: {config_file}")
-            logger.info(f"💾 已保存 ComfyUI 地址配置: {default_config['local_comfyui_url']}")
+            logger.info(f"💾 已保存 ComfyUI 地址配置: {default_config['comfyui_url']}")
   
         default_config["workflow_dir"] = os.path.abspath(default_config["workflow_dir"])
-        default_config["local_comfyui_url"] = sanitize_url(default_config["local_comfyui_url"])
+        default_config["comfyui_url"] = sanitize_url(default_config["comfyui_url"])
         if default_config.get('load_from_cloud'):
             logger.info("📁 将从云端加载工作流和映射配置")
         else:
             logger.info(f"📁 当前工作流路径为: {default_config['workflow_dir']}")
-        logger.info(f"🔗 当前 ComfyUI 地址: {default_config['local_comfyui_url']}")
+        logger.info(f"🔗 当前 ComfyUI 地址: {default_config['comfyui_url']}")
 
 
         return default_config
@@ -608,7 +606,9 @@ class HuiYingProxy:
         import requests
 
         if not comfyui_url:
-            comfyui_url = self.config.get("local_comfyui_url", "http://127.0.0.1:8188")
+            comfyui_url = self.config.get("comfyui_url")
+        if not comfyui_url:
+            raise ValueError("comfyui_url is required")
         comfyui_url = sanitize_url(comfyui_url)
         workflow_data = adapt_workflow_paths(workflow_data, comfyui_url)
         url = f"{comfyui_url}/prompt"
@@ -635,7 +635,7 @@ class HuiYingProxy:
             logger.error(f"❌ ComfyUI请求失败: {str(e)}")
             return {"error": str(e)}
 proxy = HuiYingProxy()
-COMFYUI_URL = sanitize_url(proxy.config.get("local_comfyui_url", COMFYUI_URL))
+COMFYUI_URL = sanitize_url(proxy.config.get("comfyui_url", ""))
 
 
 @app.before_request
@@ -763,7 +763,6 @@ def get_task_status(prompt_id):
 @app.route('/psPlus/workflow/huiYingCommit', methods=['POST'])
 def huiying_commit():
 
-    global COMFYUI_URL
     data = request.get_json() or {}
 
     # logger.debug(f"🌐 收到完整数据: {json.dumps(data, indent=2, ensure_ascii=False)}")
@@ -788,11 +787,10 @@ def huiying_commit():
         workflow_id = data.get('workflowId')
         param_dict = data.get('paramDict', {})
         client_id = data.get('clientId', str(uuid.uuid4()))
-        comfyui_url = data.get('comfyuiUrl') or proxy.config.get('local_comfyui_url', COMFYUI_URL)
+        comfyui_url = data.get('comfyuiUrl') or proxy.config.get('comfyui_url')
+        if not comfyui_url:
+            return jsonify({"code": 400, "msg": "missing comfyuiUrl"}), 400
         comfyui_url = sanitize_url(comfyui_url)
-        proxy.config['local_comfyui_url'] = comfyui_url
-        proxy.save_config()
-        COMFYUI_URL = comfyui_url
         
        
         if not workflow_id:
@@ -998,7 +996,7 @@ def update_comfyui_url():
     if not url:
         return jsonify({"code": 400, "msg": "missing url"}), 400
     url = sanitize_url(url)
-    proxy.config['local_comfyui_url'] = url
+    proxy.config['comfyui_url'] = url
     proxy.save_config()
     global COMFYUI_URL
     COMFYUI_URL = url
@@ -1106,7 +1104,7 @@ if __name__ == '__main__':
     
 
     logger.info("🔧 启动 ComfyUI WebSocket 监听线程...")
-    logger.info("🔄 已使用增强HTTP轮询模式，兼容本地化部署进程")
+    logger.info("🔄 已使用增强HTTP轮询模式")
     comfy_ws_listener()
 
     logger.info("🔧 启动清理任务线程服务")
