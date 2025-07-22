@@ -5,6 +5,7 @@
   "mode": "local",
   "proxy_port": 8080,
   "enable_cloud_fallback": true,
+  "load_from_cloud": true,
   "timeout": 30,
   "enable_parameter_validation": true,
   "enable_workflow_cache": true,
