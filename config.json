@@ -1,10 +1,8 @@
 {
   "workflow_dir": "./workflows",
-  "local_comfyui_url": "http://192.168.2.6:8188",
+  "comfyui_url": "",
   "cloud_service_url": "https://proxy.hueying.cn",
-  "mode": "local",
   "proxy_port": 8080,
-  "enable_cloud_fallback": true,
   "load_from_cloud": true,
   "timeout": 30,
   "enable_parameter_validation": true,
