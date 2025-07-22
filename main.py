@@ -412,6 +412,8 @@ class HuiYingProxy:
         self.mappings = self.load_mappings(mappings_file)
         self.workflow_cache = {}
         self.workflow_node_count = {}
+        if self.config.get('load_from_cloud'):
+            self.preload_workflows()
 
     def save_config(self):
         """Persist current configuration to disk."""
@@ -427,12 +429,13 @@ class HuiYingProxy:
         
         
         default_config = {
-            "workflow_dir": "workflows",  
+            "workflow_dir": "workflows",
             "local_comfyui_url": "http://127.0.0.1:8188",
             "cloud_service_url": "proxy.hueying.cn",
             "mode": "local",
             "proxy_port": 8080,
             "enable_cloud_fallback": True,
+            "load_from_cloud": False,
             "timeout": 30,
             "enable_parameter_validation": True,
             "enable_workflow_cache": True,
@@ -458,14 +461,19 @@ class HuiYingProxy:
   
         default_config["workflow_dir"] = os.path.abspath(default_config["workflow_dir"])
         default_config["local_comfyui_url"] = sanitize_url(default_config["local_comfyui_url"])
-        logger.info(f"📁 当前工作流路径为: {default_config['workflow_dir']}")
+        if default_config.get('load_from_cloud'):
+            logger.info("📁 将从云端加载工作流和映射配置")
+        else:
+            logger.info(f"📁 当前工作流路径为: {default_config['workflow_dir']}")
         logger.info(f"🔗 当前 ComfyUI 地址: {default_config['local_comfyui_url']}")
 
 
         return default_config
 
     def load_mappings(self, mappings_file):
-     
+        if self.config.get('load_from_cloud'):
+            return self.fetch_remote_mappings()
+
         if not os.path.exists(mappings_file):
             logger.warning(f"⚠️ 配置文件不存在: {mappings_file}")
             return {}
@@ -488,6 +496,13 @@ class HuiYingProxy:
             return {}
 
     def load_workflow(self, workflow_id):
+
+
+        if self.config.get('load_from_cloud'):
+            if workflow_id in self.workflow_cache:
+                logger.info(f"⚡ 从缓存中加载云端工作流: {workflow_id}")
+                return self.workflow_cache[workflow_id]
+            return self.fetch_remote_workflow(workflow_id)
 
         if self.config.get('enable_workflow_cache', True) and workflow_id in self.workflow_cache:
             logger.info(f"⚡ 从缓存中加载当前工作流: {workflow_id}")
@@ -529,6 +544,37 @@ class HuiYingProxy:
             logger.debug(f"✅ 设置路径 {path} = {value}")
         except Exception as e:
             logger.error(f"❌ 设置参数失败: path={path}, value={value}, 错误: {e}")
+
+    def fetch_remote_mappings(self):
+        cloud_url = sanitize_url(self.config.get('cloud_service_url', ''))
+        url = f"{cloud_url}/workflow_mappings.json"
+        try:
+            resp = requests.get(url, timeout=self.config.get('timeout', 30))
+            resp.raise_for_status()
+            logger.info(f"✅ 从云端加载映射配置成功: {url}")
+            return resp.json()
+        except Exception as e:
+            logger.error(f"❌ 加载云端映射配置失败: {e}")
+            return {}
+
+    def fetch_remote_workflow(self, workflow_id):
+        cloud_url = sanitize_url(self.config.get('cloud_service_url', ''))
+        url = f"{cloud_url}/workflows/{workflow_id}.json"
+        try:
+            resp = requests.get(url, timeout=self.config.get('timeout', 30))
+            resp.raise_for_status()
+            workflow = resp.json()
+            self.workflow_cache[workflow_id] = workflow
+            logger.info(f"✅ 从云端加载工作流: {workflow_id}")
+            return workflow
+        except Exception as e:
+            logger.error(f"❌ 获取云端工作流 {workflow_id} 失败: {e}")
+            return {}
+
+    def preload_workflows(self):
+        workflow_ids = self.mappings.get('workflow_mappings', {}).keys()
+        for wid in workflow_ids:
+            self.fetch_remote_workflow(wid)
 
     def merge_workflow_params(self, workflow, param_dict, workflow_id):
       
@@ -718,7 +764,7 @@ def get_task_status(prompt_id):
 def huiying_commit():
 
     global COMFYUI_URL
-    data = request.get_json()
+    data = request.get_json() or {}
 
     # logger.debug(f"🌐 收到完整数据: {json.dumps(data, indent=2, ensure_ascii=False)}")
     # logger.info("🛠️ 正在处理绘影工作流提交请求...")
@@ -735,7 +781,6 @@ def huiying_commit():
 
     try:
       
-        data = request.get_json()
         logger.info("📝 接收来自 绘影 AI 的数据字段")
         if not data:
             return jsonify({"code": 400, "msg": "请求数据为空"}), 400
@@ -848,7 +893,6 @@ def huiying_commit():
             logger.exception("❌ 参数合并失败:")
             return jsonify({"code": 500, "msg": f"参数合并失败: {str(e)}"}), 500
 
-       
         try:
             result = proxy.send_to_comfyui(merged_workflow, client_id, comfyui_url)
             prompt_id = result["data"].get("prompt_id")
