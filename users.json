@@ -1,7 +1,10 @@
 {
     "users": {
         "horsray": {
-            "password": "zzy83007932"
+            "password": "zzy83007932",
+            "is_admin": true,
+            "created_at": "2025-07-24T14:12:25.809815",
+            "last_login": null
         }
     }
 }
