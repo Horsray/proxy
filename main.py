@@ -1092,9 +1092,9 @@ def login_compatible():
 
     user = LOCAL_USERS.get(username)
     if user:
-        logger.debug("[Login] 在本地用户列表中找到用户 %s", username)
+        logger.info("[Login] 在本地用户列表中找到用户 %s", username)
     else:
-        logger.debug("[Login] 本地用户列表中未找到用户 %s", username)
+        logger.info("[Login] 本地用户列表中未找到用户 %s", username)
 
     if user and user.get("password") == password:
         token = uuid.uuid4().hex
@@ -1127,6 +1127,12 @@ def login_compatible():
         )
         logger.info("[Login] 云端返回状态码: %s", response.status_code)
         logger.debug("[Login] 云端返回内容: %s", response.text)
+
+        if response.status_code == 200:
+            logger.info("✅ [Login] 云端登录成功")
+        else:
+            logger.warning("❌ [Login] 云端登录失败")
+
         return Response(
             response.content,
             status=response.status_code,
@@ -1146,7 +1152,7 @@ def logout_proxy():
         logger.info("✅ [Logout] 本地退出成功, 用户: %s", user)
         return jsonify({"code": 200, "msg": "操作成功", "data": None}), 200
     else:
-        logger.debug("[Logout] 本地会话不存在，尝试云端登出")
+        logger.info("[Logout] 本地会话不存在，尝试云端登出")
 
     try:
         payload = request.get_data()
