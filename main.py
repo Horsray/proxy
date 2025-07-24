@@ -8,7 +8,6 @@ monkey.patch_all()
 import os
 import json
 import requests
-import logging
 import time
 import uuid
 import copy
@@ -369,7 +368,7 @@ def start_ws_listener(base_url):
         print("⚠️ 跳过 WebSocket 初始化：无有效 URL")
         return
 
-    ws_url = ws_url.replace("http://", "ws://").replace("https://", "wss://") + "/ws"
+    ws_url = base_url.replace("http://", "ws://").replace("https://", "wss://") + "/ws"
     ws = websocket.WebSocketApp(
         ws_url,
         on_message=on_message,
@@ -1014,7 +1013,11 @@ def check_online():
         logger.info("🔍 [CheckOnline] 收到请求")
         logger.debug("[CheckOnline] Headers: %s", headers)
 
-        response = requests.get(CLOUD_CHECK_URL, headers=headers)
+        response = requests.get(
+            CLOUD_CHECK_URL,
+            headers=headers,
+            timeout=proxy.config.get("timeout", 30)
+        )
         logger.debug("[CheckOnline] 云端响应状态码: %s", response.status_code)
         logger.debug("[CheckOnline] 云端响应内容: %s", response.text)
 
@@ -1058,7 +1061,11 @@ CLOUD_LOGOUT_URL = "https://umanage.lightcc.cloud/prod-api/auth/logout"
 def login_compatible():
     data = request.get_json()
     try:
-        response = requests.post(CLOUD_AUTH_URL, json=data)
+        response = requests.post(
+            CLOUD_AUTH_URL,
+            json=data,
+            timeout=proxy.config.get("timeout", 30)
+        )
         if response.status_code == 200:
             print("[Login] 登录成功 - by cloud")
             return jsonify(response.json()), 200
@@ -1078,7 +1085,12 @@ def logout_proxy():
             key: value for key, value in request.headers.items()
             if key.lower() != 'host'
         }
-        response = requests.post(CLOUD_LOGOUT_URL, headers=headers, data=payload)
+        response = requests.post(
+            CLOUD_LOGOUT_URL,
+            headers=headers,
+            data=payload,
+            timeout=proxy.config.get("timeout", 30)
+        )
         try:
             result = response.json()
         except Exception:
@@ -1092,17 +1104,11 @@ def logout_proxy():
         print("[Logout] 退出失败")
         return jsonify({"code": 500, "msg": "代理登出失败", "error": str(e)}), 500
 
-if __name__ == '__main__':
-    # app.run(debug=True, host='0.0.0.0', port=8080)
-    pass
-
-from gevent import monkey; monkey.patch_all()
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 if __name__ == '__main__':
 
-    monkey.patch_all()
-
+    # monkey.patch_all() has already been called at the top of the file
     import logging
     
 
@@ -1114,14 +1120,19 @@ if __name__ == '__main__':
     Thread(target=cleanup_task, daemon=True).start()
     
 
-    server = WSGIServer(("0.0.0.0", 8080), app, handler_class=WebSocketHandler)
-    logger.info("✅ HTTP & WebSocket 服务启动成功")
-
     port = proxy.config.get('proxy_port', 8080)
+    server = WSGIServer(
+        ("0.0.0.0", port),
+        app,
+        handler_class=WebSocketHandler,
+        log=None
+    )
+    logger.info("✅ HTTP & WebSocket 服务启动成功")
     logger.info(f"🟢 代理服务启动，监听端口: {port}")
-    logger.info(f"✅ 工作流映射配置加载完成，工作流数量: {len(proxy.mappings.get('workflow_mappings', {}))}")
+    logger.info(
+        f"✅ 工作流映射配置加载完成，工作流数量: {len(proxy.mappings.get('workflow_mappings', {}))}"
+    )
     print("============== 欢迎使用绘影 AICG 代理终端服务 v2.5  ==============")
 
-    server = WSGIServer(('0.0.0.0', port), app, log=None)
     server.serve_forever()
 
