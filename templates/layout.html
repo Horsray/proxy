@@ -9,7 +9,10 @@
 <body>
 <nav class="navbar navbar-dark bg-dark mb-4">
   <div class="container-fluid">
-    <span class="navbar-brand">用户管理系统</span>
+    <a class="navbar-brand" href="{{ url_for('user_list') }}">
+      <img src="https://dummyimage.com/40x40/000/fff&text=H" alt="logo" class="me-2">
+      慧影用户管理
+    </a>
     <span class="navbar-text">
       <a class="text-light" href="{{ url_for('logout') }}">退出</a>
     </span>
@@ -19,6 +22,7 @@
   <div class="row">
     <div class="col-2">
       <ul class="list-group">
+        <li class="list-group-item"><a href="{{ url_for('bulk_manage') }}">批量用户管理</a></li>
         <li class="list-group-item"><a href="{{ url_for('user_list') }}">用户列表</a></li>
       </ul>
     </div>
