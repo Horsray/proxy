@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+{% block title %}用户列表{% endblock %}
+{% block content %}
+<h3>新增用户</h3>
+<form class="row g-3" action="{{ url_for('add_user') }}" method="post">
+  <div class="col-md-3">
+    <input type="text" name="username" class="form-control" placeholder="用户名" required>
+  </div>
+  <div class="col-md-3">
+    <input type="text" name="password" class="form-control" placeholder="密码" required>
+  </div>
+  <div class="col-md-2 form-check mt-2">
+    <input class="form-check-input" type="checkbox" name="is_admin" id="is_admin">
+    <label class="form-check-label" for="is_admin">管理员</label>
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-success">新增</button>
+  </div>
+</form>
+<hr>
+<h3>批量开通随机账号</h3>
+<form class="row g-3" action="{{ url_for('bulk_create') }}" method="post">
+  <div class="col-md-2">
+    <input type="number" name="count" class="form-control" min="1" value="1">
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-primary">开通</button>
+  </div>
+</form>
+<hr>
+<h3>批量导入/导出</h3>
+<form class="row g-3" action="{{ url_for('import_users') }}" method="post" enctype="multipart/form-data">
+  <div class="col-md-4">
+    <input type="file" name="file" class="form-control" required>
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-secondary">导入</button>
+  </div>
+  <div class="col-md-2">
+    <a class="btn btn-outline-secondary" href="{{ url_for('export_users') }}">导出</a>
+  </div>
+</form>
+<hr>
+<h3>用户列表</h3>
+<table class="table table-striped">
+<thead>
+  <tr>
+    <th>用户名</th>
+    <th>权限</th>
+    <th>创建时间</th>
+    <th>最后登录</th>
+    <th>修改</th>
+    <th>删除</th>
+  </tr>
+</thead>
+<tbody>
+{% for name, info in users.items() %}
+<tr>
+  <form action="{{ url_for('update_user', name=name) }}" method="post">
+    <td><input name="username" class="form-control" value="{{ name }}"></td>
+    <td><input type="checkbox" name="is_admin" {% if info.is_admin %}checked{% endif %}></td>
+    <td>{{ info.created_at }}</td>
+    <td>{{ info.last_login or '' }}</td>
+    <td>
+      <input type="text" name="password" class="form-control" placeholder="新密码">
+    </td>
+    <td class="d-flex">
+      <button type="submit" class="btn btn-sm btn-primary me-2">修改</button>
+  </form>
+      <form action="{{ url_for('delete_user', name=name) }}" method="post" onsubmit="return confirm('确定删除?')">
+        <button type="submit" class="btn btn-sm btn-danger">删除</button>
+      </form>
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
