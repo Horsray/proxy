@@ -13,20 +13,25 @@ import uuid
 import copy
 import logging
 logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
-USERS_FILE = "users.json"
+# Path to local users file relative to this script
+USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
 sessions = {}
 
 def load_local_users():
+    """Load local user credentials from users.json."""
     if os.path.exists(USERS_FILE):
         try:
             with open(USERS_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
+            logging.info(f"🔐 已加载本地用户文件: {USERS_FILE}")
+            logging.debug(f"本地用户列表: {list(data.get('users', {}).keys())}")
             return data.get("users", {})
         except Exception as e:
-            logging.warning(f"Failed to load local users: {e}")
+            logging.error(f"❌ 本地用户文件加载失败: {e}")
+    else:
+        logging.warning(f"⚠️ 未找到本地用户文件: {USERS_FILE}")
     return {}
 
-LOCAL_USERS = load_local_users()
 from datetime import datetime, timedelta
 from threading import Thread, Lock
 from flask import Flask, request, jsonify, Response
@@ -45,6 +50,8 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+LOCAL_USERS = load_local_users()
 
 
 app = Flask(__name__)
@@ -381,6 +388,8 @@ def start_ws_listener(base_url):
     if not base_url or not base_url.startswith("http"):
         print("⚠️ 跳过 WebSocket 初始化：无有效 URL")
         return
+
+    import websocket
 
     ws_url = base_url.replace("http://", "ws://").replace("https://", "wss://") + "/ws"
     ws = websocket.WebSocketApp(
@@ -1068,25 +1077,29 @@ def health_check():
     })
 
 
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
 CLOUD_AUTH_URL = "https://umanage.lightcc.cloud/prod-api/auth/login"
 
 CLOUD_LOGOUT_URL = "https://umanage.lightcc.cloud/prod-api/auth/logout"
 @app.route('/auth/login', methods=['POST'])
 def login_compatible():
-    data = request.get_json() or {}
+    data = request.get_json(silent=True)
+    if data is None:
+        data = request.form.to_dict()
     username = data.get("username")
     password = data.get("password")
 
+    logger.info("🔑 [Login] 收到登录请求，用户名: %s", username)
+
     user = LOCAL_USERS.get(username)
+    if user:
+        logger.info("[Login] 在本地用户列表中找到用户 %s", username)
+    else:
+        logger.info("[Login] 本地用户列表中未找到用户 %s", username)
+
     if user and user.get("password") == password:
         token = uuid.uuid4().hex
         sessions[token] = username
-        logger.info("[Login] 本地认证成功")
+        logger.info("✅ [Login] 本地认证成功")
         return jsonify({
             "code": 200,
             "msg": "操作成功",
@@ -1101,33 +1114,45 @@ def login_compatible():
             }
         }), 200
 
+    if user:
+        logger.warning("[Login] 本地密码不匹配")
+    else:
+        logger.info("[Login] 本地认证失败，尝试云端登录")
+
     try:
         response = requests.post(
             CLOUD_AUTH_URL,
             json=data,
             timeout=proxy.config.get("timeout", 30)
         )
+        logger.info("[Login] 云端返回状态码: %s", response.status_code)
+        logger.debug("[Login] 云端返回内容: %s", response.text)
+
         if response.status_code == 200:
-            print("[Login] 登录成功 - by cloud")
+            logger.info("✅ [Login] 云端请求成功")
         else:
-            print("[Login] 登录失败")
+            logger.warning("❌ [Login] 云端登录失败")
+
         return Response(
             response.content,
             status=response.status_code,
             content_type=response.headers.get('Content-Type', 'application/json')
         )
-    except requests.RequestException:
-        print("[Login] 登录失败")
+    except requests.RequestException as e:
+        logger.error("[Login] 云端请求异常: %s", str(e))
         return jsonify({"code": 1, "msg": "request to cloud failed"}), 500
 
     
 @app.route('/auth/logout', methods=['POST'])
 def logout_proxy():
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    logger.info("🔑 [Logout] 收到退出请求，token: %s", token)
     if token in sessions:
-        sessions.pop(token, None)
-        logger.info("[Logout] 本地退出成功")
+        user = sessions.pop(token)
+        logger.info("✅ [Logout] 本地退出成功, 用户: %s", user)
         return jsonify({"code": 200, "msg": "操作成功", "data": None}), 200
+    else:
+        logger.info("[Logout] 本地会话不存在，尝试云端登出")
 
     try:
         payload = request.get_data()
@@ -1141,17 +1166,19 @@ def logout_proxy():
             data=payload,
             timeout=proxy.config.get("timeout", 30)
         )
+        logger.info("[Logout] 云端返回状态码: %s", response.status_code)
+        logger.debug("[Logout] 云端返回内容: %s", response.text)
         try:
             result = response.json()
         except Exception:
             result = {"code": 500, "msg": "云端响应格式错误", "raw": response.text}
         if response.status_code == 200:
-            print("[Logout] 退出成功 - by cloud")
+            logger.info("✅ [Logout] 退出成功 - by cloud")
         else:
-            print("[Logout] 退出失败")
+            logger.warning("❌ [Logout] 退出失败 - by cloud")
         return jsonify(result), response.status_code
     except Exception as e:
-        print("[Logout] 退出失败")
+        logger.error("[Logout] 云端请求异常: %s", str(e))
         return jsonify({"code": 500, "msg": "代理登出失败", "error": str(e)}), 500
 
 from gevent.pywsgi import WSGIServer
