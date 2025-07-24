@@ -3,14 +3,17 @@
 import os
 import json
 from datetime import datetime
+from io import BytesIO
 from functools import wraps
 
-from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify
 from werkzeug.utils import secure_filename
 
 from openpyxl import Workbook, load_workbook
 
-USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'users.json')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+USERS_FILE = os.path.join(BASE_DIR, 'users.json')
+LEDGER_FILE = os.path.join(BASE_DIR, 'ledger.json')
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'huiying-secret')
 
@@ -25,6 +28,7 @@ def load_users() -> dict:
                     info.setdefault('nickname', '')
                     info.setdefault('enabled', True)
                     info.setdefault('source', 'add')
+                    info.setdefault('price', 0)
                 return users
             except Exception:
                 return {}
@@ -34,6 +38,21 @@ def load_users() -> dict:
 def save_users(users: dict) -> None:
     with open(USERS_FILE, 'w', encoding='utf-8') as f:
         json.dump({'users': users}, f, indent=4, ensure_ascii=False)
+
+
+def load_ledger() -> list:
+    if os.path.exists(LEDGER_FILE):
+        with open(LEDGER_FILE, 'r', encoding='utf-8') as f:
+            try:
+                return json.load(f).get('records', [])
+            except Exception:
+                return []
+    return []
+
+
+def save_ledger(records: list) -> None:
+    with open(LEDGER_FILE, 'w', encoding='utf-8') as f:
+        json.dump({'records': records}, f, indent=4, ensure_ascii=False)
 
 
 def admin_required(f):
@@ -54,7 +73,7 @@ def login():
         user = users.get(username)
         if user and user.get('password') == password and user.get('is_admin'):
             session['admin'] = username
-            user['last_login'] = datetime.now().isoformat()
+            user['last_login'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             users[username] = user
             save_users(users)
             return redirect(url_for('user_list'))
@@ -81,6 +100,18 @@ def bulk_manage():
     return render_template('bulk.html', accounts=accounts)
 
 
+@app.route('/users/random')
+@admin_required
+def random_account():
+    users = load_users()
+    while True:
+        uname = f"huiying{os.urandom(4).hex()}"[:12]
+        if uname not in users:
+            break
+    pwd = os.urandom(4).hex()
+    return jsonify({'username': uname, 'password': pwd})
+
+
 @app.route('/bulk/export')
 @admin_required
 def bulk_export():
@@ -92,10 +123,11 @@ def bulk_export():
     ws.append(['用户名', '密码'])
     for acc in accounts:
         ws.append([acc['username'], acc['password']])
-    path = 'bulk_accounts.xlsx'
-    wb.save(path)
+    bio = BytesIO()
+    wb.save(bio)
+    bio.seek(0)
     session.pop('bulk_accounts', None)
-    return send_file(path, as_attachment=True)
+    return send_file(bio, download_name='bulk_accounts.xlsx', as_attachment=True)
 
 
 @app.route('/users')
@@ -122,6 +154,7 @@ def add_user():
     password = request.form.get('password')
     nickname = request.form.get('nickname', '')
     is_admin = bool(request.form.get('is_admin'))
+    price = float(request.form.get('price', 0))
     if not username or not password:
         return redirect(url_for('user_list'))
     users = load_users()
@@ -133,10 +166,21 @@ def add_user():
         'is_admin': is_admin,
         'enabled': True,
         'source': 'add',
-        'created_at': datetime.now().isoformat(),
+        'price': price,
+        'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'last_login': None
     }
     save_users(users)
+    # ledger
+    records = load_ledger()
+    records.append({
+        'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'admin': session.get('admin'),
+        'price': price,
+        'count': 1,
+        'revenue': price
+    })
+    save_ledger(records)
     return redirect(url_for('user_list'))
 
 
@@ -208,6 +252,7 @@ def update_user(name):
 @admin_required
 def import_users():
     file = request.files.get('file')
+    price = float(request.form.get('price', 0))
     if not file:
         return redirect(url_for('user_list'))
     filename = secure_filename(file.filename)
@@ -217,6 +262,7 @@ def import_users():
     ws = wb.active
     users = load_users()
     first = True
+    count = 0
     for row in ws.iter_rows(values_only=True):
         if first:
             first = False
@@ -232,10 +278,22 @@ def import_users():
                 'is_admin': is_admin,
                 'enabled': True,
                 'source': 'import',
-                'created_at': datetime.now().isoformat(),
-                'last_login': None
+                'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'last_login': None,
+                'price': price
             }
+            count += 1
     save_users(users)
+    if count > 0 and price > 0:
+        records = load_ledger()
+        records.append({
+            'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'admin': session.get('admin'),
+            'price': price,
+            'count': count,
+            'revenue': price * count
+        })
+        save_ledger(records)
     return redirect(url_for('user_list'))
 
 
@@ -260,9 +318,10 @@ def export_users():
             info.get('created_at'),
             info.get('last_login'),
         ])
-    path = 'users_export.xlsx'
-    wb.save(path)
-    return send_file(path, as_attachment=True)
+    bio = BytesIO()
+    wb.save(bio)
+    bio.seek(0)
+    return send_file(bio, download_name='users_export.xlsx', as_attachment=True)
 
 
 @app.route('/users/template')
@@ -271,15 +330,17 @@ def download_template():
     wb = Workbook()
     ws = wb.active
     ws.append(['用户名', '密码', '昵称', '是否管理员'])
-    path = 'import_template.xlsx'
-    wb.save(path)
-    return send_file(path, as_attachment=True)
+    bio = BytesIO()
+    wb.save(bio)
+    bio.seek(0)
+    return send_file(bio, download_name='import_template.xlsx', as_attachment=True)
 
 
 @app.route('/users/bulk_create', methods=['POST'])
 @admin_required
 def bulk_create():
     count = int(request.form.get('count', 0))
+    price = float(request.form.get('price', 0))
     users = load_users()
     new_accounts = []
     for _ in range(count):
@@ -294,13 +355,41 @@ def bulk_create():
             'is_admin': False,
             'enabled': True,
             'source': 'batch',
-            'created_at': datetime.now().isoformat(),
-            'last_login': None
+            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'last_login': None,
+            'price': price
         }
         new_accounts.append({'username': uname, 'password': pwd})
     save_users(users)
     session['bulk_accounts'] = new_accounts
+    if count > 0 and price > 0:
+        records = load_ledger()
+        records.append({
+            'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'admin': session.get('admin'),
+            'price': price,
+            'count': count,
+            'revenue': price * count
+        })
+        save_ledger(records)
     return redirect(url_for('bulk_manage'))
+
+
+@app.route('/ledger')
+@admin_required
+def ledger_view():
+    records = load_ledger()
+    total = sum(r.get('revenue', 0) for r in records)
+    today = datetime.now().strftime('%Y-%m-%d')
+    month = datetime.now().strftime('%Y-%m')
+    year = datetime.now().strftime('%Y')
+    daily = sum(r['revenue'] for r in records if r['time'].startswith(today))
+    monthly = sum(r['revenue'] for r in records if r['time'].startswith(month))
+    yearly = sum(r['revenue'] for r in records if r['time'].startswith(year))
+    return render_template(
+        'ledger.html', records=records, daily=daily,
+        monthly=monthly, yearly=yearly, total=total
+    )
 
 
 if __name__ == '__main__':

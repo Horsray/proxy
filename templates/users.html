@@ -13,11 +13,13 @@
 </div>
 <form method="post" action="{{ url_for('batch_action') }}">
 <div class="mb-2">
+  <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#add-user">新增</button>
   <button name="action" value="delete" class="btn btn-danger btn-sm">删除</button>
   <button name="action" value="disable" class="btn btn-warning btn-sm">停用</button>
   <button name="action" value="enable" class="btn btn-success btn-sm">启用</button>
   <a class="btn btn-secondary btn-sm" href="{{ url_for('export_users') }}">导出全部</a>
   <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('download_template') }}">模板下载</a>
+  <input type="number" name="price" step="0.01" placeholder="单价" class="form-control form-control-sm d-inline-block" style="width:100px"> 
   <input type="file" name="file" class="form-control form-control-sm d-inline-block" style="width:200px" onchange="this.form.submit()" formaction="{{ url_for('import_users') }}" formmethod="post" enctype="multipart/form-data">
 </div>
 <table class="table table-striped table-hover">
@@ -42,7 +44,9 @@
       <td>{% if info.enabled %}启用{% else %}停用{% endif %}</td>
       <td>{{ info.last_login or '' }}</td>
       <td>{{ info.created_at }}</td>
-      <td>{{ info.source }}</td>
+      <td>
+        {% if info.source == 'add' %}录入{% elif info.source == 'batch' %}生成{% elif info.source == 'import' %}导入{% else %}{{ info.source }}{% endif %}
+      </td>
       <td class="d-flex gap-1">
         <form method="post" action="{{ url_for('toggle_user', name=name) }}" class="d-inline">
           <button class="btn btn-sm btn-secondary" title="启用/停用">切换</button>
@@ -82,4 +86,49 @@
     {% endfor %}
   </ul>
 </nav>
+<!-- add user modal -->
+<div class="modal fade" id="add-user" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('add_user') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">新增用户</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">用户名</label>
+            <input name="username" id="add-name" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">密码</label>
+            <input name="password" id="add-pass" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">单价(元)</label>
+            <input name="price" type="number" step="0.01" class="form-control" value="0">
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="rand" onclick="genRandom(this.checked)">
+            <label class="form-check-label" for="rand">随机生成</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function genRandom(flag){
+    if(flag){
+      fetch('{{ url_for('random_account') }}').then(r=>r.json()).then(d=>{
+        document.getElementById('add-name').value=d.username;
+        document.getElementById('add-pass').value=d.password;
+      });
+    }
+  }
+</script>
 {% endblock %}
