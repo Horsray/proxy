@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+{% block title %}用户列表{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <form class="row row-cols-lg-auto g-2 align-items-center" method="get">
+    <div class="col-3">
+      <input type="text" name="q" class="form-control" placeholder="搜索用户名" value="{{ query }}">
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-outline-primary">搜索</button>
+    </div>
+  </form>
+</div>
+<form method="post" action="{{ url_for('batch_action') }}">
+<div class="mb-2">
+  <button name="action" value="delete" class="btn btn-danger btn-sm">删除</button>
+  <button name="action" value="disable" class="btn btn-warning btn-sm">停用</button>
+  <button name="action" value="enable" class="btn btn-success btn-sm">启用</button>
+  <a class="btn btn-secondary btn-sm" href="{{ url_for('export_users') }}">导出全部</a>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('download_template') }}">模板下载</a>
+  <input type="file" name="file" class="form-control form-control-sm d-inline-block" style="width:200px" onchange="this.form.submit()" formaction="{{ url_for('import_users') }}" formmethod="post" enctype="multipart/form-data">
+</div>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th scope="col"><input type="checkbox" id="check-all" onclick="document.querySelectorAll('input[name=names]').forEach(c=>c.checked=this.checked)"></th>
+      <th>用户名</th>
+      <th>昵称</th>
+      <th>状态</th>
+      <th>最后登录</th>
+      <th>创建时间</th>
+      <th>来源</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for name, info in users.items() %}
+    <tr>
+      <td><input type="checkbox" name="names" value="{{ name }}"></td>
+      <td>{{ name }}</td>
+      <td>{{ info.nickname }}</td>
+      <td>{% if info.enabled %}启用{% else %}停用{% endif %}</td>
+      <td>{{ info.last_login or '' }}</td>
+      <td>{{ info.created_at }}</td>
+      <td>{{ info.source }}</td>
+      <td class="d-flex gap-1">
+        <form method="post" action="{{ url_for('toggle_user', name=name) }}" class="d-inline">
+          <button class="btn btn-sm btn-secondary" title="启用/停用">切换</button>
+        </form>
+        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit-{{ name }}">编辑</button>
+        <form method="post" action="{{ url_for('delete_user', name=name) }}" class="d-inline" onsubmit="return confirm('确定删除?')">
+          <button class="btn btn-sm btn-danger" title="删除">删除</button>
+        </form>
+      </td>
+    </tr>
+    <!-- edit modal -->
+    <div class="modal fade" id="edit-{{ name }}" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post" action="{{ url_for('update_user', name=name) }}">
+            <div class="modal-header"><h5 class="modal-title">编辑 {{ name }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+              <div class="mb-2"><label class="form-label">用户名</label><input name="username" class="form-control" value="{{ name }}"></div>
+              <div class="mb-2"><label class="form-label">昵称</label><input name="nickname" class="form-control" value="{{ info.nickname }}"></div>
+              <div class="mb-2"><label class="form-label">新密码</label><input name="password" class="form-control"></div>
+              <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="is_admin" {% if info.is_admin %}checked{% endif %}> 管理员</div>
+              <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="enabled" {% if info.enabled %}checked{% endif %}> 启用</div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" type="submit">保存</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </tbody>
+</table>
+</form>
+<nav>
+  <ul class="pagination">
+    {% for p in range(1, (total-1)//per_page + 2) %}
+      <li class="page-item {% if p==page %}active{% endif %}"><a class="page-link" href="?page={{ p }}&q={{ query }}">{{ p }}</a></li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endblock %}

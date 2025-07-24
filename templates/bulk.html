@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% block title %}批量用户管理{% endblock %}
+{% block content %}
+<h4>批量开通随机账号</h4>
+<form class="row g-3" method="post" action="{{ url_for('bulk_create') }}">
+  <div class="col-auto">
+    <input type="number" name="count" class="form-control" value="1" min="1">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">开通</button>
+  </div>
+</form>
+{% if accounts %}
+<hr>
+<h5>本次生成</h5>
+<table class="table table-sm">
+  <thead><tr><th>用户名</th><th>密码</th></tr></thead>
+  <tbody>
+  {% for acc in accounts %}
+  <tr><td>{{ acc.username }}</td><td>{{ acc.password }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-success" href="{{ url_for('bulk_export') }}">导出到Excel</a>
+{% endif %}
+{% endblock %}
