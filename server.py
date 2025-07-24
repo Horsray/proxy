@@ -14,6 +14,7 @@ from openpyxl import Workbook, load_workbook
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 USERS_FILE = os.path.join(BASE_DIR, 'users.json')
 LEDGER_FILE = os.path.join(BASE_DIR, 'ledger.json')
+PRODUCTS_FILE = os.path.join(BASE_DIR, 'products.json')
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'huiying-secret')
 
@@ -53,6 +54,21 @@ def load_ledger() -> list:
 def save_ledger(records: list) -> None:
     with open(LEDGER_FILE, 'w', encoding='utf-8') as f:
         json.dump({'records': records}, f, indent=4, ensure_ascii=False)
+
+
+def load_products() -> dict:
+    if os.path.exists(PRODUCTS_FILE):
+        with open(PRODUCTS_FILE, 'r', encoding='utf-8') as f:
+            try:
+                return json.load(f).get('products', {})
+            except Exception:
+                return {}
+    return {}
+
+
+def save_products(products: dict) -> None:
+    with open(PRODUCTS_FILE, 'w', encoding='utf-8') as f:
+        json.dump({'products': products}, f, indent=4, ensure_ascii=False)
 
 
 def admin_required(f):
@@ -97,7 +113,8 @@ def index():
 @admin_required
 def bulk_manage():
     accounts = session.get('bulk_accounts')
-    return render_template('bulk.html', accounts=accounts)
+    products = load_products()
+    return render_template('bulk.html', accounts=accounts, products=products)
 
 
 @app.route('/users/random')
@@ -134,16 +151,37 @@ def bulk_export():
 @admin_required
 def user_list():
     query = request.args.get('q', '')
+    source = request.args.get('source', '')
+    status = request.args.get('status', '')
+    sort = request.args.get('sort', 'desc')
+    start = request.args.get('start', '')
+    end = request.args.get('end', '')
     page = int(request.args.get('page', 1))
     per_page = 15
     users = load_users()
     if query:
         users = {k: v for k, v in users.items() if query.lower() in k.lower()}
-    total = len(users)
-    items = list(users.items())[(page - 1) * per_page: page * per_page]
+    if source:
+        users = {k: v for k, v in users.items() if v.get('source') == source}
+    if status:
+        flag = status == 'enabled'
+        users = {k: v for k, v in users.items() if v.get('enabled', True) == flag}
+    if start:
+        users = {k: v for k, v in users.items() if v.get('created_at', '') >= start}
+    if end:
+        users = {k: v for k, v in users.items() if v.get('created_at', '') <= end}
+    items = list(users.items())
+    admins = [i for i in items if i[1].get('is_admin')]
+    others = [i for i in items if not i[1].get('is_admin')]
+    others.sort(key=lambda x: x[1].get('created_at', ''), reverse=(sort != 'asc'))
+    items = admins + others
+    total = len(items)
+    page_items = items[(page - 1) * per_page: page * per_page]
+    products = load_products()
     return render_template(
-        'users.html', users=dict(items), total=total,
-        page=page, per_page=per_page, query=query
+        'users.html', users=dict(page_items), total=total,
+        page=page, per_page=per_page, query=query, source=source,
+        status=status, sort=sort, start=start, end=end, products=products
     )
 
 
@@ -154,7 +192,8 @@ def add_user():
     password = request.form.get('password')
     nickname = request.form.get('nickname', '')
     is_admin = bool(request.form.get('is_admin'))
-    price = float(request.form.get('price', 0))
+    price = float(request.form.get('price') or 0)
+    product = request.form.get('product', '')
     if not username or not password:
         return redirect(url_for('user_list'))
     users = load_users()
@@ -167,6 +206,7 @@ def add_user():
         'enabled': True,
         'source': 'add',
         'price': price,
+        'product': product,
         'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'last_login': None
     }
@@ -176,6 +216,7 @@ def add_user():
     records.append({
         'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'admin': session.get('admin'),
+        'product': product,
         'price': price,
         'count': 1,
         'revenue': price
@@ -231,6 +272,7 @@ def update_user(name):
     nickname = request.form.get('nickname')
     is_admin = bool(request.form.get('is_admin'))
     enabled = bool(request.form.get('enabled'))
+    product = request.form.get('product')
     users = load_users()
     if name in users:
         user = users[name]
@@ -244,6 +286,8 @@ def update_user(name):
             users[name]['nickname'] = nickname
         users[name]['is_admin'] = is_admin
         users[name]['enabled'] = enabled
+        if product is not None:
+            users[name]['product'] = product
         save_users(users)
     return redirect(url_for('user_list'))
 
@@ -252,7 +296,8 @@ def update_user(name):
 @admin_required
 def import_users():
     file = request.files.get('file')
-    price = float(request.form.get('price', 0))
+    price = float(request.form.get('price') or 0)
+    product = request.form.get('product', '')
     if not file:
         return redirect(url_for('user_list'))
     filename = secure_filename(file.filename)
@@ -278,6 +323,7 @@ def import_users():
                 'is_admin': is_admin,
                 'enabled': True,
                 'source': 'import',
+                'product': product,
                 'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'last_login': None,
                 'price': price
@@ -289,6 +335,7 @@ def import_users():
         records.append({
             'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'admin': session.get('admin'),
+            'product': product,
             'price': price,
             'count': count,
             'revenue': price * count
@@ -305,7 +352,7 @@ def export_users():
     ws = wb.active
     ws.append([
         '用户名', '密码', '昵称', '是否管理员',
-        '启用', '来源', '创建时间', '最后登录'
+        '启用', '来源', '创建时间', '最后登录', '产品'
     ])
     for name, info in users.items():
         ws.append([
@@ -317,6 +364,7 @@ def export_users():
             info.get('source'),
             info.get('created_at'),
             info.get('last_login'),
+            info.get('product','')
         ])
     bio = BytesIO()
     wb.save(bio)
@@ -336,11 +384,43 @@ def download_template():
     return send_file(bio, download_name='import_template.xlsx', as_attachment=True)
 
 
+@app.route('/products')
+@admin_required
+def products():
+    products = load_products()
+    return render_template('products.html', products=products)
+
+
+@app.route('/products/add', methods=['POST'])
+@admin_required
+def add_product():
+    name = request.form.get('name')
+    version = request.form.get('version', '')
+    ptype = request.form.get('ptype', '')
+    if not name:
+        return redirect(url_for('products'))
+    products = load_products()
+    products[name] = {'name': name, 'version': version, 'type': ptype}
+    save_products(products)
+    return redirect(url_for('products'))
+
+
+@app.route('/products/<name>/delete', methods=['POST'])
+@admin_required
+def delete_product(name):
+    products = load_products()
+    if name in products:
+        products.pop(name)
+        save_products(products)
+    return redirect(url_for('products'))
+
+
 @app.route('/users/bulk_create', methods=['POST'])
 @admin_required
 def bulk_create():
     count = int(request.form.get('count', 0))
-    price = float(request.form.get('price', 0))
+    price = float(request.form.get('price') or 0)
+    product = request.form.get('product', '')
     users = load_users()
     new_accounts = []
     for _ in range(count):
@@ -355,6 +435,7 @@ def bulk_create():
             'is_admin': False,
             'enabled': True,
             'source': 'batch',
+            'product': product,
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'last_login': None,
             'price': price
@@ -367,6 +448,7 @@ def bulk_create():
         records.append({
             'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'admin': session.get('admin'),
+            'product': product,
             'price': price,
             'count': count,
             'revenue': price * count
@@ -379,6 +461,18 @@ def bulk_create():
 @admin_required
 def ledger_view():
     records = load_ledger()
+    product = request.args.get('product', '')
+    admin = request.args.get('admin', '')
+    start = request.args.get('start', '')
+    end = request.args.get('end', '')
+    if product:
+        records = [r for r in records if r.get('product') == product]
+    if admin:
+        records = [r for r in records if r.get('admin') == admin]
+    if start:
+        records = [r for r in records if r['time'] >= start]
+    if end:
+        records = [r for r in records if r['time'] <= end]
     total = sum(r.get('revenue', 0) for r in records)
     today = datetime.now().strftime('%Y-%m-%d')
     month = datetime.now().strftime('%Y-%m')
@@ -386,9 +480,12 @@ def ledger_view():
     daily = sum(r['revenue'] for r in records if r['time'].startswith(today))
     monthly = sum(r['revenue'] for r in records if r['time'].startswith(month))
     yearly = sum(r['revenue'] for r in records if r['time'].startswith(year))
+    products = load_products()
     return render_template(
         'ledger.html', records=records, daily=daily,
-        monthly=monthly, yearly=yearly, total=total
+        monthly=monthly, yearly=yearly, total=total,
+        product_filter=product, admin_filter=admin,
+        start=start, end=end, products=products
     )
 
 

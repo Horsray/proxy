@@ -3,11 +3,34 @@
 {% block content %}
 <div class="mb-3">
   <form class="row row-cols-lg-auto g-2 align-items-center" method="get">
-    <div class="col-3">
+    <div class="col-auto">
       <input type="text" name="q" class="form-control" placeholder="搜索用户名" value="{{ query }}">
     </div>
     <div class="col-auto">
-      <button type="submit" class="btn btn-outline-primary">搜索</button>
+      <select name="source" class="form-select form-select-sm">
+        <option value="">来源</option>
+        <option value="add" {% if source=='add' %}selected{% endif %}>录入</option>
+        <option value="batch" {% if source=='batch' %}selected{% endif %}>生成</option>
+        <option value="import" {% if source=='import' %}selected{% endif %}>导入</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <select name="status" class="form-select form-select-sm">
+        <option value="">状态</option>
+        <option value="enabled" {% if status=='enabled' %}selected{% endif %}>启用</option>
+        <option value="disabled" {% if status=='disabled' %}selected{% endif %}>停用</option>
+      </select>
+    </div>
+    <div class="col-auto"><input type="date" name="start" class="form-control form-control-sm" value="{{ start }}"></div>
+    <div class="col-auto"><input type="date" name="end" class="form-control form-control-sm" value="{{ end }}"></div>
+    <div class="col-auto">
+      <select name="sort" class="form-select form-select-sm">
+        <option value="desc" {% if sort=='desc' %}selected{% endif %}>新到旧</option>
+        <option value="asc" {% if sort=='asc' %}selected{% endif %}>旧到新</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-outline-primary btn-sm">筛选</button>
     </div>
   </form>
 </div>
@@ -19,19 +42,21 @@
   <button name="action" value="enable" class="btn btn-success btn-sm">启用</button>
   <a class="btn btn-secondary btn-sm" href="{{ url_for('export_users') }}">导出全部</a>
   <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('download_template') }}">模板下载</a>
-  <input type="number" name="price" step="0.01" placeholder="单价" class="form-control form-control-sm d-inline-block" style="width:100px"> 
   <input type="file" name="file" class="form-control form-control-sm d-inline-block" style="width:200px" onchange="this.form.submit()" formaction="{{ url_for('import_users') }}" formmethod="post" enctype="multipart/form-data">
 </div>
 <table class="table table-striped table-hover">
   <thead>
     <tr>
       <th scope="col"><input type="checkbox" id="check-all" onclick="document.querySelectorAll('input[name=names]').forEach(c=>c.checked=this.checked)"></th>
+      <th>编号</th>
       <th>用户名</th>
       <th>昵称</th>
+      <th>类型</th>
       <th>状态</th>
       <th>最后登录</th>
       <th>创建时间</th>
       <th>来源</th>
+      <th>产品</th>
       <th>操作</th>
     </tr>
   </thead>
@@ -39,14 +64,17 @@
   {% for name, info in users.items() %}
     <tr>
       <td><input type="checkbox" name="names" value="{{ name }}"></td>
+      <td>{{ loop.index + (page-1)*per_page }}</td>
       <td>{{ name }}</td>
       <td>{{ info.nickname }}</td>
+      <td>{% if info.is_admin %}管理员{% else %}用户{% endif %}</td>
       <td>{% if info.enabled %}启用{% else %}停用{% endif %}</td>
       <td>{{ info.last_login or '' }}</td>
       <td>{{ info.created_at }}</td>
       <td>
         {% if info.source == 'add' %}录入{% elif info.source == 'batch' %}生成{% elif info.source == 'import' %}导入{% else %}{{ info.source }}{% endif %}
       </td>
+      <td>{{ info.product or '' }}</td>
       <td class="d-flex gap-1">
         <form method="post" action="{{ url_for('toggle_user', name=name) }}" class="d-inline">
           <button class="btn btn-sm btn-secondary" title="启用/停用">切换</button>
@@ -67,6 +95,14 @@
               <div class="mb-2"><label class="form-label">用户名</label><input name="username" class="form-control" value="{{ name }}"></div>
               <div class="mb-2"><label class="form-label">昵称</label><input name="nickname" class="form-control" value="{{ info.nickname }}"></div>
               <div class="mb-2"><label class="form-label">新密码</label><input name="password" class="form-control"></div>
+              <div class="mb-2">
+                <label class="form-label">产品</label>
+                <select name="product" class="form-select">
+                  {% for p in products.values() %}
+                  <option value="{{ p.name }}" {% if info.product==p.name %}selected{% endif %}>{{ p.name }} {{ p.version }}</option>
+                  {% endfor %}
+                </select>
+              </div>
               <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="is_admin" {% if info.is_admin %}checked{% endif %}> 管理员</div>
               <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="enabled" {% if info.enabled %}checked{% endif %}> 启用</div>
             </div>
@@ -82,10 +118,11 @@
 <nav>
   <ul class="pagination">
     {% for p in range(1, (total-1)//per_page + 2) %}
-      <li class="page-item {% if p==page %}active{% endif %}"><a class="page-link" href="?page={{ p }}&q={{ query }}">{{ p }}</a></li>
+      <li class="page-item {% if p==page %}active{% endif %}"><a class="page-link" href="?page={{ p }}&q={{ query }}&source={{ source }}&status={{ status }}&sort={{ sort }}&start={{ start }}&end={{ end }}">{{ p }}</a></li>
     {% endfor %}
   </ul>
 </nav>
+<div class="mt-2">累计用户数：{{ total }}</div>
 <!-- add user modal -->
 <div class="modal fade" id="add-user" tabindex="-1">
   <div class="modal-dialog">
@@ -107,6 +144,14 @@
           <div class="mb-2">
             <label class="form-label">单价(元)</label>
             <input name="price" type="number" step="0.01" class="form-control" value="0">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">产品</label>
+            <select name="product" class="form-select">
+              {% for p in products.values() %}
+              <option value="{{ p.name }}">{{ p.name }} {{ p.version }}</option>
+              {% endfor %}
+            </select>
           </div>
           <div class="form-check mb-2">
             <input class="form-check-input" type="checkbox" id="rand" onclick="genRandom(this.checked)">

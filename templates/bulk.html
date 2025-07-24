@@ -10,6 +10,13 @@
     <input type="number" name="price" step="0.01" placeholder="单价" class="form-control">
   </div>
   <div class="col-auto">
+    <select name="product" class="form-select">
+      {% for p in products.values() %}
+      <option value="{{ p.name }}">{{ p.name }} {{ p.version }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-auto">
     <button type="submit" class="btn btn-primary">开通</button>
   </div>
 </form>
