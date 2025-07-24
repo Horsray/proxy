@@ -8,12 +8,30 @@ monkey.patch_all()
 import os
 import json
 import requests
-import logging
 import time
 import uuid
 import copy
 import logging
 logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
+# Path to local users file relative to this script
+USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
+sessions = {}
+
+def load_local_users():
+    """Load local user credentials from users.json."""
+    if os.path.exists(USERS_FILE):
+        try:
+            with open(USERS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            logging.info(f"🔐 已加载本地用户文件: {USERS_FILE}")
+            logging.debug(f"本地用户列表: {list(data.get('users', {}).keys())}")
+            return data.get("users", {})
+        except Exception as e:
+            logging.error(f"❌ 本地用户文件加载失败: {e}")
+    else:
+        logging.warning(f"⚠️ 未找到本地用户文件: {USERS_FILE}")
+    return {}
+
 from datetime import datetime, timedelta
 from threading import Thread, Lock
 from flask import Flask, request, jsonify, Response
@@ -32,6 +50,8 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+LOCAL_USERS = load_local_users()
 
 
 app = Flask(__name__)
@@ -369,7 +389,9 @@ def start_ws_listener(base_url):
         print("⚠️ 跳过 WebSocket 初始化：无有效 URL")
         return
 
-    ws_url = ws_url.replace("http://", "ws://").replace("https://", "wss://") + "/ws"
+    import websocket
+
+    ws_url = base_url.replace("http://", "ws://").replace("https://", "wss://") + "/ws"
     ws = websocket.WebSocketApp(
         ws_url,
         on_message=on_message,
@@ -1010,11 +1032,20 @@ CLOUD_CHECK_URL = "https://umanage.lightcc.cloud/prod-api/psPlus/workflow/checkO
 @app.route('/psPlus/workflow/checkOnline', methods=['GET'])
 def check_online():
     headers = dict(request.headers)
+    token = headers.get('Authorization', '').replace('Bearer ', '')
+    if token in sessions:
+        logger.info("✅ 在线检查通过 - local")
+        return jsonify({"code": 200, "msg": "操作成功", "data": {"online": True}}), 200
+
     try:
         logger.info("🔍 [CheckOnline] 收到请求")
         logger.debug("[CheckOnline] Headers: %s", headers)
 
-        response = requests.get(CLOUD_CHECK_URL, headers=headers)
+        response = requests.get(
+            CLOUD_CHECK_URL,
+            headers=headers,
+            timeout=proxy.config.get("timeout", 30)
+        )
         logger.debug("[CheckOnline] 云端响应状态码: %s", response.status_code)
         logger.debug("[CheckOnline] 云端响应内容: %s", response.text)
 
@@ -1046,63 +1077,109 @@ def health_check():
     })
 
 
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
 CLOUD_AUTH_URL = "https://umanage.lightcc.cloud/prod-api/auth/login"
 
 CLOUD_LOGOUT_URL = "https://umanage.lightcc.cloud/prod-api/auth/logout"
 @app.route('/auth/login', methods=['POST'])
 def login_compatible():
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if data is None:
+        data = request.form.to_dict()
+    username = data.get("username")
+    password = data.get("password")
+
+    logger.info("🔑 [Login] 收到登录请求，用户名: %s", username)
+
+    user = LOCAL_USERS.get(username)
+    if user:
+        logger.debug("[Login] 在本地用户列表中找到用户 %s", username)
+    else:
+        logger.debug("[Login] 本地用户列表中未找到用户 %s", username)
+
+    if user and user.get("password") == password:
+        token = uuid.uuid4().hex
+        sessions[token] = username
+        logger.info("✅ [Login] 本地认证成功")
+        return jsonify({
+            "code": 200,
+            "msg": "操作成功",
+            "data": {
+                "scope": None,
+                "openid": None,
+                "access_token": token,
+                "refresh_token": None,
+                "expire_in": 604799,
+                "refresh_expire_in": None,
+                "client_id": data.get("clientId")
+            }
+        }), 200
+
+    if user:
+        logger.warning("[Login] 本地密码不匹配")
+    else:
+        logger.info("[Login] 本地认证失败，尝试云端登录")
+
     try:
-        response = requests.post(CLOUD_AUTH_URL, json=data)
-        if response.status_code == 200:
-            print("[Login] 登录成功 - by cloud")
-            return jsonify(response.json()), 200
-        else:
-            print("[Login] 登录失败")
-            return jsonify({"code": 1, "msg": "cloud authentication failed"}), 401
+        response = requests.post(
+            CLOUD_AUTH_URL,
+            json=data,
+            timeout=proxy.config.get("timeout", 30)
+        )
+        logger.info("[Login] 云端返回状态码: %s", response.status_code)
+        logger.debug("[Login] 云端返回内容: %s", response.text)
+        return Response(
+            response.content,
+            status=response.status_code,
+            content_type=response.headers.get('Content-Type', 'application/json')
+        )
     except requests.RequestException as e:
-        print("[Login] 登录失败")
+        logger.error("[Login] 云端请求异常: %s", str(e))
         return jsonify({"code": 1, "msg": "request to cloud failed"}), 500
 
     
 @app.route('/auth/logout', methods=['POST'])
 def logout_proxy():
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    logger.info("🔑 [Logout] 收到退出请求，token: %s", token)
+    if token in sessions:
+        user = sessions.pop(token)
+        logger.info("✅ [Logout] 本地退出成功, 用户: %s", user)
+        return jsonify({"code": 200, "msg": "操作成功", "data": None}), 200
+    else:
+        logger.debug("[Logout] 本地会话不存在，尝试云端登出")
+
     try:
         payload = request.get_data()
         headers = {
             key: value for key, value in request.headers.items()
             if key.lower() != 'host'
         }
-        response = requests.post(CLOUD_LOGOUT_URL, headers=headers, data=payload)
+        response = requests.post(
+            CLOUD_LOGOUT_URL,
+            headers=headers,
+            data=payload,
+            timeout=proxy.config.get("timeout", 30)
+        )
+        logger.info("[Logout] 云端返回状态码: %s", response.status_code)
+        logger.debug("[Logout] 云端返回内容: %s", response.text)
         try:
             result = response.json()
         except Exception:
             result = {"code": 500, "msg": "云端响应格式错误", "raw": response.text}
         if response.status_code == 200:
-            print("[Logout] 退出成功 - by cloud")
+            logger.info("✅ [Logout] 退出成功 - by cloud")
         else:
-            print("[Logout] 退出失败")
+            logger.warning("❌ [Logout] 退出失败 - by cloud")
         return jsonify(result), response.status_code
     except Exception as e:
-        print("[Logout] 退出失败")
+        logger.error("[Logout] 云端请求异常: %s", str(e))
         return jsonify({"code": 500, "msg": "代理登出失败", "error": str(e)}), 500
 
-if __name__ == '__main__':
-    # app.run(debug=True, host='0.0.0.0', port=8080)
-    pass
-
-from gevent import monkey; monkey.patch_all()
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 if __name__ == '__main__':
 
-    monkey.patch_all()
-
+    # monkey.patch_all() has already been called at the top of the file
     import logging
     
 
@@ -1114,14 +1191,19 @@ if __name__ == '__main__':
     Thread(target=cleanup_task, daemon=True).start()
     
 
-    server = WSGIServer(("0.0.0.0", 8080), app, handler_class=WebSocketHandler)
-    logger.info("✅ HTTP & WebSocket 服务启动成功")
-
     port = proxy.config.get('proxy_port', 8080)
+    server = WSGIServer(
+        ("0.0.0.0", port),
+        app,
+        handler_class=WebSocketHandler,
+        log=None
+    )
+    logger.info("✅ HTTP & WebSocket 服务启动成功")
     logger.info(f"🟢 代理服务启动，监听端口: {port}")
-    logger.info(f"✅ 工作流映射配置加载完成，工作流数量: {len(proxy.mappings.get('workflow_mappings', {}))}")
+    logger.info(
+        f"✅ 工作流映射配置加载完成，工作流数量: {len(proxy.mappings.get('workflow_mappings', {}))}"
+    )
     print("============== 欢迎使用绘影 AICG 代理终端服务 v2.5  ==============")
 
-    server = WSGIServer(('0.0.0.0', port), app, log=None)
     server.serve_forever()
 
