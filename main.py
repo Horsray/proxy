@@ -13,6 +13,20 @@ import uuid
 import copy
 import logging
 logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
+USERS_FILE = "users.json"
+sessions = {}
+
+def load_local_users():
+    if os.path.exists(USERS_FILE):
+        try:
+            with open(USERS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data.get("users", {})
+        except Exception as e:
+            logging.warning(f"Failed to load local users: {e}")
+    return {}
+
+LOCAL_USERS = load_local_users()
 from datetime import datetime, timedelta
 from threading import Thread, Lock
 from flask import Flask, request, jsonify, Response
@@ -1009,6 +1023,11 @@ CLOUD_CHECK_URL = "https://umanage.lightcc.cloud/prod-api/psPlus/workflow/checkO
 @app.route('/psPlus/workflow/checkOnline', methods=['GET'])
 def check_online():
     headers = dict(request.headers)
+    token = headers.get('Authorization', '').replace('Bearer ', '')
+    if token in sessions:
+        logger.info("✅ 在线检查通过 - local")
+        return jsonify({"code": 200, "msg": "操作成功", "data": {"online": True}}), 200
+
     try:
         logger.info("🔍 [CheckOnline] 收到请求")
         logger.debug("[CheckOnline] Headers: %s", headers)
@@ -1059,7 +1078,29 @@ CLOUD_AUTH_URL = "https://umanage.lightcc.cloud/prod-api/auth/login"
 CLOUD_LOGOUT_URL = "https://umanage.lightcc.cloud/prod-api/auth/logout"
 @app.route('/auth/login', methods=['POST'])
 def login_compatible():
-    data = request.get_json()
+    data = request.get_json() or {}
+    username = data.get("username")
+    password = data.get("password")
+
+    user = LOCAL_USERS.get(username)
+    if user and user.get("password") == password:
+        token = uuid.uuid4().hex
+        sessions[token] = username
+        logger.info("[Login] 本地认证成功")
+        return jsonify({
+            "code": 200,
+            "msg": "操作成功",
+            "data": {
+                "scope": None,
+                "openid": None,
+                "access_token": token,
+                "refresh_token": None,
+                "expire_in": 604799,
+                "refresh_expire_in": None,
+                "client_id": data.get("clientId")
+            }
+        }), 200
+
     try:
         response = requests.post(
             CLOUD_AUTH_URL,
@@ -1068,17 +1109,26 @@ def login_compatible():
         )
         if response.status_code == 200:
             print("[Login] 登录成功 - by cloud")
-            return jsonify(response.json()), 200
         else:
             print("[Login] 登录失败")
-            return jsonify({"code": 1, "msg": "cloud authentication failed"}), 401
-    except requests.RequestException as e:
+        return Response(
+            response.content,
+            status=response.status_code,
+            content_type=response.headers.get('Content-Type', 'application/json')
+        )
+    except requests.RequestException:
         print("[Login] 登录失败")
         return jsonify({"code": 1, "msg": "request to cloud failed"}), 500
 
     
 @app.route('/auth/logout', methods=['POST'])
 def logout_proxy():
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    if token in sessions:
+        sessions.pop(token, None)
+        logger.info("[Logout] 本地退出成功")
+        return jsonify({"code": 200, "msg": "操作成功", "data": None}), 200
+
     try:
         payload = request.get_data()
         headers = {
