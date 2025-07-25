@@ -1184,46 +1184,49 @@ def login_compatible():
 
     logger.info("🔑 [Login] 收到登录请求，用户名: %s", username)
 
+    # 每次登录时重新加载本地用户，确保用户信息最新
+    load_local_users()
     user = LOCAL_USERS.get(username)
     if user:
         logger.info("[Login] 在本地用户列表中找到用户 %s", username)
     else:
         logger.info("[Login] 本地用户列表中未找到用户 %s", username)
 
-    if user and user.get("password") == password:
-        # 清理旧 token 并更新为最新
-        old_tokens = [t for t, u in sessions.items() if u == username]
-        for t in old_tokens:
-            del sessions[t]
-            logger.info(f"🔄 旧 token 清除: {t[:8]}...")
-        # 生成新token
-        token = uuid.uuid4().hex
-        sessions[token] = username
-        user_latest_token[username] = token
-        # 保存用户登录时的 headers，用于 checkOnline 校验使用
-        user_latest_headers[username] = dict(request.headers)
-        logger.debug(f"[Login] 为用户 {username} 存储 token: {token}")
-        logger.debug(f"[Login] 为用户 {username} 存储 headers: {user_latest_headers[username]}")
-        logger.debug(f"[Login] 当前 user_latest_token 状态: {user_latest_token}")
-        logger.info("✅ [Login] 本地认证成功 (已清理旧会话)")
-        return jsonify({
-            "code": 200,
-            "msg": "操作成功",
-            "data": {
-                "scope": None,
-                "openid": None,
-                "access_token": token,
-                "refresh_token": None,
-                "expire_in": 604799,
-                "refresh_expire_in": None,
-                "client_id": data.get("clientId")
-            }
-        }), 200
-
     if user:
+        if user.get("password") == password:
+            # 清理旧 token 并更新为最新
+            old_tokens = [t for t, u in sessions.items() if u == username]
+            for t in old_tokens:
+                del sessions[t]
+                logger.info(f"🔄 旧 token 清除: {t[:8]}...")
+            # 生成新token
+            token = uuid.uuid4().hex
+            sessions[token] = username
+            user_latest_token[username] = token
+            # 保存用户登录时的 headers，用于 checkOnline 校验使用
+            user_latest_headers[username] = dict(request.headers)
+            logger.debug(f"[Login] 为用户 {username} 存储 token: {token}")
+            logger.debug(f"[Login] 为用户 {username} 存储 headers: {user_latest_headers[username]}")
+            logger.debug(f"[Login] 当前 user_latest_token 状态: {user_latest_token}")
+            logger.info("✅ [Login] 本地认证成功 (已清理旧会话)")
+            return jsonify({
+                "code": 200,
+                "msg": "操作成功",
+                "data": {
+                    "scope": None,
+                    "openid": None,
+                    "access_token": token,
+                    "refresh_token": None,
+                    "expire_in": 604799,
+                    "refresh_expire_in": None,
+                    "client_id": data.get("clientId")
+                }
+            }), 200
+
         logger.warning("[Login] 本地密码不匹配")
-    else:
-        logger.info("[Login] 本地认证失败，尝试云端登录")
+        return jsonify({"code": 401, "msg": "密码错误"}), 401
+
+    logger.info("[Login] 本地认证失败，尝试云端登录")
 
     try:
         response = requests.post(
