@@ -63,8 +63,11 @@ def load_local_users():
     try:
         if os.path.exists(USERS_FILE):
             with open(USERS_FILE, 'r', encoding='utf-8') as f:
-                LOCAL_USERS = json.load(f)
-                logger.info(f"📦 已加载本地用户: {list(LOCAL_USERS.keys())}")
+                # users.json 结构为 {"users": {username: info}}
+                LOCAL_USERS = json.load(f).get("users", {})
+                logger.info(
+                    f"📦 已加载本地用户: {list(LOCAL_USERS.keys())}"
+                )
         else:
             logger.warning(f"⚠️ 用户文件不存在: {USERS_FILE}")
             LOCAL_USERS = {}
@@ -73,8 +76,17 @@ def load_local_users():
         LOCAL_USERS = {}
     return LOCAL_USERS
 
-# 初始化本地用户数据
-load_local_users()
+
+def save_local_users():
+    """将当前 LOCAL_USERS 写回 USERS_FILE"""
+    try:
+        with open(USERS_FILE, "w", encoding="utf-8") as f:
+            json.dump({"users": LOCAL_USERS}, f, indent=4, ensure_ascii=False)
+            logger.info("💾 本地用户数据已保存")
+    except Exception as e:
+        logger.error(f"❌ 保存本地用户失败: {e}")
+
+# 初始化本地用户数据将在日志系统初始化后执行
 
 from datetime import datetime, timedelta
 from threading import Thread, Lock
@@ -1205,6 +1217,10 @@ def login_compatible():
             user_latest_token[username] = token
             # 保存用户登录时的 headers，用于 checkOnline 校验使用
             user_latest_headers[username] = dict(request.headers)
+            # 更新最后登录时间并保存
+            user['last_login'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            LOCAL_USERS[username] = user
+            save_local_users()
             logger.debug(f"[Login] 为用户 {username} 存储 token: {token}")
             logger.debug(f"[Login] 为用户 {username} 存储 headers: {user_latest_headers[username]}")
             logger.debug(f"[Login] 当前 user_latest_token 状态: {user_latest_token}")
