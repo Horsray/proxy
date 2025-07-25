@@ -3,7 +3,7 @@
   "comfyui_url": "",
   "cloud_service_url": "https://proxy.hueying.cn",
   "proxy_port": 8080,
-  "load_from_cloud": true,
+  "load_from_cloud": false,
   "timeout": 30,
   "enable_parameter_validation": true,
   "enable_workflow_cache": true,

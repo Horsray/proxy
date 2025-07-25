@@ -2,8 +2,23 @@
     "users": {
         "horsray": {
             "password": "zzy83007932",
+            "nickname": "",
             "is_admin": true,
-            "created_at": "2025-07-24T14:12:25.809815",
+            "enabled": true,
+            "source": "add",
+            "created_at": "2025-07-24 14:12:25",
+            "last_login": "2025-07-25 16:20:11",
+            "price": 0
+        },
+        "hueying": {
+            "password": "shurui6688",
+            "nickname": "",
+            "is_admin": false,
+            "enabled": true,
+            "source": "add",
+            "price": 398.0,
+            "product": "绘影新版2.5",
+            "created_at": "2025-07-25 03:19:39",
             "last_login": null
         }
     }

@@ -1,36 +1,76 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-V2.5 
+绘影AICG代理服务器主程序
+
+该代理服务器负责连接绘影AI前端与ComfyUI后端，提供以下核心功能：
+- 用户认证与会话管理（支持本地和云端验证）
+- 工作流加载、参数映射与合并处理
+- 任务提交、进度跟踪与状态管理
+- WebSocket通信与消息队列管理
+- 客户端连接维护与资源自动清理
+
+版本: 2.5.0
 """
-from gevent import monkey
-monkey.patch_all()
 import os
 import json
-import requests
 import time
 import uuid
-import copy
 import logging
-logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
-# Path to local users file relative to this script
-USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
+from collections import defaultdict, deque
+import requests
+from flask import Flask, request, jsonify, Response, session
+from flask_cors import CORS
+import gevent
+from gevent import monkey
+from gevent.pywsgi import WSGIServer
+from geventwebsocket.handler import WebSocketHandler
+import threading
+
+monkey.patch_all()
+
+# 配置日志系统
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger(__name__)
+
+# 用户数据文件路径（存储本地认证用户信息）
+USERS_FILE = "users.json"
+# 本地用户缓存: {username: {password, ...}} - 加载自USERS_FILE
+LOCAL_USERS = {}
+# 活跃会话存储: {token: username} - 用于验证用户在线状态
+# 键为认证令牌，值为用户名
+
 sessions = {}
 
 def load_local_users():
-    """Load local user credentials from users.json."""
-    if os.path.exists(USERS_FILE):
-        try:
-            with open(USERS_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            logging.info(f"🔐 已加载本地用户文件: {USERS_FILE}")
-            logging.debug(f"本地用户列表: {list(data.get('users', {}).keys())}")
-            return data.get("users", {})
-        except Exception as e:
-            logging.error(f"❌ 本地用户文件加载失败: {e}")
-    else:
-        logging.warning(f"⚠️ 未找到本地用户文件: {USERS_FILE}")
-    return {}
+    """
+    加载本地用户数据到LOCAL_USERS全局变量
+    从USERS_FILE指定的JSON文件读取用户信息，支持本地认证
+    如果文件不存在或读取失败，将初始化空用户字典
+    
+    返回:
+        dict: 加载成功的用户字典，格式为{username: {password, ...}}
+    """
+    global LOCAL_USERS
+    try:
+        if os.path.exists(USERS_FILE):
+            with open(USERS_FILE, 'r', encoding='utf-8') as f:
+                LOCAL_USERS = json.load(f)
+                logger.info(f"📦 已加载本地用户: {list(LOCAL_USERS.keys())}")
+        else:
+            logger.warning(f"⚠️ 用户文件不存在: {USERS_FILE}")
+            LOCAL_USERS = {}
+    except Exception as e:
+        logger.error(f"❌ 加载本地用户失败: {e}")
+        LOCAL_USERS = {}
+    return LOCAL_USERS
+
+# 初始化本地用户数据
+load_local_users()
 
 from datetime import datetime, timedelta
 from threading import Thread, Lock
@@ -103,107 +143,88 @@ def adapt_workflow_paths(workflow_data, comfyui_url: str):
 
 
 comfyui_ws = None  
-message_queue = defaultdict(deque) 
-task_status = {}  
-client_last_seen = {}  
-upload_progress = {}  
-queue_lock = Lock()  
-task_result_cache = {}
+# 消息队列管理 - 用于在客户端和服务器间传递实时消息
+# 数据结构: {client_id: deque([message1, message2, ...])}
+message_queue = defaultdict(deque)
+# 客户端最后活动时间 - 用于清理非活跃连接
+# 数据结构: {client_id: timestamp}
+client_last_seen = {}
+# 任务状态跟踪 - 记录工作流执行进度
+# 数据结构: {prompt_id: {type, data, timestamp, enhanced}}
+task_status = {}
+# 线程锁 - 确保消息队列操作的线程安全
+broadcast_lock = threading.Lock()
+queue_lock = threading.Lock()
 
 def start_progress_tracker_by_mapping(prompt_id, workflow_id, client_id, comfyui_url):
-    comfyui_url = sanitize_url(comfyui_url)
+    """
+    初始化工作流进度跟踪器
+    根据工作流映射配置启动进度跟踪，监控任务执行状态并向客户端推送更新
+    
+    参数:
+        prompt_id (str): 任务ID，用于标识特定工作流执行实例
+        workflow_id (str): 工作流模板ID
+        client_id (str): 客户端ID，用于定向推送进度消息
+        comfyui_url (str): ComfyUI服务地址
+    """
     try:
-        with open("workflow_mappings.json", "r", encoding="utf-8") as f:
-            mappings = json.load(f).get("workflow_mappings", {})
-            total_nodes = mappings.get(workflow_id, {}).get("node_count", 20)  # 默认 20
+        workflow_mappings = proxy.mappings.get('workflow_mappings', {})
+        workflow_info = workflow_mappings.get(workflow_id, {})
+        node_mappings = workflow_info.get('node_mappings', {})
+        total_nodes = len(node_mappings)
+
+        proxy.workflow_node_count[workflow_id] = total_nodes
+
+        task_status[prompt_id] = {
+            "type": "start",
+            "data": {
+                "prompt_id": prompt_id,
+                "workflow_id": workflow_id,
+                "client_id": client_id,
+                "total_nodes": total_nodes,
+                "completed_nodes": 0,
+                "node_status": {}
+            },
+            "timestamp": time.time()
+        }
+
+        logger.info(f"📊 已初始化进度跟踪: {workflow_id} (节点总数: {total_nodes})")
     except Exception as e:
-        logger.warning(f"⚠️ 获取工作流节点总数失败: {e}")
-        total_nodes = 20
-
-    def track():
-        max_poll = 120
-        for i in range(1, max_poll + 1):
-            try:
-                url = f"{comfyui_url}/history/{prompt_id}"
-                resp = requests.get(url, timeout=3)
-                if resp.status_code != 200:
-                    logger.debug(f"轮询 {i} 次 - ComfyUI 返回状态码: {resp.status_code}")
-                    print(f"\rDEBUG  -  🎯 正在等待任务完成... 已轮询 {i} 次，尚未获取到历史记录", end="", flush=True)
-                    time.sleep(1)
-                    continue
-
-                data = resp.json()
-                if prompt_id not in data:
-                    print(f"\rDEBUG  -  🎯 正在等待任务完成... 已轮询 {i} 次，尚无该任务记录", end="", flush=True)
-                    time.sleep(1)
-                    continue
-
-                history_data = data[prompt_id]
-                status = history_data.get("status", {})
-
-                outputs = history_data.get("outputs", {})
-                current_node = len(outputs)
-
-                if status.get("status_str") == "success":
-                    current_node = total_nodes
-                elif status.get("status_str") == "error":
-                    current_node = 0
-
-                percent = int((current_node / max(1, total_nodes)) * 100)
-
-                print(f"\rDEBUG  -  🎯 正在等待任务完成... 已轮询 {i} 次，进度 {percent}% [节点 {current_node}/{total_nodes}]", end="", flush=True)
-
-                
-                add_message_to_queue(client_id, {
-                    "type": "executing",        
-                    "level": "info",           
-                    "data": {
-                        "prompt_id":     prompt_id,
-                        "workflow_id":   workflow_id,
-                        "node":          current_node    
-                    }
-                })
-
-                add_message_to_queue(client_id, {
-                    "type": "progress",          
-                    "level": "info",             
-                    "data": {
-                        "prompt_id":      prompt_id,
-                        "workflow_id":    workflow_id,
-                        "value":          current_node,    
-                        "max":            total_nodes,     
-                        "percentage":     percent,         
-                        "sampler_step":   sampler_step,    
-                        "sampler_steps":  sampler_steps
-                    }
-                })
-                if current_node >= total_nodes or status.get("status_str") in ["success", "error"]:
-                    print()  # 完成后换行
-                    logger.info(f"📈 进度更新: {percent}% [节点 {current_node}/{total_nodes}]")
-                    break
-
-            except Exception as e:
-                print(f"\rDEBUG  -  🎯 第 {i} 次轮询异常: {e}", end="", flush=True)
-            time.sleep(1)
+        logger.error(f"❌ 进度跟踪初始化失败: {e}")
 
 
 def add_message_to_queue(client_id, message):
-   
-    with queue_lock:
+    """
+    向指定客户端的消息队列添加消息，并添加时间戳和类型信息
+    线程安全设计，使用queue_lock确保多线程环境下的数据一致性
     
-        if len(message_queue[client_id]) > 100:
-            message_queue[client_id].popleft()
-     
-        enhanced_message = {
-            "id": str(uuid.uuid4())[:8],
-            "timestamp": time.time(),
-            "data": message
-        }
+    参数:
+        client_id (str): 客户端唯一标识符
+        message (dict): 要发送的消息字典，必须包含'type'字段
+    """
+    with queue_lock:
+        if client_id not in message_queue:
+            message_queue[client_id] = deque()
         
+        # 增强消息内容，添加时间戳
+        enhanced_message = {
+            **message,
+            "timestamp": time.time()
+        }
         message_queue[client_id].append(enhanced_message)
         logger.info(f"📨 消息已添加到客户端队列: {client_id} (类型: {message.get('type', 'unknown')})")
 
 def get_messages_for_client(client_id, since_timestamp=None):
+    """
+    获取客户端自指定时间戳以来的未读消息，并清理历史消息
+    保留最近20条消息以优化内存使用
+    
+    参数:
+        client_id (str): 客户端唯一标识符
+        since_timestamp (float): 时间戳，仅返回此时间之后的消息
+    返回:
+        list: 消息列表，每条消息包含'timestamp'和原始内容
+    """
     
     with queue_lock:
         client_last_seen[client_id] = time.time()
@@ -259,11 +280,19 @@ def cleanup_inactive_clients():
 
 
 def comfy_ws_listener():
+    """
+    ComfyUI WebSocket监听器
+    建立与ComfyUI的WebSocket连接，接收实时执行状态消息并增强处理后转发给客户端
+    支持的消息类型: status, executing, progress, executed
+    
+    消息增强: 添加进度百分比、节点ID、时间戳等额外信息，便于前端展示
+    """
     import websocket
     import json
     import copy
 
     def enhance_message(original_message):
+        """增强原始消息，添加额外元数据"""
         enhanced = copy.deepcopy(original_message)
         msg_type = enhanced.get("type")
         data = enhanced.get("data", {})
@@ -410,7 +439,7 @@ def cleanup_task():
         try:
             cleanup_inactive_clients()
             
-           
+            #  清理过期任务
             current_time = time.time()
             expired_tasks = []
             for prompt_id, status_info in task_status.items():
@@ -426,32 +455,56 @@ def cleanup_task():
         except Exception as e:
             logger.error(f"清理任务异常: {e}")
         
-        time.sleep(60)  
+        time.sleep(60)  # 每60秒执行一次
 
  
 class HuiYingProxy:
+    """
+    绘影代理核心类，负责工作流管理、参数映射和ComfyUI通信
+    
+    该类协调配置加载、工作流处理和任务提交的全过程，支持本地和云端两种模式：
+    - 本地模式：从本地文件系统加载配置和工作流
+    - 云端模式：从远程服务器获取配置和工作流资源
+    """
     def __init__(self, config_file='config.json', mappings_file='workflow_mappings.json'):
+        """
+        初始化HuiYingProxy实例
+        
+        参数:
+            config_file (str): 配置文件路径，默认为'config.json'
+            mappings_file (str): 工作流参数映射文件路径，默认为'workflow_mappings.json'
+        """
         self.config_file = config_file
         self.mappings_file = mappings_file
         self.config = self.load_config(config_file)
         self.mappings = self.load_mappings(mappings_file)
-        self.workflow_cache = {}
-        self.workflow_node_count = {}
+        self.workflow_cache = {}  # 工作流缓存: {workflow_id: workflow_data}
+        self.workflow_node_count = {}  # 工作流节点计数: {workflow_id: node_count}
         if self.config.get('load_from_cloud'):
             self.preload_workflows()
 
     def save_config(self):
-        """Persist current configuration to disk."""
+        """
+        将当前配置保存到磁盘
+        确保配置更改持久化，用于保存用户设置和系统配置
+        """
         try:
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(self.config, f, indent=2, ensure_ascii=False)
             logger.info("💾 配置已保存")
         except Exception as e:
             logger.warning(f"⚠️ 配置保存失败: {e}")
-        
 
     def load_config(self, config_file):
+        """
+        加载并合并配置文件
+        从指定文件加载用户配置，与默认配置合并，处理路径标准化
         
+        参数:
+            config_file (str): 配置文件路径
+        返回:
+            dict: 合并后的完整配置字典
+        """
         
         default_config = {
             "workflow_dir": "workflows",
@@ -670,7 +723,17 @@ def log_all_requests():
 # 处理跨域请求
 @app.route('/api/poll', methods=['GET'])
 def poll_messages():
-
+    """
+    客户端消息轮询接口
+    供前端定期调用以获取新消息，支持增量获取（只返回指定时间戳后的消息）
+    同时更新客户端最后活动时间，用于连接状态管理
+    
+    请求参数:
+        clientId (str): 客户端唯一标识符，必需
+        since (float): 可选，时间戳，只返回此时间之后的消息
+    返回:
+        json: 包含消息列表和服务器状态的响应
+    """
     client_id = request.args.get('clientId')
     since_timestamp = request.args.get('since', type=float)
     
@@ -680,7 +743,7 @@ def poll_messages():
     try:
         messages = get_messages_for_client(client_id, since_timestamp)
         
-
+        
         extra_info = {
             "active_tasks": len(task_status),
             "queue_size": len(message_queue.get(client_id, [])),
@@ -704,11 +767,19 @@ def poll_messages():
 
 @app.route('/api/task_status/<prompt_id>', methods=['GET'])
 def get_task_status(prompt_id):
-
+    """
+    获取任务状态接口
+    查询指定prompt_id的工作流执行状态，包括进度、节点信息和时效性
+    
+    请求参数:
+        prompt_id (str): 任务ID，从URL路径获取
+    返回:
+        json: 包含任务状态、执行信息和时效性的响应
+    """
     try:
         if prompt_id in task_status:
             status_info = task_status[prompt_id]
-         
+            
             enhanced_status = {
                 **status_info,
                 "age_seconds": time.time() - status_info["timestamp"],
@@ -985,6 +1056,16 @@ import time
 
 @app.route("/ws")
 def proxy_ws():
+    """
+    WebSocket代理接口
+    建立客户端与服务器间的WebSocket连接，用于实时消息推送
+    替代HTTP轮询，提供更高效的实时通信
+    
+    请求参数:
+        clientId: 客户端唯一标识符
+    返回:
+        WebSocket连接: 双向通信通道
+    """
     ws = request.environ.get("wsgi.websocket")
     if not ws:
         logger.warning("❌ 插件发来的是普通 HTTP 请求，非 WebSocket")
@@ -1031,6 +1112,17 @@ CLOUD_CHECK_URL = "https://umanage.lightcc.cloud/prod-api/psPlus/workflow/checkO
 
 @app.route('/psPlus/workflow/checkOnline', methods=['GET'])
 def check_online():
+    """
+    在线状态检查接口
+    验证用户是否处于登录状态，优先检查本地会话，本地不存在时转发至云端验证
+    用于前端定期确认用户在线状态，决定是否需要重新登录
+    
+    请求头:
+        Authorization: Bearer {token} - 用户认证令牌
+    返回:
+        json: 包含在线状态的响应，本地检查通过返回{online: true}
+              云端检查则返回云端服务的原始响应
+    """
     headers = dict(request.headers)
     token = headers.get('Authorization', '').replace('Bearer ', '')
     if token in sessions:
@@ -1067,7 +1159,14 @@ def check_online():
 
 @app.route('/health', methods=['GET'])
 def health_check():
-
+    """
+    服务健康检查接口
+    提供服务状态信息，用于监控系统检查服务可用性
+    返回服务版本、状态和支持的功能列表
+    
+    返回:
+        json: 包含服务状态和元数据的响应
+    """
     return jsonify({
         "status": "healthy",
         "service": "huiying-proxy-enhanced-fixed",
@@ -1097,9 +1196,15 @@ def login_compatible():
         logger.info("[Login] 本地用户列表中未找到用户 %s", username)
 
     if user and user.get("password") == password:
+        # 使该用户所有旧token失效
+        old_tokens = [t for t, u in sessions.items() if u == username]
+        for t in old_tokens:
+            del sessions[t]
+            logger.info(f"🔄 检测到用户在其他设备登录，触发强制下线: {t[:8]}...")
+        # 生成新token
         token = uuid.uuid4().hex
         sessions[token] = username
-        logger.info("✅ [Login] 本地认证成功")
+        logger.info("✅ [Login] 本地认证成功 (已清理旧会话)")
         return jsonify({
             "code": 200,
             "msg": "操作成功",
@@ -1145,11 +1250,21 @@ def login_compatible():
     
 @app.route('/auth/logout', methods=['POST'])
 def logout_proxy():
+    """
+    用户登出接口
+    支持本地会话清除和云端登出，优先清除本地会话
+    本地会话不存在时转发登出请求至云端服务
+    
+    请求头:
+        Authorization: Bearer {token} - 用户认证令牌
+    返回:
+        json: 登出结果响应
+    """
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
-    logger.info("🔑 [Logout] 收到退出请求，token: %s", token)
+    logger.info(f"🔑 [Logout] 收到退出请求，token: {token}")
     if token in sessions:
         user = sessions.pop(token)
-        logger.info("✅ [Logout] 本地退出成功, 用户: %s", user)
+        logger.info(f"✅ [Logout] 本地退出成功, 用户: {user}")
         return jsonify({"code": 200, "msg": "操作成功", "data": None}), 200
     else:
         logger.info("[Logout] 本地会话不存在，尝试云端登出")

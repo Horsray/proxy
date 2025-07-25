@@ -35759,3 +35759,789 @@ KeyError: 'data'
 2025-07-21 21:26:02,394 - INFO - 📡 收到插件接口请求: POST /auth/logout
 2025-07-21 21:26:04,582 - INFO - 📡 收到插件接口请求: POST /auth/login
 2025-07-21 21:26:17,539 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 03:11:54,539 - INFO - 🔐 已加载本地用户文件: E:\HueyingAI_Local\proxy-i4o1u3-codex-create-user-management-system 3\users.json
+2025-07-25 03:11:54,539 - DEBUG - 本地用户列表: ['horsray']
+2025-07-25 03:11:54,541 - INFO - 📁 开始扫描所需的必要文件
+2025-07-25 03:11:54,542 - INFO - ✅ 基础配置文件加载成功: config.json
+2025-07-25 03:11:54,542 - INFO - 📁 将从云端加载工作流和映射配置
+2025-07-25 03:11:54,542 - INFO - 🔗 当前 ComfyUI 地址: 
+2025-07-25 03:11:55,774 - ERROR - ❌ 加载云端映射配置失败: 404 Client Error: Not Found for url: https://proxy.hueying.cn/workflow_mappings.json
+2025-07-25 03:11:55,787 - INFO - 🔧 启动 ComfyUI WebSocket 监听线程...
+2025-07-25 03:11:55,787 - INFO - 🔄 已使用增强HTTP轮询模式
+2025-07-25 03:11:55,787 - INFO - 🔧 启动清理任务线程服务
+2025-07-25 03:11:55,788 - INFO - ✅ HTTP & WebSocket 服务启动成功
+2025-07-25 03:11:55,788 - INFO - 🟢 代理服务启动，监听端口: 8080
+2025-07-25 03:11:55,788 - INFO - ✅ 工作流映射配置加载完成，工作流数量: 0
+2025-07-25 03:12:21,761 - INFO - 🔐 已加载本地用户文件: E:\HueyingAI_Local\proxy-i4o1u3-codex-create-user-management-system 3\users.json
+2025-07-25 03:12:21,761 - DEBUG - 本地用户列表: ['horsray']
+2025-07-25 03:12:21,762 - INFO - 📁 开始扫描所需的必要文件
+2025-07-25 03:12:21,762 - INFO - ✅ 基础配置文件加载成功: config.json
+2025-07-25 03:12:21,762 - INFO - 📁 将从云端加载工作流和映射配置
+2025-07-25 03:12:21,762 - INFO - 🔗 当前 ComfyUI 地址: 
+2025-07-25 03:12:23,025 - ERROR - ❌ 加载云端映射配置失败: 404 Client Error: Not Found for url: https://proxy.hueying.cn/workflow_mappings.json
+2025-07-25 03:12:23,031 - INFO - 🔧 启动 ComfyUI WebSocket 监听线程...
+2025-07-25 03:12:23,031 - INFO - 🔄 已使用增强HTTP轮询模式
+2025-07-25 03:12:23,031 - INFO - 🔧 启动清理任务线程服务
+2025-07-25 03:12:23,031 - INFO - ✅ HTTP & WebSocket 服务启动成功
+2025-07-25 03:12:23,031 - INFO - 🟢 代理服务启动，监听端口: 8080
+2025-07-25 03:12:23,031 - INFO - ✅ 工作流映射配置加载完成，工作流数量: 0
+2025-07-25 06:28:27,608 - INFO - 🔐 已加载本地用户文件: /root/home/hueying_proxy/users.json
+2025-07-25 06:28:27,609 - DEBUG - 本地用户列表: ['horsray', 'hueying']
+2025-07-25 06:28:27,610 - INFO - 📁 开始扫描所需的必要文件
+2025-07-25 06:28:27,610 - INFO - ✅ 基础配置文件加载成功: config.json
+2025-07-25 06:28:27,610 - INFO - 📁 将从云端加载工作流和映射配置
+2025-07-25 06:28:27,610 - INFO - 🔗 当前 ComfyUI 地址: 
+2025-07-25 06:28:29,083 - ERROR - ❌ 加载云端映射配置失败: 502 Server Error: Bad Gateway for url: https://proxy.hueying.cn/workflow_mappings.json
+2025-07-25 06:30:49,105 - INFO - 🔐 已加载本地用户文件: /root/home/hueying_proxy/users.json
+2025-07-25 06:30:49,105 - DEBUG - 本地用户列表: ['horsray', 'hueying']
+2025-07-25 06:30:49,107 - INFO - 📁 开始扫描所需的必要文件
+2025-07-25 06:30:49,107 - INFO - ✅ 基础配置文件加载成功: config.json
+2025-07-25 06:30:49,107 - INFO - 📁 将从云端加载工作流和映射配置
+2025-07-25 06:30:49,107 - INFO - 🔗 当前 ComfyUI 地址: 
+2025-07-25 06:30:50,148 - ERROR - ❌ 加载云端映射配置失败: 502 Server Error: Bad Gateway for url: https://proxy.hueying.cn/workflow_mappings.json
+2025-07-25 06:34:12,331 - INFO - 🔐 已加载本地用户文件: /root/home/hueying_proxy/users.json
+2025-07-25 06:34:12,331 - DEBUG - 本地用户列表: ['horsray', 'hueying']
+2025-07-25 06:34:12,332 - INFO - 📁 开始扫描所需的必要文件
+2025-07-25 06:34:12,332 - INFO - ✅ 基础配置文件加载成功: config.json
+2025-07-25 06:34:12,332 - INFO - 📁 将从云端加载工作流和映射配置
+2025-07-25 06:34:12,332 - INFO - 🔗 当前 ComfyUI 地址: 
+2025-07-25 06:34:13,713 - ERROR - ❌ 加载云端映射配置失败: 502 Server Error: Bad Gateway for url: https://proxy.hueying.cn/workflow_mappings.json
+2025-07-25 06:34:13,722 - INFO - 🔧 启动 ComfyUI WebSocket 监听线程...
+2025-07-25 06:34:13,722 - INFO - 🔄 已使用增强HTTP轮询模式
+2025-07-25 06:34:13,722 - INFO - 🔧 启动清理任务线程服务
+2025-07-25 06:34:13,722 - INFO - ✅ HTTP & WebSocket 服务启动成功
+2025-07-25 06:34:13,722 - INFO - 🟢 代理服务启动，监听端口: 8080
+2025-07-25 06:34:13,722 - INFO - ✅ 工作流映射配置加载完成，工作流数量: 0
+2025-07-25 06:34:24,400 - DEBUG - Initializing WebSocket
+2025-07-25 06:34:24,400 - DEBUG - Validating WebSocket request
+2025-07-25 06:34:24,400 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 06:34:24,401 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 06:34:24,401 - INFO - 🔑 [Logout] 收到退出请求，token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJzeXNfdXNlcjoxOTM1NTE2MDg2MjY3MDM5NzQ1Iiwicm5TdHIiOiJjdHJMNUUyWWlpYjZGNXVuaTlTeUhVYU04dGpyTTA5USIsImNsaWVudGlkIjoiYzc1NDk2OTk0Y2RiOWUzOTdlZDdjYzQyM2NjYTZmODgiLCJ0ZW5hbnRJZCI6IjcwMDI0MyIsInVzZXJJZCI6MTkzNTUxNjA4NjI2NzAzOTc0NSwidXNlck5hbWUiOiJodWV5aW5nIiwiZGVwdElkIjoxOTM1NTE2MDg1OTMxNDk1NDI2LCJkZXB0TmFtZSI6Iue7mOW9sSIsImRlcHRDYXRlZ29yeSI6IiIsImRldmljZVR5cGUiOiJwbHVnaW4ifQ.WCqyVsPcesuZDr883gbpw8tl0Rz3MYslVvNv6HQdMhI
+2025-07-25 06:34:24,401 - INFO - [Logout] 本地会话不存在，尝试云端登出
+2025-07-25 06:34:24,706 - INFO - [Logout] 云端返回状态码: 200
+2025-07-25 06:34:24,707 - DEBUG - [Logout] 云端返回内容: {"code":200,"msg":"退出成功","data":null}
+2025-07-25 06:34:24,707 - INFO - ✅ [Logout] 退出成功 - by cloud
+2025-07-25 06:34:24,709 - INFO - 127.0.0.1 - - [2025-07-25 06:34:24] "POST /auth/logout HTTP/1.1" 200 198 0.308942
+2025-07-25 06:34:27,680 - DEBUG - Initializing WebSocket
+2025-07-25 06:34:27,680 - DEBUG - Validating WebSocket request
+2025-07-25 06:34:27,680 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 06:34:27,680 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 06:34:27,680 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 06:34:27,680 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 06:34:27,680 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 06:34:27,681 - INFO - 127.0.0.1 - - [2025-07-25 06:34:27] "POST /auth/login HTTP/1.1" 200 385 0.001494
+2025-07-25 06:35:13,685 - DEBUG - Initializing WebSocket
+2025-07-25 06:35:13,685 - DEBUG - Validating WebSocket request
+2025-07-25 06:35:13,685 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 06:35:13,686 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 06:35:13,686 - INFO - 🔑 [Logout] 收到退出请求，token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJzeXNfdXNlcjoxOTM1NTE2MDg2MjY3MDM5NzQ1Iiwicm5TdHIiOiJRZThqYUxSWlRXQjBzZkpTYlBuUHpRNU1seThCUGNiNSIsImNsaWVudGlkIjoiYzc1NDk2OTk0Y2RiOWUzOTdlZDdjYzQyM2NjYTZmODgiLCJ0ZW5hbnRJZCI6IjcwMDI0MyIsInVzZXJJZCI6MTkzNTUxNjA4NjI2NzAzOTc0NSwidXNlck5hbWUiOiJodWV5aW5nIiwiZGVwdElkIjoxOTM1NTE2MDg1OTMxNDk1NDI2LCJkZXB0TmFtZSI6Iue7mOW9sSIsImRlcHRDYXRlZ29yeSI6IiIsImRldmljZVR5cGUiOiJwbHVnaW4ifQ.ZvbGPUUZN9f2qrBNA8l1epnMkbfnKJDcs1QwWOjXEqs
+2025-07-25 06:35:13,686 - INFO - [Logout] 本地会话不存在，尝试云端登出
+2025-07-25 06:35:14,121 - INFO - [Logout] 云端返回状态码: 200
+2025-07-25 06:35:14,121 - DEBUG - [Logout] 云端返回内容: {"code":200,"msg":"退出成功","data":null}
+2025-07-25 06:35:14,122 - INFO - ✅ [Logout] 退出成功 - by cloud
+2025-07-25 06:35:14,123 - INFO - 127.0.0.1 - - [2025-07-25 06:35:14] "POST /auth/logout HTTP/1.1" 200 198 0.438277
+2025-07-25 06:35:15,979 - DEBUG - Initializing WebSocket
+2025-07-25 06:35:15,980 - DEBUG - Validating WebSocket request
+2025-07-25 06:35:15,980 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 06:35:15,980 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 06:35:15,980 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 06:35:15,980 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 06:35:15,980 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 06:35:15,981 - INFO - 127.0.0.1 - - [2025-07-25 06:35:15] "POST /auth/login HTTP/1.1" 200 385 0.001307
+2025-07-25 06:35:21,608 - DEBUG - Initializing WebSocket
+2025-07-25 06:35:21,608 - DEBUG - Validating WebSocket request
+2025-07-25 06:35:21,608 - INFO - 📡 收到插件接口请求: GET /psPlus/workflow/checkOnline
+2025-07-25 06:35:21,609 - INFO - ✅ 在线检查通过 - local
+2025-07-25 06:35:21,609 - INFO - 127.0.0.1 - - [2025-07-25 06:35:21] "GET /psPlus/workflow/checkOnline HTTP/1.1" 200 209 0.000987
+2025-07-25 06:35:26,316 - DEBUG - Initializing WebSocket
+2025-07-25 06:35:26,316 - DEBUG - Validating WebSocket request
+2025-07-25 06:35:26,317 - INFO - 📡 收到插件接口请求: GET /psPlus/workflow/checkOnline
+2025-07-25 06:35:26,317 - INFO - ✅ 在线检查通过 - local
+2025-07-25 06:35:26,317 - INFO - 127.0.0.1 - - [2025-07-25 06:35:26] "GET /psPlus/workflow/checkOnline HTTP/1.1" 200 209 0.001244
+2025-07-25 15:09:20,180 - INFO - 🔐 已加载本地用户文件: /root/home/hueying_proxy/users.json
+2025-07-25 15:09:20,180 - DEBUG - 本地用户列表: ['horsray', 'hueying']
+2025-07-25 15:09:20,182 - INFO - 📁 开始扫描所需的必要文件
+2025-07-25 15:09:20,182 - INFO - ✅ 基础配置文件加载成功: config.json
+2025-07-25 15:09:20,182 - INFO - 📁 当前工作流路径为: /root/home/hueying_proxy/workflows
+2025-07-25 15:09:20,182 - INFO - 🔗 当前 ComfyUI 地址: 
+2025-07-25 15:09:20,183 - INFO - ✅ 初始化参数映射配置成功: workflow_mappings.json
+2025-07-25 15:09:20,190 - INFO - 🔧 启动 ComfyUI WebSocket 监听线程...
+2025-07-25 15:09:20,190 - INFO - 🔄 已使用增强HTTP轮询模式
+2025-07-25 15:09:20,190 - INFO - 🔧 启动清理任务线程服务
+2025-07-25 15:09:20,190 - INFO - ✅ HTTP & WebSocket 服务启动成功
+2025-07-25 15:09:20,190 - INFO - 🟢 代理服务启动，监听端口: 8080
+2025-07-25 15:09:20,191 - INFO - ✅ 工作流映射配置加载完成，工作流数量: 14
+2025-07-25 15:09:20,697 - INFO - 🔐 已加载本地用户文件: /root/home/hueying_proxy/users.json
+2025-07-25 15:09:20,697 - DEBUG - 本地用户列表: ['horsray', 'hueying']
+2025-07-25 15:09:20,698 - INFO - 📁 开始扫描所需的必要文件
+2025-07-25 15:09:20,698 - INFO - ✅ 基础配置文件加载成功: config.json
+2025-07-25 15:09:20,698 - INFO - 📁 当前工作流路径为: /root/home/hueying_proxy/workflows
+2025-07-25 15:09:20,698 - INFO - 🔗 当前 ComfyUI 地址: 
+2025-07-25 15:09:20,699 - INFO - ✅ 初始化参数映射配置成功: workflow_mappings.json
+2025-07-25 15:09:20,705 - INFO - 🔧 启动 ComfyUI WebSocket 监听线程...
+2025-07-25 15:09:20,705 - INFO - 🔄 已使用增强HTTP轮询模式
+2025-07-25 15:09:20,705 - INFO - 🔧 启动清理任务线程服务
+2025-07-25 15:09:20,706 - INFO - ✅ HTTP & WebSocket 服务启动成功
+2025-07-25 15:09:20,706 - INFO - 🟢 代理服务启动，监听端口: 8080
+2025-07-25 15:09:20,706 - INFO - ✅ 工作流映射配置加载完成，工作流数量: 14
+2025-07-25 15:10:17,735 - DEBUG - Initializing WebSocket
+2025-07-25 15:10:17,736 - DEBUG - Validating WebSocket request
+2025-07-25 15:10:17,736 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:10:17,736 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:10:17,736 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:10:17,736 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:10:17,736 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:10:17,737 - INFO - 127.0.0.1 - - [2025-07-25 15:10:17] "POST /auth/login HTTP/1.1" 200 385 0.001901
+2025-07-25 15:10:30,505 - DEBUG - Initializing WebSocket
+2025-07-25 15:10:30,505 - DEBUG - Validating WebSocket request
+2025-07-25 15:10:30,505 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:10:30,506 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:10:30,506 - INFO - 🔑 [Logout] 收到退出请求，token: 6e00c24987164c458932a61dfe79e8e2
+2025-07-25 15:10:30,506 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 15:10:30,507 - INFO - 127.0.0.1 - - [2025-07-25 15:10:30] "POST /auth/logout HTTP/1.1" 200 198 0.001612
+2025-07-25 15:10:36,211 - DEBUG - Initializing WebSocket
+2025-07-25 15:10:36,211 - DEBUG - Validating WebSocket request
+2025-07-25 15:10:36,211 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:10:36,211 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:10:36,212 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:10:36,212 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:10:36,212 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:10:36,212 - INFO - 127.0.0.1 - - [2025-07-25 15:10:36] "POST /auth/login HTTP/1.1" 200 385 0.001795
+2025-07-25 15:23:45,593 - INFO - 🔐 已加载本地用户文件: /root/home/hueying_proxy/users.json
+2025-07-25 15:23:45,593 - DEBUG - 本地用户列表: ['horsray', 'hueying']
+2025-07-25 15:23:45,595 - INFO - 📁 开始扫描所需的必要文件
+2025-07-25 15:23:45,595 - INFO - ✅ 基础配置文件加载成功: config.json
+2025-07-25 15:23:45,595 - INFO - 📁 当前工作流路径为: /root/home/hueying_proxy/workflows
+2025-07-25 15:23:45,595 - INFO - 🔗 当前 ComfyUI 地址: 
+2025-07-25 15:23:45,596 - INFO - ✅ 初始化参数映射配置成功: workflow_mappings.json
+2025-07-25 15:23:45,603 - INFO - 🔧 启动 ComfyUI WebSocket 监听线程...
+2025-07-25 15:23:45,603 - INFO - 🔄 已使用增强HTTP轮询模式
+2025-07-25 15:23:45,603 - INFO - 🔧 启动清理任务线程服务
+2025-07-25 15:23:45,603 - INFO - ✅ HTTP & WebSocket 服务启动成功
+2025-07-25 15:23:45,603 - INFO - 🟢 代理服务启动，监听端口: 8080
+2025-07-25 15:23:45,603 - INFO - ✅ 工作流映射配置加载完成，工作流数量: 14
+2025-07-25 15:24:18,687 - DEBUG - Initializing WebSocket
+2025-07-25 15:24:18,688 - DEBUG - Validating WebSocket request
+2025-07-25 15:24:18,688 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:24:18,688 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:24:18,688 - INFO - 🔑 [Logout] 收到退出请求，token: a9b3888c523b4dfe99f045ad51f2af8d
+2025-07-25 15:24:18,689 - INFO - [Logout] 本地会话不存在，尝试云端登出
+2025-07-25 15:24:18,993 - INFO - [Logout] 云端返回状态码: 200
+2025-07-25 15:24:18,993 - DEBUG - [Logout] 云端返回内容: {"code":200,"msg":"退出成功","data":null}
+2025-07-25 15:24:18,993 - INFO - ✅ [Logout] 退出成功 - by cloud
+2025-07-25 15:24:18,996 - INFO - 127.0.0.1 - - [2025-07-25 15:24:18] "POST /auth/logout HTTP/1.1" 200 198 0.309660
+2025-07-25 15:24:24,293 - DEBUG - Initializing WebSocket
+2025-07-25 15:24:24,294 - DEBUG - Validating WebSocket request
+2025-07-25 15:24:24,294 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:24:24,294 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:24:24,294 - INFO - 🔑 [Logout] 收到退出请求，token: a9b3888c523b4dfe99f045ad51f2af8d
+2025-07-25 15:24:24,294 - INFO - [Logout] 本地会话不存在，尝试云端登出
+2025-07-25 15:24:24,412 - INFO - [Logout] 云端返回状态码: 200
+2025-07-25 15:24:24,412 - DEBUG - [Logout] 云端返回内容: {"code":200,"msg":"退出成功","data":null}
+2025-07-25 15:24:24,412 - INFO - ✅ [Logout] 退出成功 - by cloud
+2025-07-25 15:24:24,415 - INFO - 127.0.0.1 - - [2025-07-25 15:24:24] "POST /auth/logout HTTP/1.1" 200 198 0.121366
+2025-07-25 15:24:24,703 - DEBUG - Initializing WebSocket
+2025-07-25 15:24:24,704 - DEBUG - Validating WebSocket request
+2025-07-25 15:24:24,704 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:24:24,704 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:24:24,704 - INFO - 🔑 [Logout] 收到退出请求，token: a9b3888c523b4dfe99f045ad51f2af8d
+2025-07-25 15:24:24,704 - INFO - [Logout] 本地会话不存在，尝试云端登出
+2025-07-25 15:24:24,986 - INFO - [Logout] 云端返回状态码: 200
+2025-07-25 15:24:24,986 - DEBUG - [Logout] 云端返回内容: {"code":200,"msg":"退出成功","data":null}
+2025-07-25 15:24:24,986 - INFO - ✅ [Logout] 退出成功 - by cloud
+2025-07-25 15:24:24,988 - INFO - 127.0.0.1 - - [2025-07-25 15:24:24] "POST /auth/logout HTTP/1.1" 200 198 0.284862
+2025-07-25 15:24:28,105 - DEBUG - Initializing WebSocket
+2025-07-25 15:24:28,105 - DEBUG - Validating WebSocket request
+2025-07-25 15:24:28,106 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:24:28,106 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:24:28,106 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:24:28,106 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:24:28,106 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:24:28,107 - INFO - 127.0.0.1 - - [2025-07-25 15:24:28] "POST /auth/login HTTP/1.1" 200 385 0.001400
+2025-07-25 15:25:43,431 - DEBUG - Initializing WebSocket
+2025-07-25 15:25:43,431 - DEBUG - Validating WebSocket request
+2025-07-25 15:25:43,431 - INFO - 📡 收到插件接口请求: GET /actuator/health
+2025-07-25 15:25:43,432 - INFO - 172.203.245.49 - - [2025-07-25 15:25:43] "GET /actuator/health HTTP/1.1" 404 363 0.001193
+2025-07-25 15:25:43,970 - DEBUG - Initializing WebSocket
+2025-07-25 15:25:43,971 - DEBUG - Validating WebSocket request
+2025-07-25 15:25:43,972 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 15:25:43,973 - INFO - 127.0.0.1 - - [2025-07-25 15:25:43] "GET / HTTP/1.1" 404 363 0.002545
+2025-07-25 15:26:21,909 - DEBUG - Initializing WebSocket
+2025-07-25 15:26:21,909 - DEBUG - Validating WebSocket request
+2025-07-25 15:26:21,909 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:26:21,910 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:26:21,910 - INFO - 🔑 [Logout] 收到退出请求，token: 51f58a38801042358752e4f08e783632
+2025-07-25 15:26:21,910 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 15:26:21,911 - INFO - 127.0.0.1 - - [2025-07-25 15:26:21] "POST /auth/logout HTTP/1.1" 200 198 0.001724
+2025-07-25 15:26:24,848 - DEBUG - Initializing WebSocket
+2025-07-25 15:26:24,849 - DEBUG - Validating WebSocket request
+2025-07-25 15:26:24,849 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:26:24,849 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:26:24,850 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:26:24,850 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:26:24,850 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:26:24,851 - INFO - 127.0.0.1 - - [2025-07-25 15:26:24] "POST /auth/login HTTP/1.1" 200 385 0.002254
+2025-07-25 15:26:37,353 - DEBUG - Initializing WebSocket
+2025-07-25 15:26:37,354 - DEBUG - Validating WebSocket request
+2025-07-25 15:26:37,354 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:26:37,354 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:26:37,354 - INFO - 🔑 [Logout] 收到退出请求，token: 3553e198142a47e28d1d42f3a8cda340
+2025-07-25 15:26:37,355 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 15:26:37,356 - INFO - 127.0.0.1 - - [2025-07-25 15:26:37] "POST /auth/logout HTTP/1.1" 200 198 0.002140
+2025-07-25 15:26:40,107 - DEBUG - Initializing WebSocket
+2025-07-25 15:26:40,107 - DEBUG - Validating WebSocket request
+2025-07-25 15:26:40,108 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:26:40,108 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:26:40,109 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:26:40,109 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:26:40,109 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:26:40,110 - INFO - 127.0.0.1 - - [2025-07-25 15:26:40] "POST /auth/login HTTP/1.1" 200 385 0.002550
+2025-07-25 15:26:49,966 - DEBUG - Initializing WebSocket
+2025-07-25 15:26:49,967 - DEBUG - Validating WebSocket request
+2025-07-25 15:26:49,967 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:26:49,967 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:26:49,968 - INFO - 🔑 [Logout] 收到退出请求，token: f62723a954bb410ca37db7cd8622f305
+2025-07-25 15:26:49,968 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 15:26:49,968 - INFO - 127.0.0.1 - - [2025-07-25 15:26:49] "POST /auth/logout HTTP/1.1" 200 198 0.002178
+2025-07-25 15:26:55,188 - DEBUG - Initializing WebSocket
+2025-07-25 15:26:55,189 - DEBUG - Validating WebSocket request
+2025-07-25 15:26:55,189 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:26:55,189 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:26:55,189 - INFO - 🔑 [Logout] 收到退出请求，token: f62723a954bb410ca37db7cd8622f305
+2025-07-25 15:26:55,189 - INFO - [Logout] 本地会话不存在，尝试云端登出
+2025-07-25 15:26:55,494 - INFO - [Logout] 云端返回状态码: 200
+2025-07-25 15:26:55,494 - DEBUG - [Logout] 云端返回内容: {"code":200,"msg":"退出成功","data":null}
+2025-07-25 15:26:55,494 - INFO - ✅ [Logout] 退出成功 - by cloud
+2025-07-25 15:26:55,496 - INFO - 127.0.0.1 - - [2025-07-25 15:26:55] "POST /auth/logout HTTP/1.1" 200 198 0.307969
+2025-07-25 15:27:25,411 - DEBUG - Initializing WebSocket
+2025-07-25 15:27:25,411 - DEBUG - Validating WebSocket request
+2025-07-25 15:27:25,411 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:27:25,411 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:27:25,411 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:27:25,412 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:27:25,412 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:27:25,412 - INFO - 127.0.0.1 - - [2025-07-25 15:27:25] "POST /auth/login HTTP/1.1" 200 385 0.001582
+2025-07-25 15:27:32,424 - DEBUG - Initializing WebSocket
+2025-07-25 15:27:32,425 - DEBUG - Validating WebSocket request
+2025-07-25 15:27:32,425 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 15:27:32,425 - INFO - 220.196.160.125 - - [2025-07-25 15:27:32] "GET / HTTP/1.1" 404 363 0.001069
+2025-07-25 15:27:47,491 - DEBUG - Initializing WebSocket
+2025-07-25 15:27:47,491 - DEBUG - Validating WebSocket request
+2025-07-25 15:27:47,491 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:27:47,492 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:27:47,492 - INFO - 🔑 [Logout] 收到退出请求，token: 9514dfeac89e46b081e129be7ccb1fc9
+2025-07-25 15:27:47,492 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 15:27:47,493 - INFO - 127.0.0.1 - - [2025-07-25 15:27:47] "POST /auth/logout HTTP/1.1" 200 198 0.001415
+2025-07-25 15:27:50,211 - DEBUG - Initializing WebSocket
+2025-07-25 15:27:50,212 - DEBUG - Validating WebSocket request
+2025-07-25 15:27:50,212 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:27:50,213 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:27:50,213 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:27:50,213 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:27:50,213 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:27:50,214 - INFO - 127.0.0.1 - - [2025-07-25 15:27:50] "POST /auth/login HTTP/1.1" 200 385 0.002380
+2025-07-25 15:33:52,355 - DEBUG - Initializing WebSocket
+2025-07-25 15:33:52,355 - DEBUG - Validating WebSocket request
+2025-07-25 15:33:52,355 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:33:52,355 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:33:52,355 - INFO - 🔑 [Logout] 收到退出请求，token: 4f316bd5bb1342478cafc5a6a547dd78
+2025-07-25 15:33:52,356 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 15:33:52,357 - INFO - 127.0.0.1 - - [2025-07-25 15:33:52] "POST /auth/logout HTTP/1.1" 200 198 0.001956
+2025-07-25 15:33:54,848 - DEBUG - Initializing WebSocket
+2025-07-25 15:33:54,848 - DEBUG - Validating WebSocket request
+2025-07-25 15:33:54,848 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:33:54,849 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:33:54,849 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:33:54,850 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:33:54,850 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:33:54,851 - INFO - 127.0.0.1 - - [2025-07-25 15:33:54] "POST /auth/login HTTP/1.1" 200 385 0.002569
+2025-07-25 15:33:57,199 - DEBUG - Initializing WebSocket
+2025-07-25 15:33:57,200 - DEBUG - Validating WebSocket request
+2025-07-25 15:33:57,200 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:33:57,201 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:33:57,201 - INFO - 🔑 [Logout] 收到退出请求，token: 507a12ce74ac4ba79c4a753dd6bb6aa0
+2025-07-25 15:33:57,201 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 15:33:57,202 - INFO - 127.0.0.1 - - [2025-07-25 15:33:57] "POST /auth/logout HTTP/1.1" 200 198 0.002517
+2025-07-25 15:34:03,870 - DEBUG - Initializing WebSocket
+2025-07-25 15:34:03,870 - DEBUG - Validating WebSocket request
+2025-07-25 15:34:03,870 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:34:03,870 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:34:03,871 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:34:03,871 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:34:03,871 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:34:03,871 - INFO - 127.0.0.1 - - [2025-07-25 15:34:03] "POST /auth/login HTTP/1.1" 200 385 0.001081
+2025-07-25 15:35:39,407 - DEBUG - Initializing WebSocket
+2025-07-25 15:35:39,408 - DEBUG - Validating WebSocket request
+2025-07-25 15:35:39,408 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:35:39,408 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:35:39,408 - INFO - 🔑 [Logout] 收到退出请求，token: 66be22047157417ea92a574b634dd4ea
+2025-07-25 15:35:39,408 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 15:35:39,409 - INFO - 127.0.0.1 - - [2025-07-25 15:35:39] "POST /auth/logout HTTP/1.1" 200 198 0.001512
+2025-07-25 15:35:42,038 - DEBUG - Initializing WebSocket
+2025-07-25 15:35:42,038 - DEBUG - Validating WebSocket request
+2025-07-25 15:35:42,038 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:35:42,038 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:35:42,039 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:35:42,039 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:35:42,039 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:35:42,039 - INFO - 127.0.0.1 - - [2025-07-25 15:35:42] "POST /auth/login HTTP/1.1" 200 385 0.001562
+2025-07-25 15:36:18,016 - DEBUG - Initializing WebSocket
+2025-07-25 15:36:18,016 - DEBUG - Validating WebSocket request
+2025-07-25 15:36:18,016 - INFO - 📡 收到插件接口请求: GET /admin/index.html
+2025-07-25 15:36:18,017 - INFO - 127.0.0.1 - - [2025-07-25 15:36:18] "GET /admin/index.html HTTP/1.1" 404 363 0.000982
+2025-07-25 15:43:25,724 - DEBUG - Initializing WebSocket
+2025-07-25 15:43:25,724 - DEBUG - Validating WebSocket request
+2025-07-25 15:43:25,725 - INFO - 📡 收到插件接口请求: GET /index.html
+2025-07-25 15:43:25,725 - INFO - 127.0.0.1 - - [2025-07-25 15:43:25] "GET /index.html HTTP/1.1" 404 363 0.001159
+2025-07-25 15:43:40,821 - DEBUG - Initializing WebSocket
+2025-07-25 15:43:40,821 - DEBUG - Validating WebSocket request
+2025-07-25 15:43:40,821 - INFO - 📡 收到插件接口请求: GET /+CSCOE+/logon.html
+2025-07-25 15:43:40,822 - INFO - 127.0.0.1 - - [2025-07-25 15:43:40] "GET /+CSCOE+/logon.html HTTP/1.1" 404 363 0.001001
+2025-07-25 15:46:43,540 - DEBUG - Initializing WebSocket
+2025-07-25 15:46:43,540 - DEBUG - Validating WebSocket request
+2025-07-25 15:46:43,540 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:46:43,541 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 15:46:43,541 - INFO - 🔑 [Logout] 收到退出请求，token: 187d299bceb045a89cd4f7f5ba1171d0
+2025-07-25 15:46:43,541 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 15:46:43,541 - INFO - 127.0.0.1 - - [2025-07-25 15:46:43] "POST /auth/logout HTTP/1.1" 200 198 0.001274
+2025-07-25 15:46:54,207 - DEBUG - Initializing WebSocket
+2025-07-25 15:46:54,207 - DEBUG - Validating WebSocket request
+2025-07-25 15:46:54,207 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 15:46:54,207 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 15:46:54,208 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 15:46:54,208 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 15:46:54,208 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 15:46:54,208 - INFO - 127.0.0.1 - - [2025-07-25 15:46:54] "POST /auth/login HTTP/1.1" 200 385 0.001480
+2025-07-25 15:50:05,156 - DEBUG - Initializing WebSocket
+2025-07-25 15:50:05,156 - DEBUG - Validating WebSocket request
+2025-07-25 15:50:05,156 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 15:50:05,158 - INFO - 127.0.0.1 - - [2025-07-25 15:50:05] "GET / HTTP/1.1" 404 363 0.002530
+2025-07-25 15:50:05,365 - DEBUG - Initializing WebSocket
+2025-07-25 15:50:05,365 - DEBUG - Validating WebSocket request
+2025-07-25 15:50:05,365 - INFO - 📡 收到插件接口请求: GET /favicon.ico
+2025-07-25 15:50:05,368 - INFO - 127.0.0.1 - - [2025-07-25 15:50:05] "GET /favicon.ico HTTP/1.1" 404 363 0.002850
+2025-07-25 16:00:03,915 - DEBUG - Initializing WebSocket
+2025-07-25 16:00:03,916 - DEBUG - Validating WebSocket request
+2025-07-25 16:00:03,916 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:00:03,917 - INFO - 127.0.0.1 - - [2025-07-25 16:00:03] "GET / HTTP/1.1" 404 363 0.001520
+2025-07-25 16:00:41,815 - DEBUG - Initializing WebSocket
+2025-07-25 16:00:41,815 - DEBUG - Validating WebSocket request
+2025-07-25 16:00:41,815 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:00:41,816 - INFO - 127.0.0.1 - - [2025-07-25 16:00:41] "GET / HTTP/1.1" 404 363 0.001045
+2025-07-25 16:03:03,146 - DEBUG - Initializing WebSocket
+2025-07-25 16:03:03,146 - DEBUG - Validating WebSocket request
+2025-07-25 16:03:03,146 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:03:03,147 - INFO - 193.34.212.110 - - [2025-07-25 16:03:03] "GET / HTTP/1.1" 404 363 0.001274
+2025-07-25 16:03:54,988 - INFO - 20.168.7.2 - - [2025-07-25 16:03:54] "MGLNDD_101.35.143.252_8080" 400 - 0.000593
+2025-07-25 16:04:43,788 - DEBUG - Initializing WebSocket
+2025-07-25 16:04:43,788 - DEBUG - Validating WebSocket request
+2025-07-25 16:04:43,789 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:04:43,789 - INFO - 127.0.0.1 - - [2025-07-25 16:04:43] "GET / HTTP/1.1" 404 363 0.001014
+2025-07-25 16:04:46,578 - DEBUG - Initializing WebSocket
+2025-07-25 16:04:46,578 - DEBUG - Validating WebSocket request
+2025-07-25 16:04:46,578 - INFO - 📡 收到插件接口请求: GET /webui/
+2025-07-25 16:04:46,579 - INFO - 127.0.0.1 - - [2025-07-25 16:04:46] "GET /webui/ HTTP/1.1" 404 363 0.001098
+2025-07-25 16:04:47,480 - DEBUG - Initializing WebSocket
+2025-07-25 16:04:47,481 - DEBUG - Validating WebSocket request
+2025-07-25 16:04:47,481 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:04:47,482 - INFO - 127.0.0.1 - - [2025-07-25 16:04:47] "GET / HTTP/1.1" 404 363 0.001740
+2025-07-25 16:04:47,911 - DEBUG - Initializing WebSocket
+2025-07-25 16:04:47,911 - DEBUG - Validating WebSocket request
+2025-07-25 16:04:47,911 - INFO - 📡 收到插件接口请求: GET /favicon.ico
+2025-07-25 16:04:47,912 - INFO - 127.0.0.1 - - [2025-07-25 16:04:47] "GET /favicon.ico HTTP/1.1" 404 363 0.001261
+2025-07-25 16:05:30,738 - DEBUG - Initializing WebSocket
+2025-07-25 16:05:30,739 - DEBUG - Validating WebSocket request
+2025-07-25 16:05:30,739 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:05:30,740 - INFO - 127.0.0.1 - - [2025-07-25 16:05:30] "GET / HTTP/1.1" 404 363 0.001828
+2025-07-25 16:05:31,167 - DEBUG - Initializing WebSocket
+2025-07-25 16:05:31,167 - DEBUG - Validating WebSocket request
+2025-07-25 16:05:31,167 - INFO - 📡 收到插件接口请求: GET /favicon.ico
+2025-07-25 16:05:31,168 - INFO - 127.0.0.1 - - [2025-07-25 16:05:31] "GET /favicon.ico HTTP/1.1" 404 363 0.001696
+2025-07-25 16:06:02,059 - DEBUG - Initializing WebSocket
+2025-07-25 16:06:02,059 - DEBUG - Validating WebSocket request
+2025-07-25 16:06:02,059 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:06:02,060 - INFO - 127.0.0.1 - - [2025-07-25 16:06:02] "GET / HTTP/1.1" 404 363 0.000953
+2025-07-25 16:07:08,033 - DEBUG - Initializing WebSocket
+2025-07-25 16:07:08,034 - DEBUG - Validating WebSocket request
+2025-07-25 16:07:08,034 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:07:08,035 - INFO - 127.0.0.1 - - [2025-07-25 16:07:08] "GET / HTTP/1.1" 404 363 0.001512
+2025-07-25 16:07:11,765 - DEBUG - Initializing WebSocket
+2025-07-25 16:07:11,765 - DEBUG - Validating WebSocket request
+2025-07-25 16:07:11,765 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:07:11,767 - INFO - 127.0.0.1 - - [2025-07-25 16:07:11] "GET / HTTP/1.1" 404 363 0.002193
+2025-07-25 16:08:03,138 - DEBUG - Initializing WebSocket
+2025-07-25 16:08:03,139 - DEBUG - Validating WebSocket request
+2025-07-25 16:08:03,139 - INFO - 📡 收到插件接口请求: GET /favicon.ico
+2025-07-25 16:08:03,140 - INFO - 127.0.0.1 - - [2025-07-25 16:08:03] "GET /favicon.ico HTTP/1.1" 404 363 0.001560
+2025-07-25 16:08:05,170 - DEBUG - Initializing WebSocket
+2025-07-25 16:08:05,170 - DEBUG - Validating WebSocket request
+2025-07-25 16:08:05,171 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:08:05,171 - INFO - 127.0.0.1 - - [2025-07-25 16:08:05] "GET / HTTP/1.1" 404 363 0.001139
+2025-07-25 16:09:42,987 - DEBUG - Initializing WebSocket
+2025-07-25 16:09:42,989 - DEBUG - Validating WebSocket request
+2025-07-25 16:09:42,989 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:09:42,990 - INFO - 194.34.235.33 - - [2025-07-25 16:09:42] "GET / HTTP/1.1" 404 363 0.003211
+2025-07-25 16:09:43,403 - DEBUG - Initializing WebSocket
+2025-07-25 16:09:43,404 - DEBUG - Validating WebSocket request
+2025-07-25 16:09:43,404 - INFO - 📡 收到插件接口请求: GET /favicon.ico
+2025-07-25 16:09:43,405 - INFO - 194.34.235.33 - - [2025-07-25 16:09:43] "GET /favicon.ico HTTP/1.1" 404 363 0.001379
+2025-07-25 16:10:27,386 - DEBUG - Initializing WebSocket
+2025-07-25 16:10:27,386 - DEBUG - Validating WebSocket request
+2025-07-25 16:10:27,386 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:10:27,387 - INFO - 127.0.0.1 - - [2025-07-25 16:10:27] "GET / HTTP/1.1" 404 363 0.001261
+2025-07-25 16:13:51,146 - DEBUG - Initializing WebSocket
+2025-07-25 16:13:51,146 - DEBUG - Validating WebSocket request
+2025-07-25 16:13:51,146 - INFO - 📡 收到插件接口请求: GET /doc/index.html
+2025-07-25 16:13:51,147 - INFO - 127.0.0.1 - - [2025-07-25 16:13:51] "GET /doc/index.html HTTP/1.1" 404 363 0.001034
+2025-07-25 16:19:49,937 - DEBUG - Initializing WebSocket
+2025-07-25 16:19:49,937 - DEBUG - Validating WebSocket request
+2025-07-25 16:19:49,937 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:19:49,937 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 16:19:49,937 - INFO - 🔑 [Logout] 收到退出请求，token: 992bfa60515f432c8d2ebdf2c5b1b3a1
+2025-07-25 16:19:49,938 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 16:19:49,938 - INFO - 127.0.0.1 - - [2025-07-25 16:19:49] "POST /auth/logout HTTP/1.0" 200 217 0.001257
+2025-07-25 16:19:53,991 - DEBUG - Initializing WebSocket
+2025-07-25 16:19:53,992 - DEBUG - Validating WebSocket request
+2025-07-25 16:19:53,992 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:19:53,992 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 16:19:53,992 - INFO - 🔑 [Login] 收到登录请求，用户名: hueying
+2025-07-25 16:19:53,992 - INFO - [Login] 在本地用户列表中找到用户 hueying
+2025-07-25 16:19:53,992 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 16:19:53,993 - INFO - 127.0.0.1 - - [2025-07-25 16:19:53] "POST /auth/login HTTP/1.0" 200 404 0.001163
+2025-07-25 16:19:56,621 - DEBUG - Initializing WebSocket
+2025-07-25 16:19:56,621 - DEBUG - Validating WebSocket request
+2025-07-25 16:19:56,621 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:19:56,622 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 16:19:56,622 - INFO - 🔑 [Logout] 收到退出请求，token: c55f61e3b69c4134a5ab481d8d6e92f2
+2025-07-25 16:19:56,622 - INFO - ✅ [Logout] 本地退出成功, 用户: hueying
+2025-07-25 16:19:56,622 - INFO - 127.0.0.1 - - [2025-07-25 16:19:56] "POST /auth/logout HTTP/1.0" 200 217 0.001079
+2025-07-25 16:20:30,278 - DEBUG - Initializing WebSocket
+2025-07-25 16:20:30,278 - DEBUG - Validating WebSocket request
+2025-07-25 16:20:30,278 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:20:30,278 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 16:20:30,279 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 16:20:30,279 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 16:20:30,279 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 16:20:30,279 - INFO - 127.0.0.1 - - [2025-07-25 16:20:30] "POST /auth/login HTTP/1.0" 200 404 0.001425
+2025-07-25 16:20:33,289 - DEBUG - Initializing WebSocket
+2025-07-25 16:20:33,289 - DEBUG - Validating WebSocket request
+2025-07-25 16:20:33,289 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:20:33,290 - INFO - 185.191.127.222 - - [2025-07-25 16:20:33] "GET / HTTP/1.1" 404 363 0.001310
+2025-07-25 16:20:35,183 - DEBUG - Initializing WebSocket
+2025-07-25 16:20:35,183 - DEBUG - Validating WebSocket request
+2025-07-25 16:20:35,183 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:20:35,183 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 16:20:35,183 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 16:20:35,184 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 16:20:35,184 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 16:20:35,184 - INFO - 127.0.0.1 - - [2025-07-25 16:20:35] "POST /auth/login HTTP/1.0" 200 404 0.001405
+2025-07-25 16:21:23,630 - DEBUG - Initializing WebSocket
+2025-07-25 16:21:23,631 - DEBUG - Validating WebSocket request
+2025-07-25 16:21:23,631 - INFO - 📡 收到插件接口请求: GET /geoserver/web/
+2025-07-25 16:21:23,632 - INFO - 127.0.0.1 - - [2025-07-25 16:21:23] "GET /geoserver/web/ HTTP/1.0" 404 382 0.001459
+2025-07-25 16:24:08,651 - DEBUG - Initializing WebSocket
+2025-07-25 16:24:08,651 - DEBUG - Validating WebSocket request
+2025-07-25 16:24:08,652 - INFO - 📡 收到插件接口请求: GET /.git/config
+2025-07-25 16:24:08,652 - INFO - 127.0.0.1 - - [2025-07-25 16:24:08] "GET /.git/config HTTP/1.0" 404 382 0.001381
+2025-07-25 16:28:54,382 - DEBUG - Initializing WebSocket
+2025-07-25 16:28:54,382 - DEBUG - Validating WebSocket request
+2025-07-25 16:28:54,382 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:28:54,382 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 16:28:54,382 - INFO - 🔑 [Logout] 收到退出请求，token: f0bc5e135eb14ce5b2077f4210799f9f
+2025-07-25 16:28:54,382 - INFO - ✅ [Logout] 本地退出成功, 用户: horsray
+2025-07-25 16:28:54,383 - INFO - 127.0.0.1 - - [2025-07-25 16:28:54] "POST /auth/logout HTTP/1.0" 200 217 0.001235
+2025-07-25 16:28:58,027 - DEBUG - Initializing WebSocket
+2025-07-25 16:28:58,028 - DEBUG - Validating WebSocket request
+2025-07-25 16:28:58,028 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:28:58,028 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 16:28:58,028 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 16:28:58,028 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 16:28:58,028 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 16:28:58,029 - INFO - 127.0.0.1 - - [2025-07-25 16:28:58] "POST /auth/login HTTP/1.0" 200 404 0.001455
+2025-07-25 16:33:39,920 - DEBUG - Initializing WebSocket
+2025-07-25 16:33:39,921 - DEBUG - Validating WebSocket request
+2025-07-25 16:33:39,921 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:33:39,921 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 16:33:39,921 - INFO - 🔑 [Logout] 收到退出请求，token: 910cc7f51f6a4c07973f892873789363
+2025-07-25 16:33:39,922 - INFO - ✅ [Logout] 本地退出成功, 用户: horsray
+2025-07-25 16:33:39,922 - INFO - 127.0.0.1 - - [2025-07-25 16:33:39] "POST /auth/logout HTTP/1.0" 200 217 0.001944
+2025-07-25 16:33:41,362 - DEBUG - Initializing WebSocket
+2025-07-25 16:33:41,362 - DEBUG - Validating WebSocket request
+2025-07-25 16:33:41,362 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:33:41,362 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 16:33:41,363 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 16:33:41,364 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 16:33:41,364 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 16:33:41,364 - INFO - 127.0.0.1 - - [2025-07-25 16:33:41] "POST /auth/login HTTP/1.0" 200 404 0.002449
+2025-07-25 16:33:42,509 - DEBUG - Initializing WebSocket
+2025-07-25 16:33:42,509 - DEBUG - Validating WebSocket request
+2025-07-25 16:33:42,510 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:33:42,510 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 16:33:42,510 - INFO - 🔑 [Logout] 收到退出请求，token: 484590142bf94e16a9a9816dee000677
+2025-07-25 16:33:42,510 - INFO - ✅ [Logout] 本地退出成功, 用户: horsray
+2025-07-25 16:33:42,510 - INFO - 127.0.0.1 - - [2025-07-25 16:33:42] "POST /auth/logout HTTP/1.0" 200 217 0.001047
+2025-07-25 16:33:44,833 - DEBUG - Initializing WebSocket
+2025-07-25 16:33:44,833 - DEBUG - Validating WebSocket request
+2025-07-25 16:33:44,833 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:33:44,834 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 16:33:44,834 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 16:33:44,834 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 16:33:44,834 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 16:33:44,835 - INFO - 127.0.0.1 - - [2025-07-25 16:33:44] "POST /auth/login HTTP/1.0" 200 404 0.001554
+2025-07-25 16:34:15,423 - DEBUG - Initializing WebSocket
+2025-07-25 16:34:15,424 - DEBUG - Validating WebSocket request
+2025-07-25 16:34:15,424 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:34:15,424 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 16:34:15,425 - INFO - 🔑 [Logout] 收到退出请求，token: f28db0decf50462f8c4ea325b5167828
+2025-07-25 16:34:15,425 - INFO - ✅ [Logout] 本地退出成功, 用户: horsray
+2025-07-25 16:34:15,425 - INFO - 127.0.0.1 - - [2025-07-25 16:34:15] "POST /auth/logout HTTP/1.0" 200 217 0.001955
+2025-07-25 16:34:16,676 - DEBUG - Initializing WebSocket
+2025-07-25 16:34:16,677 - DEBUG - Validating WebSocket request
+2025-07-25 16:34:16,677 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:34:16,677 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 16:34:16,677 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 16:34:16,677 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 16:34:16,677 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 16:34:16,679 - INFO - 127.0.0.1 - - [2025-07-25 16:34:16] "POST /auth/login HTTP/1.0" 200 404 0.002567
+2025-07-25 16:37:35,768 - DEBUG - Initializing WebSocket
+2025-07-25 16:37:35,769 - DEBUG - Validating WebSocket request
+2025-07-25 16:37:35,769 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:37:35,770 - INFO - 127.0.0.1 - - [2025-07-25 16:37:35] "GET / HTTP/1.0" 404 382 0.001386
+2025-07-25 16:37:39,930 - DEBUG - Initializing WebSocket
+2025-07-25 16:37:39,931 - DEBUG - Validating WebSocket request
+2025-07-25 16:37:39,931 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:37:39,931 - INFO - 📡 收到插件接口请求: HEAD /
+2025-07-25 16:37:39,931 - INFO - 127.0.0.1 - - [2025-07-25 16:37:39] "HEAD / HTTP/1.0" 404 175 0.000978
+2025-07-25 16:37:40,127 - DEBUG - Initializing WebSocket
+2025-07-25 16:37:40,127 - DEBUG - Validating WebSocket request
+2025-07-25 16:37:40,127 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:37:40,128 - INFO - 127.0.0.1 - - [2025-07-25 16:37:40] "GET / HTTP/1.0" 404 382 0.001145
+2025-07-25 16:45:21,614 - DEBUG - Initializing WebSocket
+2025-07-25 16:45:21,614 - DEBUG - Validating WebSocket request
+2025-07-25 16:45:21,614 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:45:21,614 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 16:45:21,614 - INFO - 🔑 [Logout] 收到退出请求，token: e6b5d0de0c47424a92a49079a2c67925
+2025-07-25 16:45:21,614 - INFO - ✅ [Logout] 本地退出成功, 用户: horsray
+2025-07-25 16:45:21,615 - INFO - 127.0.0.1 - - [2025-07-25 16:45:21] "POST /auth/logout HTTP/1.0" 200 217 0.000993
+2025-07-25 16:45:23,255 - DEBUG - Initializing WebSocket
+2025-07-25 16:45:23,255 - DEBUG - Validating WebSocket request
+2025-07-25 16:45:23,255 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 16:45:23,255 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 16:45:23,256 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 16:45:23,256 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 16:45:23,256 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 16:45:23,257 - INFO - 127.0.0.1 - - [2025-07-25 16:45:23] "POST /auth/login HTTP/1.0" 200 404 0.002011
+2025-07-25 16:57:37,262 - DEBUG - Initializing WebSocket
+2025-07-25 16:57:37,262 - DEBUG - Validating WebSocket request
+2025-07-25 16:57:37,262 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:57:37,263 - INFO - 127.0.0.1 - - [2025-07-25 16:57:37] "GET / HTTP/1.0" 404 382 0.001561
+2025-07-25 16:57:53,710 - DEBUG - Initializing WebSocket
+2025-07-25 16:57:53,710 - DEBUG - Validating WebSocket request
+2025-07-25 16:57:53,711 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 16:57:53,714 - INFO - 127.0.0.1 - - [2025-07-25 16:57:53] "GET / HTTP/1.0" 404 382 0.003453
+2025-07-25 17:09:22,278 - DEBUG - Initializing WebSocket
+2025-07-25 17:09:22,279 - DEBUG - Validating WebSocket request
+2025-07-25 17:09:22,279 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:09:22,280 - INFO - 193.34.212.110 - - [2025-07-25 17:09:22] "GET / HTTP/1.1" 404 363 0.001104
+2025-07-25 17:11:21,212 - DEBUG - Initializing WebSocket
+2025-07-25 17:11:21,212 - DEBUG - Validating WebSocket request
+2025-07-25 17:11:21,212 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:11:21,213 - INFO - 185.191.127.222 - - [2025-07-25 17:11:21] "GET / HTTP/1.1" 404 363 0.001014
+2025-07-25 17:19:24,723 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:24,723 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:24,723 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:19:24,724 - INFO - 127.0.0.1 - - [2025-07-25 17:19:24] "GET / HTTP/1.0" 404 382 0.001038
+2025-07-25 17:19:24,744 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:24,744 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:24,745 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:19:24,745 - INFO - 127.0.0.1 - - [2025-07-25 17:19:24] "GET / HTTP/1.0" 404 382 0.001404
+2025-07-25 17:19:28,965 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:28,965 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:28,965 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:19:28,966 - INFO - 127.0.0.1 - - [2025-07-25 17:19:28] "GET / HTTP/1.0" 404 382 0.000954
+2025-07-25 17:19:32,282 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:32,282 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:32,282 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:19:32,283 - INFO - 127.0.0.1 - - [2025-07-25 17:19:32] "GET / HTTP/1.0" 404 382 0.001314
+2025-07-25 17:19:38,311 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:38,311 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:38,312 - INFO - 📡 收到插件接口请求: GET /.git/config
+2025-07-25 17:19:38,312 - INFO - 127.0.0.1 - - [2025-07-25 17:19:38] "GET /.git/config HTTP/1.0" 404 382 0.001036
+2025-07-25 17:19:41,394 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:41,394 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:41,395 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:19:41,395 - INFO - 127.0.0.1 - - [2025-07-25 17:19:41] "GET / HTTP/1.0" 404 382 0.001253
+2025-07-25 17:19:42,075 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:42,075 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:42,076 - INFO - 📡 收到插件接口请求: GET /@vite/env
+2025-07-25 17:19:42,076 - INFO - 127.0.0.1 - - [2025-07-25 17:19:42] "GET /@vite/env HTTP/1.0" 404 382 0.001093
+2025-07-25 17:19:42,766 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:42,767 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:42,767 - INFO - 📡 收到插件接口请求: GET /actuator/env
+2025-07-25 17:19:42,768 - INFO - 127.0.0.1 - - [2025-07-25 17:19:42] "GET /actuator/env HTTP/1.0" 404 382 0.001511
+2025-07-25 17:19:43,450 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:43,450 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:43,450 - INFO - 📡 收到插件接口请求: GET /server
+2025-07-25 17:19:43,451 - INFO - 127.0.0.1 - - [2025-07-25 17:19:43] "GET /server HTTP/1.0" 404 382 0.000900
+2025-07-25 17:19:44,116 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:44,116 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:44,116 - INFO - 📡 收到插件接口请求: GET /version
+2025-07-25 17:19:44,117 - INFO - 127.0.0.1 - - [2025-07-25 17:19:44] "GET /version HTTP/1.0" 404 382 0.001067
+2025-07-25 17:19:44,789 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:44,789 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:44,790 - INFO - 📡 收到插件接口请求: GET /.vscode/sftp.json
+2025-07-25 17:19:44,791 - INFO - 127.0.0.1 - - [2025-07-25 17:19:44] "GET /.vscode/sftp.json HTTP/1.0" 404 382 0.001677
+2025-07-25 17:19:45,445 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:45,445 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:45,446 - INFO - 📡 收到插件接口请求: GET /about
+2025-07-25 17:19:45,446 - INFO - 127.0.0.1 - - [2025-07-25 17:19:45] "GET /about HTTP/1.0" 404 382 0.000963
+2025-07-25 17:19:46,102 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:46,103 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:46,103 - INFO - 📡 收到插件接口请求: GET /debug/default/view
+2025-07-25 17:19:46,104 - INFO - 127.0.0.1 - - [2025-07-25 17:19:46] "GET /debug/default/view?panel=config HTTP/1.0" 404 382 0.001114
+2025-07-25 17:19:46,750 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:46,750 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:46,751 - INFO - 📡 收到插件接口请求: GET /v2/_catalog
+2025-07-25 17:19:46,751 - INFO - 127.0.0.1 - - [2025-07-25 17:19:46] "GET /v2/_catalog HTTP/1.0" 404 382 0.001234
+2025-07-25 17:19:47,408 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:47,408 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:47,409 - INFO - 📡 收到插件接口请求: GET /ecp/Current/exporttool/microsoft.exchange.ediscovery.exporttool.application
+2025-07-25 17:19:47,410 - INFO - 127.0.0.1 - - [2025-07-25 17:19:47] "GET /ecp/Current/exporttool/microsoft.exchange.ediscovery.exporttool.application HTTP/1.0" 404 382 0.002064
+2025-07-25 17:19:48,048 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:48,048 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:48,049 - INFO - 📡 收到插件接口请求: GET /server-status
+2025-07-25 17:19:48,049 - INFO - 127.0.0.1 - - [2025-07-25 17:19:48] "GET /server-status HTTP/1.0" 404 382 0.001116
+2025-07-25 17:19:48,693 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:48,694 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:48,694 - INFO - 📡 收到插件接口请求: GET /login.action
+2025-07-25 17:19:48,695 - INFO - 127.0.0.1 - - [2025-07-25 17:19:48] "GET /login.action HTTP/1.0" 404 382 0.001398
+2025-07-25 17:19:50,669 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:50,669 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:50,669 - INFO - 📡 收到插件接口请求: GET /_all_dbs
+2025-07-25 17:19:50,671 - INFO - 127.0.0.1 - - [2025-07-25 17:19:50] "GET /_all_dbs HTTP/1.0" 404 382 0.001774
+2025-07-25 17:19:51,308 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:51,308 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:51,309 - INFO - 📡 收到插件接口请求: GET /.DS_Store
+2025-07-25 17:19:51,309 - INFO - 127.0.0.1 - - [2025-07-25 17:19:51] "GET /.DS_Store HTTP/1.0" 404 382 0.001177
+2025-07-25 17:19:51,982 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:51,982 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:51,983 - INFO - 📡 收到插件接口请求: GET /.env
+2025-07-25 17:19:51,984 - INFO - 127.0.0.1 - - [2025-07-25 17:19:51] "GET /.env HTTP/1.0" 404 382 0.002000
+2025-07-25 17:19:52,637 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:52,637 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:52,637 - INFO - 📡 收到插件接口请求: GET /.git/config
+2025-07-25 17:19:52,639 - INFO - 127.0.0.1 - - [2025-07-25 17:19:52] "GET /.git/config HTTP/1.0" 404 382 0.001688
+2025-07-25 17:19:53,285 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:53,285 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:53,285 - INFO - 📡 收到插件接口请求: GET /s/235323e2334313e25333e2130313/_/;/META-INF/maven/com.atlassian.jira/jira-webapp-dist/pom.properties
+2025-07-25 17:19:53,289 - INFO - 127.0.0.1 - - [2025-07-25 17:19:53] "GET /s/235323e2334313e25333e2130313/_/;/META-INF/maven/com.atlassian.jira/jira-webapp-dist/pom.properties HTTP/1.0" 404 382 0.002590
+2025-07-25 17:19:53,934 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:53,934 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:53,934 - INFO - 📡 收到插件接口请求: GET /config.json
+2025-07-25 17:19:53,935 - INFO - 127.0.0.1 - - [2025-07-25 17:19:53] "GET /config.json HTTP/1.0" 404 382 0.001221
+2025-07-25 17:19:54,570 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:54,570 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:54,570 - INFO - 📡 收到插件接口请求: GET /telescope/requests
+2025-07-25 17:19:54,571 - INFO - 127.0.0.1 - - [2025-07-25 17:19:54] "GET /telescope/requests HTTP/1.0" 404 382 0.001199
+2025-07-25 17:19:55,220 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:55,220 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:55,220 - INFO - 📡 收到插件接口请求: GET /info.php
+2025-07-25 17:19:55,221 - INFO - 127.0.0.1 - - [2025-07-25 17:19:55] "GET /info.php HTTP/1.0" 404 382 0.000987
+2025-07-25 17:19:55,928 - DEBUG - Initializing WebSocket
+2025-07-25 17:19:55,929 - DEBUG - Validating WebSocket request
+2025-07-25 17:19:55,929 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:19:55,929 - INFO - 127.0.0.1 - - [2025-07-25 17:19:55] "GET /?rest_route=/wp/v2/users/ HTTP/1.0" 404 382 0.001042
+2025-07-25 17:20:50,828 - DEBUG - Initializing WebSocket
+2025-07-25 17:20:50,829 - DEBUG - Validating WebSocket request
+2025-07-25 17:20:50,829 - INFO - 📡 收到插件接口请求: GET /.git/config
+2025-07-25 17:20:50,830 - INFO - 127.0.0.1 - - [2025-07-25 17:20:50] "GET /.git/config HTTP/1.0" 404 382 0.000989
+2025-07-25 17:22:12,599 - DEBUG - Initializing WebSocket
+2025-07-25 17:22:12,600 - DEBUG - Validating WebSocket request
+2025-07-25 17:22:12,600 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:22:12,600 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 17:22:12,600 - INFO - 🔑 [Logout] 收到退出请求，token: 7dde3b6ffc164616a1d1f57c1567bad7
+2025-07-25 17:22:12,600 - INFO - ✅ [Logout] 本地退出成功, 用户: horsray
+2025-07-25 17:22:12,601 - INFO - 127.0.0.1 - - [2025-07-25 17:22:12] "POST /auth/logout HTTP/1.0" 200 217 0.001599
+2025-07-25 17:22:14,624 - DEBUG - Initializing WebSocket
+2025-07-25 17:22:14,624 - DEBUG - Validating WebSocket request
+2025-07-25 17:22:14,624 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:22:14,624 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 17:22:14,624 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 17:22:14,624 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 17:22:14,624 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 17:22:14,625 - INFO - 127.0.0.1 - - [2025-07-25 17:22:14] "POST /auth/login HTTP/1.0" 200 404 0.001191
+2025-07-25 17:22:16,916 - DEBUG - Initializing WebSocket
+2025-07-25 17:22:16,917 - DEBUG - Validating WebSocket request
+2025-07-25 17:22:16,917 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:22:16,917 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 17:22:16,917 - INFO - 🔑 [Logout] 收到退出请求，token: 767838c418074fa9a1f3e0ee6a6f3ac9
+2025-07-25 17:22:16,917 - INFO - ✅ [Logout] 本地退出成功, 用户: horsray
+2025-07-25 17:22:16,917 - INFO - 127.0.0.1 - - [2025-07-25 17:22:16] "POST /auth/logout HTTP/1.0" 200 217 0.001018
+2025-07-25 17:22:18,308 - DEBUG - Initializing WebSocket
+2025-07-25 17:22:18,308 - DEBUG - Validating WebSocket request
+2025-07-25 17:22:18,309 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:22:18,310 - INFO - 127.0.0.1 - - [2025-07-25 17:22:18] "GET / HTTP/1.0" 404 382 0.001858
+2025-07-25 17:22:18,707 - DEBUG - Initializing WebSocket
+2025-07-25 17:22:18,707 - DEBUG - Validating WebSocket request
+2025-07-25 17:22:18,707 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:22:18,708 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 17:22:18,708 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 17:22:18,708 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 17:22:18,708 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 17:22:18,708 - INFO - 127.0.0.1 - - [2025-07-25 17:22:18] "POST /auth/login HTTP/1.0" 200 404 0.001313
+2025-07-25 17:22:20,339 - DEBUG - Initializing WebSocket
+2025-07-25 17:22:20,339 - DEBUG - Validating WebSocket request
+2025-07-25 17:22:20,340 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:22:20,340 - INFO - 📡 收到插件接口请求: POST /auth/logout
+2025-07-25 17:22:20,340 - INFO - 🔑 [Logout] 收到退出请求，token: 7b5525b0419b4e5382f301aae45655f9
+2025-07-25 17:22:20,340 - INFO - ✅ [Logout] 本地退出成功, 用户: horsray
+2025-07-25 17:22:20,340 - INFO - 127.0.0.1 - - [2025-07-25 17:22:20] "POST /auth/logout HTTP/1.0" 200 217 0.001067
+2025-07-25 17:22:23,411 - DEBUG - Initializing WebSocket
+2025-07-25 17:22:23,411 - DEBUG - Validating WebSocket request
+2025-07-25 17:22:23,411 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:22:23,412 - INFO - 📡 收到插件接口请求: POST /auth/login
+2025-07-25 17:22:23,412 - INFO - 🔑 [Login] 收到登录请求，用户名: horsray
+2025-07-25 17:22:23,412 - INFO - [Login] 在本地用户列表中找到用户 horsray
+2025-07-25 17:22:23,412 - INFO - ✅ [Login] 本地认证成功
+2025-07-25 17:22:23,413 - INFO - 127.0.0.1 - - [2025-07-25 17:22:23] "POST /auth/login HTTP/1.0" 200 404 0.001429
+2025-07-25 17:27:24,011 - INFO - 149.130.164.54 - - [2025-07-25 17:27:24] " " 400 - 7.747921
+2025-07-25 17:29:49,753 - DEBUG - Initializing WebSocket
+2025-07-25 17:29:49,753 - DEBUG - Validating WebSocket request
+2025-07-25 17:29:49,754 - INFO - 📡 收到插件接口请求: GET /http://149.130.171.76:5000
+2025-07-25 17:29:49,755 - INFO - 149.130.164.54 - - [2025-07-25 17:29:49] "GET http://149.130.171.76:5000 HTTP/1.1" 404 363 0.001787
+2025-07-25 17:29:50,250 - DEBUG - Initializing WebSocket
+2025-07-25 17:29:50,250 - DEBUG - Validating WebSocket request
+2025-07-25 17:29:50,251 - INFO - 📡 收到插件接口请求: GET /http://149.130.171.76:5000
+2025-07-25 17:29:50,252 - INFO - 149.130.164.54 - - [2025-07-25 17:29:50] "GET http://149.130.171.76:5000 HTTP/1.1" 404 363 0.001639
+2025-07-25 17:39:27,354 - DEBUG - Initializing WebSocket
+2025-07-25 17:39:27,355 - DEBUG - Validating WebSocket request
+2025-07-25 17:39:27,355 - INFO - 📡 收到插件接口请求: GET /http://example.com/
+2025-07-25 17:39:27,355 - INFO - 207.167.67.206 - - [2025-07-25 17:39:27] "GET http://example.com/ HTTP/1.1" 404 - 0.000969
+2025-07-25 17:39:27,832 - DEBUG - Initializing WebSocket
+2025-07-25 17:39:27,832 - DEBUG - Validating WebSocket request
+2025-07-25 17:39:27,832 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:39:27,832 - INFO - 📡 收到插件接口请求: CONNECT /dnspod.qcloud.com:443
+2025-07-25 17:39:27,833 - INFO - 207.167.67.206 - - [2025-07-25 17:39:27] "CONNECT dnspod.qcloud.com:443 HTTP/1.1" 404 363 0.001317
+2025-07-25 17:39:28,224 - DEBUG - Initializing WebSocket
+2025-07-25 17:39:28,224 - DEBUG - Validating WebSocket request
+2025-07-25 17:39:28,224 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:39:28,224 - INFO - 📡 收到插件接口请求: CONNECT /example.com:443
+2025-07-25 17:39:28,225 - INFO - 207.167.67.206 - - [2025-07-25 17:39:28] "CONNECT example.com:443 HTTP/1.1" 404 363 0.000965
+2025-07-25 17:39:28,617 - DEBUG - Initializing WebSocket
+2025-07-25 17:39:28,617 - DEBUG - Validating WebSocket request
+2025-07-25 17:39:28,617 - INFO - 📡 收到插件接口请求: GET /http://example.com/
+2025-07-25 17:39:28,618 - INFO - 207.167.67.206 - - [2025-07-25 17:39:28] "GET http://example.com/ HTTP/1.1" 404 - 0.000952
+2025-07-25 17:39:29,009 - DEBUG - Initializing WebSocket
+2025-07-25 17:39:29,010 - DEBUG - Validating WebSocket request
+2025-07-25 17:39:29,010 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:39:29,011 - INFO - 📡 收到插件接口请求: CONNECT /dnspod.qcloud.com:443
+2025-07-25 17:39:29,014 - INFO - 207.167.67.206 - - [2025-07-25 17:39:29] "CONNECT dnspod.qcloud.com:443 HTTP/1.1" 404 363 0.003133
+2025-07-25 17:39:29,905 - DEBUG - Initializing WebSocket
+2025-07-25 17:39:29,905 - DEBUG - Validating WebSocket request
+2025-07-25 17:39:29,906 - DEBUG - Can only upgrade connection if using GET method.
+2025-07-25 17:39:29,906 - INFO - 📡 收到插件接口请求: CONNECT /example.com:443
+2025-07-25 17:39:29,906 - INFO - 207.167.67.206 - - [2025-07-25 17:39:29] "CONNECT example.com:443 HTTP/1.1" 404 363 0.001090
+2025-07-25 17:45:54,125 - DEBUG - Initializing WebSocket
+2025-07-25 17:45:54,125 - DEBUG - Validating WebSocket request
+2025-07-25 17:45:54,127 - INFO - 📡 收到插件接口请求: GET /
+2025-07-25 17:45:54,128 - INFO - 127.0.0.1 - - [2025-07-25 17:45:54] "GET / HTTP/1.0" 404 382 0.003233

@@ -4,9 +4,9 @@ flask-socketio==5.3.6
 python-socketio==5.9.0
 requests==2.31.0
 websocket-client==1.6.4
-gevent==23.9.1
+gevent==25.5.1
 gevent-websocket==0.10.1
-pillow==10.0.1
+pillow==10.4.0
 python-engineio==4.7.1
 eventlet==0.33.3
 
