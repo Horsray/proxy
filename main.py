@@ -43,25 +43,12 @@ USERS_FILE = "users.json"
 LOCAL_USERS = {}
 # 活跃会话存储: {token: username} - 用于验证用户在线状态
 # 键为认证令牌，值为用户名
-
 sessions = {}
 
-from functools import wraps
-
-def get_request_token() -> str:
-    """Extract bearer token from the current request."""
-    return request.headers.get('Authorization', '').replace('Bearer ', '')
-
-def login_required(func):
-    """Decorator to ensure requests are authenticated."""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        token = get_request_token()
-        if token not in sessions:
-            logger.warning("❌ 未经授权的访问，token 无效")
-            return jsonify({"code": 401, "msg": "unauthorized"}), 401
-        return func(*args, **kwargs)
-    return wrapper
+# 记录每个用户的最新 token
+user_latest_token = {}
+# 记录每个用户的最新 headers
+user_latest_headers = {}
 
 def load_local_users():
     """
@@ -739,7 +726,6 @@ def log_all_requests():
 
 # 处理跨域请求
 @app.route('/api/poll', methods=['GET'])
-@login_required
 def poll_messages():
     """
     客户端消息轮询接口
@@ -784,7 +770,6 @@ def poll_messages():
         return jsonify({"error": f"轮询失败: {str(e)}"}), 500
 
 @app.route('/api/task_status/<prompt_id>', methods=['GET'])
-@login_required
 def get_task_status(prompt_id):
     """
     获取任务状态接口
@@ -876,8 +861,15 @@ def get_task_status(prompt_id):
 #         return jsonify({"code": 500, "msg": "上传 mask 转发失败", "error": str(e)}), 500
 #数据提交接口
 @app.route('/psPlus/workflow/huiYingCommit', methods=['POST'])
-@login_required
 def huiying_commit():
+
+    # 校验 token 是否有效
+    auth_header = request.headers.get("Authorization", "")
+    token = auth_header.replace("Bearer ", "")
+    username = sessions.get(token)
+    if not username:
+        logger.warning("❌ 提交被拒绝，用户未登录或 token 已失效")
+        return jsonify({"code": 401, "msg": "未授权访问，请重新登录"}), 401
 
     data = request.get_json() or {}
 
@@ -1075,7 +1067,6 @@ import gevent
 import time
 
 @app.route("/ws")
-@login_required
 def proxy_ws():
     """
     WebSocket代理接口
@@ -1117,7 +1108,6 @@ def proxy_ws():
         ws.close()
 
 @app.route('/api/config/comfyui_url', methods=['POST'])
-@login_required
 def update_comfyui_url():
     data = request.get_json() or {}
     url = data.get('url')
@@ -1135,48 +1125,31 @@ CLOUD_CHECK_URL = "https://umanage.lightcc.cloud/prod-api/psPlus/workflow/checkO
 @app.route('/psPlus/workflow/checkOnline', methods=['GET'])
 def check_online():
     """
-    在线状态检查接口
-    验证用户是否处于登录状态，优先检查本地会话，本地不存在时转发至云端验证
-    用于前端定期确认用户在线状态，决定是否需要重新登录
-    
-    请求头:
-        Authorization: Bearer {token} - 用户认证令牌
-    返回:
-        json: 包含在线状态的响应，本地检查通过返回{online: true}
-              云端检查则返回云端服务的原始响应
+    在线状态检查接口（本地会话覆盖逻辑）
+    如果同一用户后登录覆盖旧 token，旧 token 被踢出。
     """
+    logger.info("🔍 [CheckOnline] 收到请求")
     headers = dict(request.headers)
-    token = headers.get('Authorization', '').replace('Bearer ', '')
-    if token in sessions:
+    logger.debug(f"[CheckOnline] Headers: {headers}")
+
+    auth_header = headers.get("Authorization", "")
+    token = auth_header.replace("Bearer ", "").strip()
+    username = sessions.get(token)
+    logger.debug(f"[CheckOnline] 当前 token: {token}")
+    logger.debug(f"[CheckOnline] 对应用户名: {username}")
+    logger.debug(f"[CheckOnline] 当前 user_latest_token 状态: {user_latest_token}")
+
+    if username:
+        # 检查是否为该用户的最新 token
+        latest_token = user_latest_token.get(username)
+        if latest_token and latest_token != token:
+            logger.warning(f"[CheckOnline] 非最新 token 登录尝试，拒绝访问: {token[:8]}...")
+            return jsonify({"code": 401, "msg": "认证失败，无法访问系统资源", "data": None}), 401
+
         logger.info("✅ 在线检查通过 - local")
-        return jsonify({"code": 200, "msg": "操作成功", "data": {"online": True}}), 200
+        return jsonify({"code": 200, "msg": "在线", "data": {"mode": "local", "user": username}})
 
-    try:
-        logger.info("🔍 [CheckOnline] 收到请求")
-        logger.debug("[CheckOnline] Headers: %s", headers)
-
-        response = requests.get(
-            CLOUD_CHECK_URL,
-            headers=headers,
-            timeout=proxy.config.get("timeout", 30)
-        )
-        logger.debug("[CheckOnline] 云端响应状态码: %s", response.status_code)
-        logger.debug("[CheckOnline] 云端响应内容: %s", response.text)
-
-        if response.status_code == 200:
-            logger.info("✅ 在线检查通过 - by cloud")
-        else:
-            logger.warning("❌ 在线检查失败 - by cloud")
-
-        return Response(
-            response.content,
-            status=response.status_code,
-            content_type=response.headers.get('Content-Type', 'application/json')
-        )
-
-    except Exception as e:
-        logger.error("[CheckOnline] 请求云端失败: %s", str(e))
-        return jsonify({"code": 500, "msg": "checkOnline failed"}), 500
+    return jsonify({"code": 401, "msg": "认证失败", "data": None}), 401
 
 
 @app.route('/health', methods=['GET'])
@@ -1218,14 +1191,20 @@ def login_compatible():
         logger.info("[Login] 本地用户列表中未找到用户 %s", username)
 
     if user and user.get("password") == password:
-        # 使该用户所有旧token失效
+        # 清理旧 token 并更新为最新
         old_tokens = [t for t, u in sessions.items() if u == username]
         for t in old_tokens:
             del sessions[t]
-            logger.info(f"🔄 检测到用户在其他设备登录，触发强制下线: {t[:8]}...")
+            logger.info(f"🔄 旧 token 清除: {t[:8]}...")
         # 生成新token
         token = uuid.uuid4().hex
         sessions[token] = username
+        user_latest_token[username] = token
+        # 保存用户登录时的 headers，用于 checkOnline 校验使用
+        user_latest_headers[username] = dict(request.headers)
+        logger.debug(f"[Login] 为用户 {username} 存储 token: {token}")
+        logger.debug(f"[Login] 为用户 {username} 存储 headers: {user_latest_headers[username]}")
+        logger.debug(f"[Login] 当前 user_latest_token 状态: {user_latest_token}")
         logger.info("✅ [Login] 本地认证成功 (已清理旧会话)")
         return jsonify({
             "code": 200,
@@ -1285,8 +1264,12 @@ def logout_proxy():
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     logger.info(f"🔑 [Logout] 收到退出请求，token: {token}")
     if token in sessions:
-        user = sessions.pop(token)
-        logger.info(f"✅ [Logout] 本地退出成功, 用户: {user}")
+        # 清除该用户的最新 token 记录
+        username = sessions[token]
+        del sessions[token]
+        if username in user_latest_token:
+            del user_latest_token[username]
+        logger.info(f"✅ [Logout] 本地退出成功, 用户: {username}")
         return jsonify({"code": 200, "msg": "操作成功", "data": None}), 200
     else:
         logger.info("[Logout] 本地会话不存在，尝试云端登出")
