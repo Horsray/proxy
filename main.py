@@ -46,6 +46,23 @@ LOCAL_USERS = {}
 
 sessions = {}
 
+from functools import wraps
+
+def get_request_token() -> str:
+    """Extract bearer token from the current request."""
+    return request.headers.get('Authorization', '').replace('Bearer ', '')
+
+def login_required(func):
+    """Decorator to ensure requests are authenticated."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        token = get_request_token()
+        if token not in sessions:
+            logger.warning("❌ 未经授权的访问，token 无效")
+            return jsonify({"code": 401, "msg": "unauthorized"}), 401
+        return func(*args, **kwargs)
+    return wrapper
+
 def load_local_users():
     """
     加载本地用户数据到LOCAL_USERS全局变量
@@ -722,6 +739,7 @@ def log_all_requests():
 
 # 处理跨域请求
 @app.route('/api/poll', methods=['GET'])
+@login_required
 def poll_messages():
     """
     客户端消息轮询接口
@@ -766,6 +784,7 @@ def poll_messages():
         return jsonify({"error": f"轮询失败: {str(e)}"}), 500
 
 @app.route('/api/task_status/<prompt_id>', methods=['GET'])
+@login_required
 def get_task_status(prompt_id):
     """
     获取任务状态接口
@@ -857,6 +876,7 @@ def get_task_status(prompt_id):
 #         return jsonify({"code": 500, "msg": "上传 mask 转发失败", "error": str(e)}), 500
 #数据提交接口
 @app.route('/psPlus/workflow/huiYingCommit', methods=['POST'])
+@login_required
 def huiying_commit():
 
     data = request.get_json() or {}
@@ -1055,6 +1075,7 @@ import gevent
 import time
 
 @app.route("/ws")
+@login_required
 def proxy_ws():
     """
     WebSocket代理接口
@@ -1096,6 +1117,7 @@ def proxy_ws():
         ws.close()
 
 @app.route('/api/config/comfyui_url', methods=['POST'])
+@login_required
 def update_comfyui_url():
     data = request.get_json() or {}
     url = data.get('url')
