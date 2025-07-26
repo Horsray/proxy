@@ -18,6 +18,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 USERS_FILE = os.path.join(BASE_DIR, 'users.json')
 LEDGER_FILE = os.path.join(BASE_DIR, 'ledger.json')
 PRODUCTS_FILE = os.path.join(BASE_DIR, 'products.json')
+APPLICATIONS_FILE = os.path.join(BASE_DIR, 'applications.json')
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'huiying-secret')
 
@@ -61,6 +62,9 @@ def load_users() -> dict:
                     info.setdefault('ip_address', '')
                     info.setdefault('location', '')
                     info.setdefault('remark', '')
+                    info.setdefault('is_agent', False)
+                    info.setdefault('owner', '')
+                    info.setdefault('forsale', False)
                 return users
             except Exception:
                 return {}
@@ -106,10 +110,34 @@ def save_products(products: dict) -> None:
         json.dump({'products': products}, f, indent=4, ensure_ascii=False)
 
 
+def load_applications() -> list:
+    if os.path.exists(APPLICATIONS_FILE):
+        with open(APPLICATIONS_FILE, 'r', encoding='utf-8') as f:
+            try:
+                return json.load(f).get('apps', [])
+            except Exception:
+                return []
+    return []
+
+
+def save_applications(apps: list) -> None:
+    with open(APPLICATIONS_FILE, 'w', encoding='utf-8') as f:
+        json.dump({'apps': apps}, f, indent=4, ensure_ascii=False)
+
+
 def admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if session.get('admin') != 'horsray':
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return wrapper
+
+
+def agent_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not session.get('agent'):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return wrapper
@@ -122,15 +150,19 @@ def login():
         password = request.form.get('password')
         users = load_users()
         user = users.get(username)
-        if user and user.get('password') == password and user.get('is_admin'):
-            session['admin'] = username
+        if user and user.get('password') == password:
             client_ip = get_client_ip()
             user['last_login'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             user['ip_address'] = client_ip
             user['location'] = get_location_from_ip(client_ip)
             users[username] = user
             save_users(users)
-            return redirect(url_for('user_list'))
+            if user.get('is_admin'):
+                session['admin'] = username
+                return redirect(url_for('user_list'))
+            elif user.get('is_agent'):
+                session['agent'] = username
+                return redirect(url_for('agent_users'))
         return render_template('login.html', error='登录失败')
     return render_template('login.html')
 
@@ -138,6 +170,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('admin', None)
+    session.pop('agent', None)
     return redirect(url_for('login'))
 
 
@@ -315,6 +348,21 @@ def toggle_user(name):
     return redirect(url_for('user_list'))
 
 
+@app.route('/sales/users/<name>/sold', methods=['POST'])
+@agent_required
+def mark_sold(name):
+    users = load_users()
+    current = session.get('agent')
+    if name in users and users[name].get('owner') == current and users[name].get('forsale'):
+        users[name]['forsale'] = False
+        save_users(users)
+        if request.is_json:
+            return jsonify({'success': True})
+    if request.is_json:
+        return jsonify({'success': False}), 404
+    return redirect(url_for('agent_users'))
+
+
 @app.route('/users/batch_action', methods=['POST'])
 @admin_required
 def batch_action():
@@ -334,16 +382,17 @@ def batch_action():
     return redirect(url_for('user_list'))
 
 
-@app.route('/users/<n>/update', methods=['POST'])
+@app.route('/users/<name>/update', methods=['POST'])
 @admin_required
 def update_user(name):
-    new_name = request.form.get('username')
-    password = request.form.get('password')
-    nickname = request.form.get('nickname')
-    is_admin = bool(request.form.get('is_admin'))
-    enabled = bool(request.form.get('enabled'))
-    product = request.form.get('product')
-    remark = request.form.get('remark', '')
+    data = request.get_json(silent=True) or request.form
+    new_name = data.get('username')
+    password = data.get('password')
+    nickname = data.get('nickname')
+    is_admin = bool(data.get('is_admin'))
+    enabled = bool(data.get('enabled'))
+    product = data.get('product')
+    remark = data.get('remark', '')
     users = load_users()
     if name in users:
         user = users[name]
@@ -361,6 +410,10 @@ def update_user(name):
             users[name]['product'] = product
         users[name]['remark'] = remark
         save_users(users)
+        if request.is_json:
+            return jsonify({'success': True})
+    if request.is_json:
+        return jsonify({'success': False}), 404
     return redirect(url_for('user_list'))
 
 
@@ -598,11 +651,121 @@ def ledger_view():
     
     products = load_products()
     return render_template(
-        'ledger.html', records=filtered_records, 
+        'ledger.html', records=filtered_records,
         product_filter=product_filter, admin_filter=admin_filter,
         start=start, end=end, products=products,
         daily=daily, monthly=monthly, yearly=yearly, total=total
     )
+
+
+@app.route('/sales/users')
+@agent_required
+def agent_users():
+    users = load_users()
+    current = session.get('agent')
+    my_users = {k: v for k, v in users.items() if v.get('owner') == current}
+    return render_template('users.html', users=my_users, total=len(my_users), page=1, per_page=len(my_users), query='', source='', status='', sort='desc', start='', end='', products=load_products())
+
+
+@app.route('/sales/ledger')
+@agent_required
+def agent_ledger():
+    records = [r for r in load_ledger() if r.get('admin') == session.get('agent')]
+    products = load_products()
+    return render_template('ledger.html', records=records, product_filter='', admin_filter=session.get('agent'), start='', end='', products=products, daily=0, monthly=0, yearly=0, total=0)
+
+
+@app.route('/sales/apply', methods=['GET', 'POST'])
+@agent_required
+def apply_bulk():
+    products = load_products()
+    if request.method == 'POST':
+        count = int(request.form.get('count', 0))
+        price = float(request.form.get('price') or 0)
+        product = request.form.get('product', '')
+        apps = load_applications()
+        apps.append({
+            'id': os.urandom(6).hex(),
+            'agent': session.get('agent'),
+            'count': count,
+            'price': price,
+            'product': product,
+            'status': 'pending',
+            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+        save_applications(apps)
+        return redirect(url_for('apply_bulk'))
+    return render_template('bulk.html', accounts=None, products=products, info=None, page=1, per_page=20, total=0)
+
+
+@app.route('/applications')
+@admin_required
+def applications_list():
+    apps = load_applications()
+    return render_template('applications.html', apps=apps)
+
+
+@app.route('/applications/<app_id>/approve', methods=['POST'])
+@admin_required
+def approve_application(app_id):
+    apps = load_applications()
+    app_record = next((a for a in apps if a['id'] == app_id), None)
+    if not app_record:
+        return redirect(url_for('applications_list'))
+    if app_record['status'] != 'pending':
+        return redirect(url_for('applications_list'))
+    # generate accounts
+    users = load_users()
+    new_accounts = []
+    for _ in range(app_record['count']):
+        while True:
+            uname = f"huiying{os.urandom(4).hex()}"[:12]
+            if uname not in users:
+                break
+        pwd = os.urandom(4).hex()
+        users[uname] = {
+            'password': pwd,
+            'nickname': '',
+            'is_admin': False,
+            'enabled': True,
+            'source': 'agent',
+            'product': app_record['product'],
+            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'last_login': None,
+            'price': app_record['price'],
+            'ip_address': '',
+            'location': '',
+            'owner': app_record['agent'],
+            'forsale': True
+        }
+        new_accounts.append({'username': uname, 'password': pwd})
+    save_users(users)
+    # ledger
+    records = load_ledger()
+    records.append({
+        'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'admin': app_record['agent'],
+        'product': app_record['product'],
+        'price': app_record['price'],
+        'count': app_record['count'],
+        'revenue': app_record['price'] * app_record['count']
+    })
+    save_ledger(records)
+    app_record['status'] = 'approved'
+    save_applications(apps)
+    return redirect(url_for('applications_list'))
+
+
+@app.route('/applications/<app_id>/reject', methods=['POST'])
+@admin_required
+def reject_application(app_id):
+    apps = load_applications()
+    for a in apps:
+        if a['id'] == app_id and a['status'] == 'pending':
+            a['status'] = 'rejected'
+            break
+    save_applications(apps)
+    return redirect(url_for('applications_list'))
 
 
 
