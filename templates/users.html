@@ -269,10 +269,9 @@
                 {% endif %}
               </td>
               <td>
-                <div class="d-flex align-items-center">
-                  <span class="text-muted" id="remark-display-{{ name | replace("'", "\\'") }}">{{ info.remark or '无备注' }}</span>
-                  <input type="text" class="form-control form-control-sm d-none ms-2" id="remark-input-{{ name | replace("'", "\\'") }}" value="{{ info.remark }}" style="max-width:150px;">
-                  <button type="button" class="btn btn-sm btn-outline-secondary ms-2" id="remark-btn-{{ name | replace("'", "\\'") }}" onclick="toggleRemark('{{ name | replace("'", "\\'") }}')">编辑</button>
+                <div>
+                  <span class="text-muted d-block" id="remark-display-{{ name | replace("'", "\\'") }}" onclick="startRemarkEdit('{{ name | replace("'", "\\'") }}')" style="cursor:pointer; min-height:1.5rem; word-break:break-all;">{{ info.remark or '无备注' }}</span>
+                  <input type="text" class="form-control form-control-sm d-none" id="remark-input-{{ name | replace("'", "\\'") }}" value="{{ info.remark }}" style="width:100%;" onblur="saveRemark('{{ name | replace("'", "\\'") }}')" onkeydown="if(event.key==='Enter'){this.blur();}">
                 </div>
               </td>
               <td>
@@ -575,29 +574,32 @@
     prodSel.addEventListener('change',setPrice);setPrice();
   }
 
-  function toggleRemark(username){
-    const display = document.getElementById(`remark-display-${username}`);
-    const input = document.getElementById(`remark-input-${username}`);
-    const btn = document.getElementById(`remark-btn-${username}`);
-    if(input.classList.contains('d-none')){
-      input.classList.remove('d-none');
-      btn.textContent='保存';
-      input.focus();
-    }else{
-      const value = input.value;
-      const base = isAgent ? '/sales/users/' : '/users/';
-      fetch(`${base}${encodeURIComponent(username)}/update`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({remark:value})
-      }).then(r=>r.json()).then(d=>{
-        if(d.success){
-          display.textContent=value||'无备注';
-          input.classList.add('d-none');
-          btn.textContent='编辑';
-        }else{alert('保存失败');}
-      });
-    }
+  function startRemarkEdit(username){
+    const display=document.getElementById(`remark-display-${username}`);
+    const input=document.getElementById(`remark-input-${username}`);
+    display.classList.add('d-none');
+    input.classList.remove('d-none');
+    input.value=display.textContent.trim()==='无备注'?'':display.textContent.trim();
+    input.focus();
+  }
+
+  function saveRemark(username){
+    const display=document.getElementById(`remark-display-${username}`);
+    const input=document.getElementById(`remark-input-${username}`);
+    const value=input.value.trim();
+    const base=isAgent?'/sales/users/':'/users/';
+    fetch(`${base}${encodeURIComponent(username)}/update`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({remark:value})
+    }).then(r=>r.json()).then(d=>{
+      if(d.success){
+        display.textContent=value||'无备注';
+      }else{alert('保存失败');}
+    }).finally(()=>{
+      input.classList.add('d-none');
+      display.classList.remove('d-none');
+    });
   }
 
   function markSold(username){
