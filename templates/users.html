@@ -76,7 +76,7 @@
         <button type="submit" class="btn btn-primary">
           <i class="fas fa-search me-2"></i>筛选
         </button>
-        <a href="{{ url_for('user_list') }}" class="btn btn-outline-secondary ms-2"><i class="fas fa-undo me-2"></i>重置</a>
+          <a href="{{ session.get('admin') and url_for('user_list') or url_for('agent_users') }}" class="btn btn-outline-secondary ms-2"><i class="fas fa-undo me-2"></i>重置</a>
       </div>
     </form>
   </div>

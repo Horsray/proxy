@@ -24,18 +24,11 @@ app.secret_key = os.environ.get('SECRET_KEY', 'huiying-secret')
 
 
 def get_location_from_ip(ip_address):
-    """根据IP地址获取地理位置信息"""
-    try:
-        # 使用免费的IP地理位置API
-        response = requests.get(f'http://ip-api.com/json/{ip_address}?lang=zh-CN', timeout=5)
-        if response.status_code == 200:
-            data = response.json()
-            if data['status'] == 'success':
-                city = data.get('city', '未知')
-                return f"{city}-{ip_address}"
-        return f"未知-{ip_address}"
-    except:
-        return f"未知-{ip_address}"
+    """根据IP地址获取地理位置信息
+
+    由于外部网络请求会导致登录缓慢，这里直接返回 IP 地址。
+    """
+    return ip_address
 
 
 def get_client_ip():
