@@ -387,16 +387,25 @@ def batch_action():
 @app.route('/users/<name>/update', methods=['POST'])
 @admin_required
 def update_user(name):
-    data = request.get_json(silent=True) or request.form
-    new_name = data.get('username')
-    password = data.get('password')
-    nickname = data.get('nickname')
-    is_admin = bool(data.get('is_admin'))
-    is_agent = bool(data.get('is_agent'))
-    enabled = bool(data.get('enabled'))
-    product = data.get('product')
-    remark = data.get('remark', '')
+    """Update user info. Supports JSON update for remarks."""
     users = load_users()
+    if request.is_json:
+        data = request.get_json(silent=True) or {}
+        remark = data.get('remark')
+        if name in users and remark is not None:
+            users[name]['remark'] = remark
+            save_users(users)
+            return jsonify({'success': True})
+        return jsonify({'success': False}), 404
+
+    new_name = request.form.get('username')
+    password = request.form.get('password')
+    nickname = request.form.get('nickname')
+    is_admin = bool(request.form.get('is_admin'))
+    is_agent = bool(request.form.get('is_agent'))
+    enabled = bool(request.form.get('enabled'))
+    product = request.form.get('product')
+    remark = request.form.get('remark', '')
     if name in users:
         user = users[name]
         if new_name and new_name != name:
@@ -414,10 +423,6 @@ def update_user(name):
             users[name]['product'] = product
         users[name]['remark'] = remark
         save_users(users)
-        if request.is_json:
-            return jsonify({'success': True})
-    if request.is_json:
-        return jsonify({'success': False}), 404
     return redirect(url_for('user_list'))
 
 
@@ -668,7 +673,21 @@ def agent_users():
     users = load_users()
     current = session.get('agent')
     my_users = {k: v for k, v in users.items() if v.get('owner') == current}
-    return render_template('users.html', users=my_users, total=len(my_users), page=1, per_page=len(my_users), query='', source='', status='', sort='desc', start='', end='', products=load_products())
+    per_page = max(int(request.args.get('per_page', 20)), 1)
+    return render_template(
+        'users.html',
+        users=my_users,
+        total=len(my_users),
+        page=1,
+        per_page=per_page,
+        query='',
+        source='',
+        status='',
+        sort='desc',
+        start='',
+        end='',
+        products=load_products()
+    )
 
 
 @app.route('/sales/ledger')
