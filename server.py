@@ -145,6 +145,11 @@ def agent_required(f):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Handle login for admins and sales agents."""
+    # Clear previous login state so roles don't persist across logins
+    session.pop('admin', None)
+    session.pop('agent', None)
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -160,7 +165,7 @@ def login():
             if user.get('is_admin'):
                 session['admin'] = username
                 return redirect(url_for('user_list'))
-            elif user.get('is_agent'):
+            if user.get('is_agent'):
                 session['agent'] = username
                 return redirect(url_for('agent_users'))
         return render_template('login.html', error='登录失败')
