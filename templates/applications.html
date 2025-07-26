@@ -19,7 +19,15 @@
       <td>{{ a.count }}</td>
       <td>{{ a.price }}</td>
       <td>{{ a.product }}</td>
-      <td>{{ a.status }}</td>
+      <td>
+        {% if a.status == 'pending' %}
+          <span class="text-primary">待审批</span>
+        {% elif a.status == 'approved' %}
+          <span class="text-success">已通过</span>
+        {% else %}
+          <span class="text-danger">已拒绝</span>
+        {% endif %}
+      </td>
       <td>
         {% if a.status == 'pending' %}
         <button type="submit" formaction="{{ url_for('approve_application', app_id=a.id) }}" formmethod="post" class="btn btn-sm btn-success">通过</button>

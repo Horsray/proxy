@@ -522,6 +522,18 @@ def agent_batch_action():
             users[name]['enabled'] = False
         elif action == 'sold' and users[name].get('forsale'):
             users[name]['forsale'] = False
+            price = users[name].get('price', 0)
+            records = load_ledger()
+            records.append({
+                'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'admin': current,
+                'role': 'agent',
+                'product': users[name].get('product', ''),
+                'price': price,
+                'count': 1,
+                'revenue': price
+            })
+            save_ledger(records)
     save_users(users)
     return redirect(url_for('agent_users'))
 
@@ -697,7 +709,7 @@ def add_product():
     return redirect(url_for('products'))
 
 
-@app.route('/products/<name>/delete', methods=['POST'])
+@app.route('/products/<path:name>/delete', methods=['POST'])
 @admin_required
 def delete_product(name):
     products = load_products()
@@ -707,7 +719,7 @@ def delete_product(name):
     return redirect(url_for('products'))
 
 
-@app.route('/products/<name>/default', methods=['POST'])
+@app.route('/products/<path:name>/default', methods=['POST'])
 @admin_required
 def set_default_product(name):
     products = load_products()
