@@ -142,6 +142,7 @@
               <th>来源</th>
               <th>产品</th>
               <th>备注</th>
+              <th>待售</th>
               <th style="width: 200px;">操作</th>
             </tr>
           </thead>
@@ -179,6 +180,10 @@
                 {% if info.is_admin %}
                   <span class="badge bg-warning text-dark">
                     <i class="fas fa-user-shield me-1"></i>管理员
+                  </span>
+                {% elif info.is_agent %}
+                  <span class="badge bg-secondary">
+                    <i class="fas fa-user-tag me-1"></i>销售代理
                   </span>
                 {% else %}
                   <span class="badge bg-info">
@@ -259,6 +264,18 @@
                 </div>
               </td>
               <td>
+                {% if info.forsale %}
+                  <span class="badge bg-warning">待售</span>
+                  {% if session.get('agent') and info.owner==session.get('agent') %}
+                  <form method="post" action="{{ url_for('mark_sold', name=name) }}" class="d-inline">
+                    <button class="btn btn-sm btn-outline-success">标记已售</button>
+                  </form>
+                  {% endif %}
+                {% else %}
+                  <span class="badge bg-success">已售</span>
+                {% endif %}
+              </td>
+              <td>
                 <div class="d-flex gap-1">
                   <button type="button" class="btn btn-sm btn-outline-primary" onclick="openEditModal('{{ name | replace("'", "\\'") }}')" title="编辑用户">
                     <i class="fas fa-edit"></i>
@@ -329,6 +346,14 @@
                     <input class="form-check-input" type="checkbox" name="is_admin" id="edit-admin-checkbox">
                     <label class="form-check-label" for="edit-admin-checkbox">
                       <i class="fas fa-user-shield me-2"></i>管理员权限
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_agent" id="edit-agent-checkbox">
+                    <label class="form-check-label" for="edit-agent-checkbox">
+                      <i class="fas fa-user-tag me-2"></i>销售代理
                     </label>
                   </div>
                 </div>
@@ -429,6 +454,17 @@
                 </div>
               </div>
             </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" name="is_agent" id="add-agent">
+                  <label class="form-check-label" for="add-agent">
+                    <i class="fas fa-user-tag me-2"></i>销售代理
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -452,6 +488,7 @@
       username: '{{ name | replace("'", "\\'") }}',
       nickname: '{{ info.nickname | replace("'", "\\'") }}',
       is_admin: {{ 'true' if info.is_admin else 'false' }},
+      is_agent: {{ 'true' if info.is_agent else 'false' }},
       enabled: {{ 'true' if info.enabled else 'false' }},
       product: '{{ info.product | replace("'", "\\'") }}'
     },
@@ -472,6 +509,7 @@
     document.getElementById('edit-nickname-input').value = user.nickname;
     document.getElementById('edit-password-input').value = '';
     document.getElementById('edit-admin-checkbox').checked = user.is_admin;
+    document.getElementById('edit-agent-checkbox').checked = user.is_agent;
     document.getElementById('edit-enabled-checkbox').checked = user.enabled;
     
     // 设置产品选择
@@ -500,6 +538,21 @@
       if(p!==undefined && (priceInput.value=='' || priceInput.value=='0')){priceInput.value=p;}
     }
     prodSel.addEventListener('change',setPrice);setPrice();
+  }
+
+  function editRemark(username){
+    const current=document.getElementById(`remark-display-${username}`);
+    const value=prompt('输入备注', current.textContent.trim());
+    if(value===null) return;
+    fetch(`/users/${encodeURIComponent(username)}/update`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({remark:value})
+    }).then(r=>r.json()).then(d=>{
+      if(d.success){
+        current.textContent=value||'无备注';
+      }else{alert('保存失败');}
+    });
   }
 </script>
 

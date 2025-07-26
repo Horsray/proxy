@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% block title %}订单审批{% endblock %}
+{% block content %}
+<h2 class="mb-3">待审批申请</h2>
+<table class="table">
+  <thead>
+    <tr><th>代理</th><th>数量</th><th>价格</th><th>产品</th><th>状态</th><th>操作</th></tr>
+  </thead>
+  <tbody>
+  {% for a in apps %}
+    <tr>
+      <td>{{ a.agent }}</td><td>{{ a.count }}</td><td>{{ a.price }}</td><td>{{ a.product }}</td><td>{{ a.status }}</td>
+      <td>
+        {% if a.status == 'pending' %}
+        <form method="post" action="{{ url_for('approve_application', app_id=a.id) }}" class="d-inline">
+          <button class="btn btn-sm btn-success">通过</button>
+        </form>
+        <form method="post" action="{{ url_for('reject_application', app_id=a.id) }}" class="d-inline ms-1">
+          <button class="btn btn-sm btn-danger">拒绝</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
