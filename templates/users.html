@@ -23,15 +23,15 @@
     <i class="fas fa-filter me-2"></i>筛选条件
   </div>
   <div class="card-body">
-    <form class="row g-3" method="get">
-      <div class="col-md-3">
+    <form class="row row-cols-lg-auto g-2 align-items-end" method="get">
+      <div class="col-auto">
         <label class="form-label">搜索用户名</label>
         <div class="input-group">
           <span class="input-group-text"><i class="fas fa-search"></i></span>
           <input type="text" name="q" class="form-control" placeholder="输入用户名" value="{{ query }}">
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-auto">
         <label class="form-label">来源</label>
         <select name="source" class="form-select">
           <option value="">全部来源</option>
@@ -41,7 +41,7 @@
           <option value="agent" {% if source=='agent' %}selected{% endif %}>代理</option>
         </select>
       </div>
-      <div class="col-md-2">
+      <div class="col-auto">
         <label class="form-label">账户状态</label>
         <select name="status" class="form-select">
           <option value="">全部状态</option>
@@ -49,7 +49,7 @@
           <option value="disabled" {% if status=='disabled' %}selected{% endif %}>已停用</option>
         </select>
       </div>
-      <div class="col-md-2">
+      <div class="col-auto">
         <label class="form-label">售出状态</label>
         <select name="sale" class="form-select">
           <option value="">全部</option>
@@ -57,28 +57,26 @@
           <option value="sold" {% if sale=='sold' %}selected{% endif %}>已售</option>
         </select>
       </div>
-      <div class="col-md-2">
+      <div class="col-auto">
         <label class="form-label">开始日期</label>
         <input type="date" name="start" class="form-control" value="{{ start }}">
       </div>
-      <div class="col-md-2">
+      <div class="col-auto">
         <label class="form-label">结束日期</label>
         <input type="date" name="end" class="form-control" value="{{ end }}">
       </div>
-      <div class="col-md-1">
+      <div class="col-auto">
         <label class="form-label">排序</label>
         <select name="sort" class="form-select">
           <option value="desc" {% if sort=='desc' %}selected{% endif %}>新→旧</option>
           <option value="asc" {% if sort=='asc' %}selected{% endif %}>旧→新</option>
         </select>
       </div>
-      <div class="col-12">
+      <div class="col-auto">
         <button type="submit" class="btn btn-primary">
           <i class="fas fa-search me-2"></i>筛选
         </button>
-        <a href="{{ url_for('user_list') }}" class="btn btn-outline-secondary ms-2">
-          <i class="fas fa-undo me-2"></i>重置
-        </a>
+        <a href="{{ url_for('user_list') }}" class="btn btn-outline-secondary ms-2"><i class="fas fa-undo me-2"></i>重置</a>
       </div>
     </form>
   </div>
@@ -284,9 +282,7 @@
                 {% if info.forsale %}
                   <span class="badge bg-warning">待售</span>
                   {% if session.get('agent') and info.owner==session.get('agent') %}
-                  <form method="post" action="{{ url_for('mark_sold', name=name) }}" class="d-inline">
-                    <button class="btn btn-sm btn-outline-success">标记售出</button>
-                  </form>
+                  <button type="button" class="btn btn-sm btn-outline-success" onclick="markSold('{{ name | replace("'", "\\'") }}')">标记售出</button>
                   {% endif %}
                 {% else %}
                   <span class="badge bg-success">已售</span>
@@ -595,6 +591,15 @@
       if(d.success){
         current.textContent=value||'无备注';
       }else{alert('保存失败');}
+    });
+  }
+
+  function markSold(username){
+    fetch(`/sales/users/${encodeURIComponent(username)}/sold`,{
+      method:'POST',
+      headers:{'Accept':'application/json'}
+    }).then(r=>r.json()).then(d=>{
+        if(d.success){location.reload();}else{alert('标记失败');}
     });
   }
 </script>

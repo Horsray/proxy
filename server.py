@@ -125,6 +125,23 @@ def save_applications(apps: list) -> None:
         json.dump({'apps': apps}, f, indent=4, ensure_ascii=False)
 
 
+@app.context_processor
+def inject_counts():
+    """Provide pending application counts for templates."""
+    apps = load_applications()
+    pending_admin = sum(1 for a in apps if a.get('status') == 'pending')
+    pending_agent = 0
+    if session.get('agent'):
+        pending_agent = sum(
+            1 for a in apps
+            if a.get('agent') == session.get('agent') and a.get('status') == 'pending'
+        )
+    return dict(
+        pending_approve_count=pending_admin,
+        pending_apply_count=pending_agent,
+    )
+
+
 def admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -389,9 +406,9 @@ def mark_sold(name):
             'revenue': price
         })
         save_ledger(records)
-        if request.is_json:
+        if request.is_json or request.headers.get('Accept') == 'application/json':
             return jsonify({'success': True})
-    if request.is_json:
+    if request.is_json or request.headers.get('Accept') == 'application/json':
         return jsonify({'success': False}), 404
     return redirect(url_for('agent_users'))
 
@@ -911,7 +928,7 @@ def _approve_application(app_record):
     records = load_ledger()
     records.append({
         'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'admin': session.get('admin'),
+        'admin': app_record['agent'],
         'product': app_record['product'],
         'price': app_record['price'],
         'count': app_record['count'],
