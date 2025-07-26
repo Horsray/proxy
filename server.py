@@ -128,7 +128,7 @@ def save_applications(apps: list) -> None:
 def admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if session.get('admin') != 'horsray':
+        if not session.get('admin'):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return wrapper

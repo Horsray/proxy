@@ -467,19 +467,30 @@
                 </div>
               </div>
             </div>
-            {% if session.get('admin') %}
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label class="form-label">&nbsp;</label>
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" name="is_agent" id="add-agent">
-                  <label class="form-check-label" for="add-agent">
-                    <i class="fas fa-user-tag me-2"></i>销售代理
-                  </label>
+              {% if session.get('admin') %}
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">&nbsp;</label>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="is_admin" id="add-admin">
+                    <label class="form-check-label" for="add-admin">
+                      <i class="fas fa-user-shield me-2"></i>管理员权限
+                    </label>
+                  </div>
                 </div>
               </div>
-            </div>
-            {% endif %}
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">&nbsp;</label>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="is_agent" id="add-agent">
+                    <label class="form-check-label" for="add-agent">
+                      <i class="fas fa-user-tag me-2"></i>销售代理
+                    </label>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
           </div>
         </div>
         <div class="modal-footer">
