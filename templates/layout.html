@@ -531,7 +531,7 @@
       <div class="d-flex align-items-center">
         <span class="navbar-text me-3">
           <i class="fas fa-user-circle me-2"></i>
-          {{ session.get('admin', '管理员') }}
+          {{ session.get('admin') or session.get('agent') or '管理员' }}
         </span>
         <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">
           <i class="fas fa-sign-out-alt me-2"></i>退出
@@ -545,6 +545,7 @@
     <!-- 左侧菜单 -->
     <div class="sidebar">
       <div class="list-group list-group-flush">
+        {% if session.get('admin') %}
         <a href="{{ url_for('bulk_manage') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/bulk') %}active{% endif %}">
           <i class="fas fa-users-cog"></i>批量用户管理
         </a>
@@ -557,6 +558,22 @@
         <a href="{{ url_for('products') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/products') %}active{% endif %}">
           <i class="fas fa-box"></i>产品维护
         </a>
+        <a href="{{ url_for('applications_list') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/applications') %}active{% endif %}">
+          <i class="fas fa-list"></i>订单审批
+          {% if pending_approve_count %}<span class="badge bg-danger ms-1">{{ pending_approve_count }}</span>{% endif %}
+        </a>
+        {% else %}
+        <a href="{{ url_for('apply_bulk') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/sales/apply') %}active{% endif %}">
+          <i class="fas fa-layer-group"></i>批量开通申请
+          {% if pending_apply_count %}<span class="badge bg-danger ms-1">{{ pending_apply_count }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('agent_users') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/sales/users') %}active{% endif %}">
+          <i class="fas fa-users"></i>我的用户
+        </a>
+        <a href="{{ url_for('agent_ledger') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/sales/ledger') %}active{% endif %}">
+          <i class="fas fa-chart-line"></i>我的台账
+        </a>
+        {% endif %}
       </div>
     </div>
 

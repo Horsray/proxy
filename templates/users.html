@@ -23,71 +23,84 @@
     <i class="fas fa-filter me-2"></i>筛选条件
   </div>
   <div class="card-body">
-    <form class="row g-3" method="get">
-      <div class="col-md-3">
+    <form class="row row-cols-lg-auto g-2 align-items-end" method="get">
+      <div class="col-auto">
         <label class="form-label">搜索用户名</label>
         <div class="input-group">
           <span class="input-group-text"><i class="fas fa-search"></i></span>
           <input type="text" name="q" class="form-control" placeholder="输入用户名" value="{{ query }}">
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-auto">
         <label class="form-label">来源</label>
         <select name="source" class="form-select">
           <option value="">全部来源</option>
           <option value="add" {% if source=='add' %}selected{% endif %}>手动录入</option>
           <option value="batch" {% if source=='batch' %}selected{% endif %}>批量生成</option>
           <option value="import" {% if source=='import' %}selected{% endif %}>文件导入</option>
+          <option value="agent" {% if source=='agent' %}selected{% endif %}>代理</option>
         </select>
       </div>
-      <div class="col-md-2">
-        <label class="form-label">状态</label>
+      <div class="col-auto">
+        <label class="form-label">账户状态</label>
         <select name="status" class="form-select">
           <option value="">全部状态</option>
           <option value="enabled" {% if status=='enabled' %}selected{% endif %}>已启用</option>
           <option value="disabled" {% if status=='disabled' %}selected{% endif %}>已停用</option>
         </select>
       </div>
-      <div class="col-md-2">
+      <div class="col-auto">
+        <label class="form-label">售出状态</label>
+        <select name="sale" class="form-select">
+          <option value="">全部</option>
+          <option value="forsale" {% if sale=='forsale' %}selected{% endif %}>未售</option>
+          <option value="sold" {% if sale=='sold' %}selected{% endif %}>已售</option>
+        </select>
+      </div>
+      <div class="col-auto">
         <label class="form-label">开始日期</label>
         <input type="date" name="start" class="form-control" value="{{ start }}">
       </div>
-      <div class="col-md-2">
+      <div class="col-auto">
         <label class="form-label">结束日期</label>
         <input type="date" name="end" class="form-control" value="{{ end }}">
       </div>
-      <div class="col-md-1">
+      <div class="col-auto">
         <label class="form-label">排序</label>
         <select name="sort" class="form-select">
           <option value="desc" {% if sort=='desc' %}selected{% endif %}>新→旧</option>
           <option value="asc" {% if sort=='asc' %}selected{% endif %}>旧→新</option>
         </select>
       </div>
-      <div class="col-12">
+      <div class="col-auto">
         <button type="submit" class="btn btn-primary">
           <i class="fas fa-search me-2"></i>筛选
         </button>
-        <a href="{{ url_for('user_list') }}" class="btn btn-outline-secondary ms-2">
-          <i class="fas fa-undo me-2"></i>重置
-        </a>
+          <a href="{{ session.get('admin') and url_for('user_list') or url_for('agent_users') }}" class="btn btn-outline-secondary ms-2"><i class="fas fa-undo me-2"></i>重置</a>
       </div>
     </form>
   </div>
 </div>
 
 <!-- 操作按钮区域 -->
-<form method="post" action="{{ url_for('batch_action') }}" id="batchForm">
+<form method="post" action="{{ url_for('batch_action') if session.get('admin') else url_for('agent_batch_action') }}" id="batchForm">
   <div class="card mb-4">
     <div class="card-body">
       <div class="row align-items-center">
         <div class="col-md-8">
           <div class="d-flex flex-wrap gap-2">
+            {% if session.get('admin') %}
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-user">
               <i class="fas fa-plus me-2"></i>新增用户
             </button>
             <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('确定删除选中的用户吗？')">
               <i class="fas fa-trash me-2"></i>批量删除
             </button>
+            {% else %}
+            <button type="submit" name="action" value="sold" class="btn btn-success">
+              <i class="fas fa-flag me-2"></i>标记已售
+            </button>
+            {% endif %}
             <button type="submit" name="action" value="disable" class="btn btn-warning">
               <i class="fas fa-ban me-2"></i>批量停用
             </button>
@@ -96,6 +109,7 @@
             </button>
           </div>
         </div>
+        {% if session.get('admin') %}
         <div class="col-md-4">
           <div class="d-flex flex-wrap gap-2 justify-content-md-end">
             <a class="btn btn-outline-primary" href="{{ url_for('export_users') }}">
@@ -110,6 +124,7 @@
             </label>
           </div>
         </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -135,13 +150,14 @@
               <th>用户名</th>
               <th>昵称</th>
               <th>类型</th>
-              <th>状态</th>
+              <th>账户状态</th>
               <th>IP地址</th>
               <th>最后登录</th>
               <th>创建时间</th>
               <th>来源</th>
               <th>产品</th>
               <th>备注</th>
+              <th>销售状态</th>
               <th style="width: 200px;">操作</th>
             </tr>
           </thead>
@@ -179,6 +195,10 @@
                 {% if info.is_admin %}
                   <span class="badge bg-warning text-dark">
                     <i class="fas fa-user-shield me-1"></i>管理员
+                  </span>
+                {% elif info.is_agent %}
+                  <span class="badge bg-secondary">
+                    <i class="fas fa-user-tag me-1"></i>销售代理
                   </span>
                 {% else %}
                   <span class="badge bg-info">
@@ -237,6 +257,8 @@
                   <span class="badge bg-info">
                     <i class="fas fa-file-import me-1"></i>文件导入
                   </span>
+                {% elif info.source == 'agent' %}
+                  <span class="badge bg-warning text-dark">代理售出</span>
                 {% else %}
                   <span class="badge bg-secondary">{{ info.source }}</span>
                 {% endif %}
@@ -249,25 +271,33 @@
                 {% endif %}
               </td>
               <td>
-                <div class="d-flex align-items-center">
-                  <span class="text-muted me-2" id="remark-display-{{ name | replace("'", "\\'") }}">
-                    {{ info.remark or '无备注' }}
-                  </span>
-                  <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editRemark('{{ name | replace("'", "\\'") }}')" title="编辑备注">
-                    <i class="fas fa-edit"></i>
-                  </button>
+                <div>
+                  <span class="text-muted d-block" id="remark-display-{{ name | replace("'", "\\'") }}" onclick="startRemarkEdit('{{ name | replace("'", "\\'") }}')" style="cursor:pointer; min-height:1.5rem; word-break:break-all;">{{ info.remark or '无备注' }}</span>
+                  <input type="text" class="form-control form-control-sm d-none" id="remark-input-{{ name | replace("'", "\\'") }}" value="{{ info.remark }}" style="width:100%;" onblur="saveRemark('{{ name | replace("'", "\\'") }}')" onkeydown="if(event.key==='Enter'){this.blur();}">
                 </div>
+              </td>
+              <td>
+                {% if info.forsale %}
+                  <span class="badge bg-warning">待售</span>
+                  {% if session.get('agent') and info.owner==session.get('agent') %}
+                  <button type="button" class="btn btn-sm btn-outline-success" onclick="markSold('{{ name | replace("'", "\\'") }}')">标记售出</button>
+                  {% endif %}
+                {% else %}
+                  <span class="badge bg-success">已售</span>
+                {% endif %}
               </td>
               <td>
                 <div class="d-flex gap-1">
                   <button type="button" class="btn btn-sm btn-outline-primary" onclick="openEditModal('{{ name | replace("'", "\\'") }}')" title="编辑用户">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <form method="post" action="{{ url_for('delete_user', name=name) }}" class="d-inline" onsubmit="return confirm('确定删除用户 {{ name }} 吗？')">
-                    <button class="btn btn-sm btn-outline-danger" title="删除用户">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </form>
+                  {% if session.get('admin') %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger" title="删除用户"
+                          formaction="{{ url_for('delete_user', name=name) }}" formmethod="post"
+                          onclick="return confirm('确定删除用户 {{ name }} 吗？')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                  {% endif %}
                 </div>
               </td>
             </tr>
@@ -324,6 +354,7 @@
             </div>
             <div class="col-12">
               <div class="row">
+                {% if session.get('admin') %}
                 <div class="col-md-6">
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" name="is_admin" id="edit-admin-checkbox">
@@ -332,6 +363,15 @@
                     </label>
                   </div>
                 </div>
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_agent" id="edit-agent-checkbox">
+                    <label class="form-check-label" for="edit-agent-checkbox">
+                      <i class="fas fa-user-tag me-2"></i>销售代理
+                    </label>
+                  </div>
+                </div>
+                {% endif %}
                 <div class="col-md-6">
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" name="enabled" id="edit-enabled-checkbox">
@@ -358,18 +398,20 @@
 </div>
 
 <!-- 分页导航 -->
-{% if (total-1)//per_page + 1 > 1 %}
+{% set page_count = ((total-1)//per_page + 1) if per_page else 1 %}
+{% if page_count > 1 %}
 <nav class="mt-4">
   <ul class="pagination justify-content-center">
-    {% for p in range(1, (total-1)//per_page + 2) %}
-      <li class="page-item {% if p==page %}active{% endif %}">
-        <a class="page-link" href="?page={{ p }}&q={{ query }}&source={{ source }}&status={{ status }}&sort={{ sort }}&start={{ start }}&end={{ end }}">{{ p }}</a>
-      </li>
+    {% for p in range(1, page_count + 1) %}
+        <li class="page-item {% if p==page %}active{% endif %}">
+          <a class="page-link" href="?page={{ p }}&q={{ query }}&source={{ source }}&status={{ status }}&sale={{ sale }}&sort={{ sort }}&start={{ start }}&end={{ end }}">{{ p }}</a>
+        </li>
     {% endfor %}
   </ul>
 </nav>
 {% endif %}
 
+{% if session.get('admin') %}
 <!-- 新增用户模态框 -->
 <div class="modal fade" id="add-user" tabindex="-1">
   <div class="modal-dialog modal-lg">
@@ -429,6 +471,30 @@
                 </div>
               </div>
             </div>
+              {% if session.get('admin') %}
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">&nbsp;</label>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="is_admin" id="add-admin">
+                    <label class="form-check-label" for="add-admin">
+                      <i class="fas fa-user-shield me-2"></i>管理员权限
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">&nbsp;</label>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="is_agent" id="add-agent">
+                    <label class="form-check-label" for="add-agent">
+                      <i class="fas fa-user-tag me-2"></i>销售代理
+                    </label>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
           </div>
         </div>
         <div class="modal-footer">
@@ -443,6 +509,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 
 <script>
   // 用户数据存储
@@ -452,6 +519,7 @@
       username: '{{ name | replace("'", "\\'") }}',
       nickname: '{{ info.nickname | replace("'", "\\'") }}',
       is_admin: {{ 'true' if info.is_admin else 'false' }},
+      is_agent: {{ 'true' if info.is_agent else 'false' }},
       enabled: {{ 'true' if info.enabled else 'false' }},
       product: '{{ info.product | replace("'", "\\'") }}'
     },
@@ -459,19 +527,25 @@
   };
 
   // 打开编辑模态框
+  const isAgent = {{ 'true' if session.get('agent') else 'false' }};
+
   function openEditModal(username) {
     const user = usersData[username];
     if (!user) return;
-    
+
     // 设置表单action
-    document.getElementById('edit-user-form').action = `/users/${encodeURIComponent(username)}/update`;
+    const base = isAgent ? '/sales/users/' : '/users/';
+    document.getElementById('edit-user-form').action = `${base}${encodeURIComponent(username)}/update`;
     
     // 填充表单数据
     document.getElementById('edit-username').textContent = username;
     document.getElementById('edit-username-input').value = user.username;
     document.getElementById('edit-nickname-input').value = user.nickname;
     document.getElementById('edit-password-input').value = '';
-    document.getElementById('edit-admin-checkbox').checked = user.is_admin;
+    const adminBox = document.getElementById('edit-admin-checkbox');
+    if (adminBox) adminBox.checked = user.is_admin;
+    const agentBox = document.getElementById('edit-agent-checkbox');
+    if (agentBox) agentBox.checked = user.is_agent;
     document.getElementById('edit-enabled-checkbox').checked = user.enabled;
     
     // 设置产品选择
@@ -501,6 +575,53 @@
     }
     prodSel.addEventListener('change',setPrice);setPrice();
   }
+
+  function startRemarkEdit(username){
+    const display=document.getElementById(`remark-display-${username}`);
+    const input=document.getElementById(`remark-input-${username}`);
+    display.classList.add('d-none');
+    input.classList.remove('d-none');
+    input.value=display.textContent.trim()==='无备注'?'':display.textContent.trim();
+    input.focus();
+  }
+
+  function saveRemark(username){
+    const display=document.getElementById(`remark-display-${username}`);
+    const input=document.getElementById(`remark-input-${username}`);
+    const value=input.value.trim();
+    const base=isAgent?'/sales/users/':'/users/';
+    fetch(`${base}${encodeURIComponent(username)}/update`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({remark:value})
+    }).then(r=>r.json()).then(d=>{
+      if(d.success){
+        display.textContent=value||'无备注';
+      }else{alert('保存失败');}
+    }).finally(()=>{
+      input.classList.add('d-none');
+      display.classList.remove('d-none');
+    });
+  }
+
+  function markSold(username){
+    fetch(`/sales/users/${encodeURIComponent(username)}/sold`,{
+      method:'POST',
+      headers:{'Accept':'application/json'}
+    }).then(r=>r.json()).then(d=>{
+        if(d.success){location.reload();}else{alert('标记失败');}
+    });
+  }
+
+  document.getElementById('batchForm').addEventListener('submit',function(e){
+    const action = e.submitter ? e.submitter.value : '';
+    if(['delete','enable','disable','sold'].includes(action)){
+      if(!this.querySelector('input[name="names"]:checked')){
+        e.preventDefault();
+        alert('请选择要操作的用户');
+      }
+    }
+  });
 </script>
 
 {% endblock %}
