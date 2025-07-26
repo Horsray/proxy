@@ -150,7 +150,7 @@
               <th>来源</th>
               <th>产品</th>
               <th>备注</th>
-              <th>待售</th>
+              <th>销售状态</th>
               <th style="width: 200px;">操作</th>
             </tr>
           </thead>
@@ -276,7 +276,7 @@
                   <span class="badge bg-warning">待售</span>
                   {% if session.get('agent') and info.owner==session.get('agent') %}
                   <form method="post" action="{{ url_for('mark_sold', name=name) }}" class="d-inline">
-                    <button class="btn btn-sm btn-outline-success">标记已售</button>
+                    <button class="btn btn-sm btn-outline-success">标记售出</button>
                   </form>
                   {% endif %}
                 {% else %}

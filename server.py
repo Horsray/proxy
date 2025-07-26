@@ -372,6 +372,18 @@ def mark_sold(name):
     if name in users and users[name].get('owner') == current and users[name].get('forsale'):
         users[name]['forsale'] = False
         save_users(users)
+        # add ledger record when item sold
+        records = load_ledger()
+        price = users[name].get('price', 0)
+        records.append({
+            'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'admin': current,
+            'product': users[name].get('product', ''),
+            'price': price,
+            'count': 1,
+            'revenue': price
+        })
+        save_ledger(records)
         if request.is_json:
             return jsonify({'success': True})
     if request.is_json:
@@ -385,9 +397,22 @@ def batch_sold():
     names = request.form.getlist('names')
     users = load_users()
     current = session.get('agent')
+    sold_any = False
     for name in names:
         if name in users and users[name].get('owner') == current and users[name].get('forsale'):
             users[name]['forsale'] = False
+            price = users[name].get('price', 0)
+            records = load_ledger()
+            records.append({
+                'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'admin': current,
+                'product': users[name].get('product', ''),
+                'price': price,
+                'count': 1,
+                'revenue': price
+            })
+            save_ledger(records)
+            sold_any = True
     save_users(users)
     return redirect(url_for('agent_users'))
 
@@ -806,27 +831,24 @@ def apply_bulk():
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
         save_applications(apps)
+        session['apply_success'] = True
         return redirect(url_for('apply_bulk'))
-    return render_template('bulk.html', accounts=None, products=products, info=None, page=1, per_page=20, total=0)
+    success = session.pop('apply_success', False)
+    my_apps = [a for a in load_applications() if a.get('agent') == session.get('agent')]
+    return render_template(
+        'bulk.html', accounts=None, products=products, info=None,
+        page=1, per_page=20, total=0, success=success, apps=my_apps
+    )
 
 
 @app.route('/applications')
 @admin_required
 def applications_list():
     apps = load_applications()
-    return render_template('applications.html', apps=apps)
+    return render_template('applications.html', apps=apps, products=load_products())
 
 
-@app.route('/applications/<app_id>/approve', methods=['POST'])
-@admin_required
-def approve_application(app_id):
-    apps = load_applications()
-    app_record = next((a for a in apps if a['id'] == app_id), None)
-    if not app_record:
-        return redirect(url_for('applications_list'))
-    if app_record['status'] != 'pending':
-        return redirect(url_for('applications_list'))
-    # generate accounts
+def _approve_application(app_record):
     users = load_users()
     new_accounts = []
     for _ in range(app_record['count']):
@@ -852,11 +874,10 @@ def approve_application(app_id):
         }
         new_accounts.append({'username': uname, 'password': pwd})
     save_users(users)
-    # ledger
     records = load_ledger()
     records.append({
         'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'admin': app_record['agent'],
+        'admin': session.get('admin'),
         'product': app_record['product'],
         'price': app_record['price'],
         'count': app_record['count'],
@@ -864,6 +885,16 @@ def approve_application(app_id):
     })
     save_ledger(records)
     app_record['status'] = 'approved'
+
+
+@app.route('/applications/<app_id>/approve', methods=['POST'])
+@admin_required
+def approve_application(app_id):
+    apps = load_applications()
+    app_record = next((a for a in apps if a['id'] == app_id), None)
+    if not app_record or app_record['status'] != 'pending':
+        return redirect(url_for('applications_list'))
+    _approve_application(app_record)
     save_applications(apps)
     return redirect(url_for('applications_list'))
 
@@ -877,6 +908,40 @@ def reject_application(app_id):
             a['status'] = 'rejected'
             break
     save_applications(apps)
+    return redirect(url_for('applications_list'))
+
+
+@app.route('/applications/<app_id>/update', methods=['POST'])
+@admin_required
+def update_application(app_id):
+    apps = load_applications()
+    app_record = next((a for a in apps if a['id'] == app_id), None)
+    if not app_record or app_record.get('status') != 'pending':
+        return redirect(url_for('applications_list'))
+    app_record['count'] = int(request.form.get('count', app_record['count']))
+    app_record['price'] = float(request.form.get('price', app_record['price']))
+    app_record['product'] = request.form.get('product', app_record['product'])
+    save_applications(apps)
+    return redirect(url_for('applications_list'))
+
+
+@app.route('/applications/batch', methods=['POST'])
+@admin_required
+def batch_applications():
+    action = request.form.get('action')
+    ids = request.form.getlist('ids')
+    if action == 'approve':
+        apps = load_applications()
+        for app_record in apps:
+            if app_record['id'] in ids and app_record['status'] == 'pending':
+                _approve_application(app_record)
+        save_applications(apps)
+    elif action == 'reject':
+        apps = load_applications()
+        for a in apps:
+            if a['id'] in ids and a['status'] == 'pending':
+                a['status'] = 'rejected'
+        save_applications(apps)
     return redirect(url_for('applications_list'))
 
 

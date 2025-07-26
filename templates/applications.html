@@ -2,14 +2,43 @@
 {% block title %}订单审批{% endblock %}
 {% block content %}
 <h2 class="mb-3">待审批申请</h2>
+<form method="post" action="{{ url_for('batch_applications') }}">
+<div class="mb-2">
+  <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">批量通过</button>
+  <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm ms-2">批量拒绝</button>
+</div>
 <table class="table">
   <thead>
-    <tr><th>代理</th><th>数量</th><th>价格</th><th>产品</th><th>状态</th><th>操作</th></tr>
+    <tr><th></th><th>代理</th><th>数量</th><th>价格</th><th>产品</th><th>状态</th><th>操作</th></tr>
   </thead>
   <tbody>
   {% for a in apps %}
     <tr>
-      <td>{{ a.agent }}</td><td>{{ a.count }}</td><td>{{ a.price }}</td><td>{{ a.product }}</td><td>{{ a.status }}</td>
+      <td><input type="checkbox" name="ids" value="{{ a.id }}" {% if a.status != 'pending' %}disabled{% endif %}></td>
+      <td>{{ a.agent }}</td>
+      <td>
+        {% if a.status=='pending' %}
+        <form method="post" action="{{ url_for('update_application', app_id=a.id) }}" class="d-inline">
+          <input name="count" value="{{ a.count }}" style="width:60px" class="form-control form-control-sm d-inline">
+      </td>
+      <td>
+          <input name="price" value="{{ a.price }}" style="width:60px" class="form-control form-control-sm d-inline">
+      </td>
+      <td>
+          <select name="product" class="form-select form-select-sm d-inline" style="width:100px">
+            {% for p in products.values() %}
+            <option value="{{ p.name }}" {% if p.name==a.product %}selected{% endif %}>{{ p.name }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-sm btn-primary ms-1">保存</button>
+        </form>
+        {% else %}
+        {{ a.count }}
+      </td>
+      <td>{{ a.price }}</td>
+      <td>{{ a.product }}</td>
+        {% endif %}
+      <td>{{ a.status }}</td>
       <td>
         {% if a.status == 'pending' %}
         <form method="post" action="{{ url_for('approve_application', app_id=a.id) }}" class="d-inline">
@@ -18,10 +47,11 @@
         <form method="post" action="{{ url_for('reject_application', app_id=a.id) }}" class="d-inline ms-1">
           <button class="btn btn-sm btn-danger">拒绝</button>
         </form>
-        {% endif %}
+        {% else %}-{% endif %}
       </td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
+</form>
 {% endblock %}
