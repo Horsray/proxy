@@ -1,78 +1,507 @@
 {% extends 'layout.html' %}
 {% block title %}用户列表{% endblock %}
 {% block content %}
-<h3>新增用户</h3>
-<form class="row g-3" action="{{ url_for('add_user') }}" method="post">
-  <div class="col-md-3">
-    <input type="text" name="username" class="form-control" placeholder="用户名" required>
+
+<!-- 页面标题 -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="mb-1" style="color: var(--gray-800); font-weight: 700;">
+      <i class="fas fa-users me-3" style="color: var(--primary-color);"></i>用户管理
+    </h2>
+    <p class="text-muted mb-0">管理系统用户账户和权限</p>
   </div>
-  <div class="col-md-3">
-    <input type="text" name="password" class="form-control" placeholder="密码" required>
+  <div class="d-flex gap-2">
+    <span class="badge bg-primary fs-6 px-3 py-2">
+      <i class="fas fa-users me-2"></i>总用户数：{{ total }}
+    </span>
   </div>
-  <div class="col-md-2 form-check mt-2">
-    <input class="form-check-input" type="checkbox" name="is_admin" id="is_admin">
-    <label class="form-check-label" for="is_admin">管理员</label>
+</div>
+
+<!-- 搜索和筛选区域 -->
+<div class="card mb-4">
+  <div class="card-header">
+    <i class="fas fa-filter me-2"></i>筛选条件
   </div>
-  <div class="col-md-2">
-    <button type="submit" class="btn btn-success">新增</button>
+  <div class="card-body">
+    <form class="row g-3" method="get">
+      <div class="col-md-3">
+        <label class="form-label">搜索用户名</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+          <input type="text" name="q" class="form-control" placeholder="输入用户名" value="{{ query }}">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">来源</label>
+        <select name="source" class="form-select">
+          <option value="">全部来源</option>
+          <option value="add" {% if source=='add' %}selected{% endif %}>手动录入</option>
+          <option value="batch" {% if source=='batch' %}selected{% endif %}>批量生成</option>
+          <option value="import" {% if source=='import' %}selected{% endif %}>文件导入</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">状态</label>
+        <select name="status" class="form-select">
+          <option value="">全部状态</option>
+          <option value="enabled" {% if status=='enabled' %}selected{% endif %}>已启用</option>
+          <option value="disabled" {% if status=='disabled' %}selected{% endif %}>已停用</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">开始日期</label>
+        <input type="date" name="start" class="form-control" value="{{ start }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">结束日期</label>
+        <input type="date" name="end" class="form-control" value="{{ end }}">
+      </div>
+      <div class="col-md-1">
+        <label class="form-label">排序</label>
+        <select name="sort" class="form-select">
+          <option value="desc" {% if sort=='desc' %}selected{% endif %}>新→旧</option>
+          <option value="asc" {% if sort=='asc' %}selected{% endif %}>旧→新</option>
+        </select>
+      </div>
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-search me-2"></i>筛选
+        </button>
+        <a href="{{ url_for('user_list') }}" class="btn btn-outline-secondary ms-2">
+          <i class="fas fa-undo me-2"></i>重置
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 操作按钮区域 -->
+<form method="post" action="{{ url_for('batch_action') }}" id="batchForm">
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-user">
+              <i class="fas fa-plus me-2"></i>新增用户
+            </button>
+            <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('确定删除选中的用户吗？')">
+              <i class="fas fa-trash me-2"></i>批量删除
+            </button>
+            <button type="submit" name="action" value="disable" class="btn btn-warning">
+              <i class="fas fa-ban me-2"></i>批量停用
+            </button>
+            <button type="submit" name="action" value="enable" class="btn btn-success">
+              <i class="fas fa-check me-2"></i>批量启用
+            </button>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+            <a class="btn btn-outline-primary" href="{{ url_for('export_users') }}">
+              <i class="fas fa-download me-2"></i>导出全部
+            </a>
+            <a class="btn btn-outline-secondary" href="{{ url_for('download_template') }}">
+              <i class="fas fa-file-excel me-2"></i>下载模板
+            </a>
+            <input type="file" name="file" id="import-file" class="d-none" onchange="this.form.submit()" formaction="{{ url_for('import_users') }}" formmethod="post" enctype="multipart/form-data">
+            <label for="import-file" class="btn btn-outline-success">
+              <i class="fas fa-upload me-2"></i>导入用户
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用户列表表格 -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><i class="fas fa-list me-2"></i>用户列表</span>
+      <small class="text-muted">共 {{ total }} 条记录</small>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th scope="col" style="width: 50px;">
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="check-all" onclick="document.querySelectorAll('input[name=names]').forEach(c=>c.checked=this.checked)">
+                  <label class="form-check-label" for="check-all"></label>
+                </div>
+              </th>
+              <th>编号</th>
+              <th>用户名</th>
+              <th>昵称</th>
+              <th>类型</th>
+              <th>状态</th>
+              <th>IP地址</th>
+              <th>最后登录</th>
+              <th>创建时间</th>
+              <th>来源</th>
+              <th>产品</th>
+              <th>备注</th>
+              <th style="width: 200px;">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for name, info in users.items() %}
+            <tr>
+              <td>
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" name="names" value="{{ name }}" id="check-{{ loop.index }}">
+                  <label class="form-check-label" for="check-{{ loop.index }}"></label>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark">{{ loop.index + (page-1)*per_page }}</span>
+              </td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm me-3">
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                      <i class="fas fa-user text-white"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="fw-bold">{{ name }}</div>
+                    {% if info.is_admin %}
+                      <small class="text-primary"><i class="fas fa-crown me-1"></i>管理员</small>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="text-muted">{{ info.nickname or '未设置' }}</span>
+              </td>
+              <td>
+                {% if info.is_admin %}
+                  <span class="badge bg-warning text-dark">
+                    <i class="fas fa-user-shield me-1"></i>管理员
+                  </span>
+                {% else %}
+                  <span class="badge bg-info">
+                    <i class="fas fa-user me-1"></i>普通用户
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                <label class="toggle-switch">
+                  <input type="checkbox" {% if info.enabled %}checked{% endif %} 
+                         onchange="toggleUserStatus('{{ name }}', this)">
+                  <span class="toggle-slider"></span>
+                </label>
+              </td>
+              <td>
+                {% if info.location %}
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                    <div>
+                      <div class="fw-bold">{{ info.location }}</div>
+                      <small class="text-muted">{{ info.ip_address }}</small>
+                    </div>
+                  </div>
+                {% else %}
+                  <span class="text-muted">
+                    <i class="fas fa-question-circle me-1"></i>未知
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                {% if info.last_login %}
+                  <div>
+                    <div class="fw-bold">{{ info.last_login.split(' ')[0] }}</div>
+                    <small class="text-muted">{{ info.last_login.split(' ')[1] }}</small>
+                  </div>
+                {% else %}
+                  <span class="text-muted">从未登录</span>
+                {% endif %}
+              </td>
+              <td>
+                <div>
+                  <div class="fw-bold">{{ info.created_at.split(' ')[0] }}</div>
+                  <small class="text-muted">{{ info.created_at.split(' ')[1] }}</small>
+                </div>
+              </td>
+              <td>
+                {% if info.source == 'add' %}
+                  <span class="badge bg-success">
+                    <i class="fas fa-plus me-1"></i>手动录入
+                  </span>
+                {% elif info.source == 'batch' %}
+                  <span class="badge bg-primary">
+                    <i class="fas fa-layer-group me-1"></i>批量生成
+                  </span>
+                {% elif info.source == 'import' %}
+                  <span class="badge bg-info">
+                    <i class="fas fa-file-import me-1"></i>文件导入
+                  </span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ info.source }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if info.product %}
+                  <span class="badge bg-light text-dark">{{ info.product }}</span>
+                {% else %}
+                  <span class="text-muted">未设置</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <span class="text-muted me-2" id="remark-display-{{ name | replace("'", "\\'") }}">
+                    {{ info.remark or '无备注' }}
+                  </span>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editRemark('{{ name | replace("'", "\\'") }}')" title="编辑备注">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button type="button" class="btn btn-sm btn-outline-primary" onclick="openEditModal('{{ name | replace("'", "\\'") }}')" title="编辑用户">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <form method="post" action="{{ url_for('delete_user', name=name) }}" class="d-inline" onsubmit="return confirm('确定删除用户 {{ name }} 吗？')">
+                    <button class="btn btn-sm btn-outline-danger" title="删除用户">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </form>
-<hr>
-<h3>批量开通随机账号</h3>
-<form class="row g-3" action="{{ url_for('bulk_create') }}" method="post">
-  <div class="col-md-2">
-    <input type="number" name="count" class="form-control" min="1" value="1">
-  </div>
-  <div class="col-md-2">
-    <button type="submit" class="btn btn-primary">开通</button>
-  </div>
-</form>
-<hr>
-<h3>批量导入/导出</h3>
-<form class="row g-3" action="{{ url_for('import_users') }}" method="post" enctype="multipart/form-data">
-  <div class="col-md-4">
-    <input type="file" name="file" class="form-control" required>
-  </div>
-  <div class="col-md-2">
-    <button type="submit" class="btn btn-secondary">导入</button>
-  </div>
-  <div class="col-md-2">
-    <a class="btn btn-outline-secondary" href="{{ url_for('export_users') }}">导出</a>
-  </div>
-</form>
-<hr>
-<h3>用户列表</h3>
-<table class="table table-striped">
-<thead>
-  <tr>
-    <th>用户名</th>
-    <th>权限</th>
-    <th>创建时间</th>
-    <th>最后登录</th>
-    <th>修改</th>
-    <th>删除</th>
-  </tr>
-</thead>
-<tbody>
-{% for name, info in users.items() %}
-<tr>
-  <form action="{{ url_for('update_user', name=name) }}" method="post">
-    <td><input name="username" class="form-control" value="{{ name }}"></td>
-    <td><input type="checkbox" name="is_admin" {% if info.is_admin %}checked{% endif %}></td>
-    <td>{{ info.created_at }}</td>
-    <td>{{ info.last_login or '' }}</td>
-    <td>
-      <input type="text" name="password" class="form-control" placeholder="新密码">
-    </td>
-    <td class="d-flex">
-      <button type="submit" class="btn btn-sm btn-primary me-2">修改</button>
-  </form>
-      <form action="{{ url_for('delete_user', name=name) }}" method="post" onsubmit="return confirm('确定删除?')">
-        <button type="submit" class="btn btn-sm btn-danger">删除</button>
+
+<!-- 编辑用户模态框 -->
+<div class="modal fade" id="edit-user-modal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" id="edit-user-form">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-user-edit me-2"></i>编辑用户 - <span id="edit-username"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">用户名</label>
+                <input name="username" id="edit-username-input" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">昵称</label>
+                <input name="nickname" id="edit-nickname-input" class="form-control" placeholder="请输入昵称">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">新密码</label>
+                <input name="password" id="edit-password-input" type="password" class="form-control" placeholder="留空则不修改">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">产品</label>
+                <select name="product" id="edit-product-select" class="form-select">
+                  <option value="">请选择产品</option>
+                  {% for p in products.values() %}
+                  <option value="{{ p.name }}" data-price="{{ p.price }}">{{ p.name }} {{ p.version }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_admin" id="edit-admin-checkbox">
+                    <label class="form-check-label" for="edit-admin-checkbox">
+                      <i class="fas fa-user-shield me-2"></i>管理员权限
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" name="enabled" id="edit-enabled-checkbox">
+                    <label class="form-check-label" for="edit-enabled-checkbox">
+                      <i class="fas fa-toggle-on me-2"></i>启用账户
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>取消
+          </button>
+          <button class="btn btn-primary" type="submit">
+            <i class="fas fa-save me-2"></i>保存更改
+          </button>
+        </div>
       </form>
-    </td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+    </div>
+  </div>
+</div>
+
+<!-- 分页导航 -->
+{% if (total-1)//per_page + 1 > 1 %}
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% for p in range(1, (total-1)//per_page + 2) %}
+      <li class="page-item {% if p==page %}active{% endif %}">
+        <a class="page-link" href="?page={{ p }}&q={{ query }}&source={{ source }}&status={{ status }}&sort={{ sort }}&start={{ start }}&end={{ end }}">{{ p }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+
+<!-- 新增用户模态框 -->
+<div class="modal fade" id="add-user" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('add_user') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-user-plus me-2"></i>新增用户
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">用户名 <span class="text-danger">*</span></label>
+                <input name="username" id="add-name" class="form-control" required placeholder="请输入用户名">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">密码 <span class="text-danger">*</span></label>
+                <input name="password" id="add-pass" type="password" class="form-control" required placeholder="请输入密码">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">昵称</label>
+                <input name="nickname" class="form-control" placeholder="请输入昵称">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">单价(元)</label>
+                <input name="price" type="number" step="0.01" class="form-control" value="0" min="0">
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label class="form-label">产品</label>
+                <select name="product" class="form-select" id="add-product">
+                  <option value="">请选择产品</option>
+                  {% for p in products.values() %}
+                  <option value="{{ p.name }}" data-price="{{ p.price }}" {% if p.default %}selected{% endif %}>{{ p.name }} {{ p.version }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="rand" onclick="genRandom(this.checked)">
+                  <label class="form-check-label" for="rand">
+                    <i class="fas fa-dice me-2"></i>随机生成
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>取消
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>创建用户
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 用户数据存储
+  const usersData = {
+    {% for name, info in users.items() %}
+    '{{ name | replace("'", "\\'") }}': {
+      username: '{{ name | replace("'", "\\'") }}',
+      nickname: '{{ info.nickname | replace("'", "\\'") }}',
+      is_admin: {{ 'true' if info.is_admin else 'false' }},
+      enabled: {{ 'true' if info.enabled else 'false' }},
+      product: '{{ info.product | replace("'", "\\'") }}'
+    },
+    {% endfor %}
+  };
+
+  // 打开编辑模态框
+  function openEditModal(username) {
+    const user = usersData[username];
+    if (!user) return;
+    
+    // 设置表单action
+    document.getElementById('edit-user-form').action = `/users/${encodeURIComponent(username)}/update`;
+    
+    // 填充表单数据
+    document.getElementById('edit-username').textContent = username;
+    document.getElementById('edit-username-input').value = user.username;
+    document.getElementById('edit-nickname-input').value = user.nickname;
+    document.getElementById('edit-password-input').value = '';
+    document.getElementById('edit-admin-checkbox').checked = user.is_admin;
+    document.getElementById('edit-enabled-checkbox').checked = user.enabled;
+    
+    // 设置产品选择
+    const productSelect = document.getElementById('edit-product-select');
+    productSelect.value = user.product;
+    
+    // 显示模态框
+    const modal = new bootstrap.Modal(document.getElementById('edit-user-modal'));
+    modal.show();
+  }
+
+  function genRandom(flag){
+    if(flag){
+      fetch('{{ url_for("random_account") }}').then(r=>r.json()).then(d=>{
+        document.getElementById('add-name').value=d.username;
+        document.getElementById('add-pass').value=d.password;
+      });
+    }
+  }
+  
+  const prodSel=document.getElementById('add-product');
+  const priceInput=document.querySelector('#add-user input[name="price"]');
+  if(prodSel){
+    function setPrice(){
+      const p=prodSel.selectedOptions[0].dataset.price;
+      if(p!==undefined && (priceInput.value=='' || priceInput.value=='0')){priceInput.value=p;}
+    }
+    prodSel.addEventListener('change',setPrice);setPrice();
+  }
+</script>
+
 {% endblock %}
+

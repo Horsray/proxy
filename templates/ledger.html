@@ -1,0 +1,175 @@
+{% extends 'layout.html' %}
+{% block title %}台账管理{% endblock %}
+{% block content %}
+
+<!-- 页面标题 -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="mb-1" style="color: var(--gray-800); font-weight: 700;">
+      <i class="fas fa-chart-line me-3" style="color: var(--primary-color);"></i>台账管理
+    </h2>
+    <p class="text-muted mb-0">查看销售记录和收入统计</p>
+  </div>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <i class="fas fa-calendar-day text-primary fs-3 me-2"></i>
+          <div>
+            <h5 class="card-title mb-0">今日收入</h5>
+            <h3 class="text-primary mb-0">¥{{ daily }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <i class="fas fa-calendar-alt text-success fs-3 me-2"></i>
+          <div>
+            <h5 class="card-title mb-0">本月收入</h5>
+            <h3 class="text-success mb-0">¥{{ monthly }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <i class="fas fa-calendar text-warning fs-3 me-2"></i>
+          <div>
+            <h5 class="card-title mb-0">本年收入</h5>
+            <h3 class="text-warning mb-0">¥{{ yearly }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <i class="fas fa-coins text-info fs-3 me-2"></i>
+          <div>
+            <h5 class="card-title mb-0">累计收入</h5>
+            <h3 class="text-info mb-0">¥{{ total }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 筛选区域 -->
+<div class="card mb-4">
+  <div class="card-header">
+    <i class="fas fa-filter me-2"></i>筛选条件
+  </div>
+  <div class="card-body">
+    <form class="row g-3" method="get">
+      <div class="col-md-3">
+        <label class="form-label">产品</label>
+        <select name="product" class="form-select">
+          <option value="">全部产品</option>
+          {% for p in products.values() %}
+          <option value="{{ p.name }}" {% if product_filter==p.name %}selected{% endif %}>{{ p.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">开始日期</label>
+        <input type="date" name="start" class="form-control" value="{{ start }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">结束日期</label>
+        <input type="date" name="end" class="form-control" value="{{ end }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">管理员</label>
+        <input name="admin" class="form-control" placeholder="输入管理员名称" value="{{ admin_filter }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">&nbsp;</label>
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" type="submit">
+            <i class="fas fa-search me-2"></i>筛选
+          </button>
+          <a href="{{ url_for('ledger_view') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-undo me-2"></i>重置
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 台账记录表格 -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="fas fa-list me-2"></i>销售记录</span>
+    <small class="text-muted">共 {{ records|length }} 条记录</small>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>时间</th>
+            <th>管理员</th>
+            <th>产品</th>
+            <th>单价</th>
+            <th>数量</th>
+            <th>销售额</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in records %}
+        <tr>
+          <td>
+            <div>
+              <div class="fw-bold">{{ r.time.split(' ')[0] }}</div>
+              <small class="text-muted">{{ r.time.split(' ')[1] if ' ' in r.time else '' }}</small>
+            </div>
+          </td>
+          <td>
+            <span class="badge bg-light text-dark">
+              <i class="fas fa-user me-1"></i>{{ r.admin }}
+            </span>
+          </td>
+          <td>
+            <span class="badge bg-primary">{{ r.product }}</span>
+          </td>
+          <td>
+            <span class="text-success fw-bold">¥{{ r.price }}</span>
+          </td>
+          <td>
+            <span class="badge bg-info">{{ r.count }}</span>
+          </td>
+          <td>
+            <span class="text-primary fw-bold fs-6">¥{{ r.revenue }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+        {% if not records %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-4">
+            <i class="fas fa-inbox fs-1 mb-3 d-block"></i>
+            暂无销售记录
+          </td>
+        </tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

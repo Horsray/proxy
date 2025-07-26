@@ -1,9 +1,10 @@
-# User management server for Huiying Proxy
+# Enhanced User management server for Huiying Proxy
 
 import os
 import json
 import inspect
 import argparse
+import requests
 from datetime import datetime
 from io import BytesIO
 from functools import wraps
@@ -20,14 +21,30 @@ PRODUCTS_FILE = os.path.join(BASE_DIR, 'products.json')
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'huiying-secret')
 
-# Parse command line arguments
-import sys
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--port', type=int, default=5001, help='Port to run the server on')
-    args = parser.parse_args()
-    app.run(host='0.0.0.0', port=args.port)
+def get_location_from_ip(ip_address):
+    """根据IP地址获取地理位置信息"""
+    try:
+        # 使用免费的IP地理位置API
+        response = requests.get(f'http://ip-api.com/json/{ip_address}?lang=zh-CN', timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            if data['status'] == 'success':
+                city = data.get('city', '未知')
+                return f"{city}-{ip_address}"
+        return f"未知-{ip_address}"
+    except:
+        return f"未知-{ip_address}"
+
+
+def get_client_ip():
+    """获取客户端真实IP地址"""
+    if request.headers.get('X-Forwarded-For'):
+        return request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    elif request.headers.get('X-Real-IP'):
+        return request.headers.get('X-Real-IP')
+    else:
+        return request.remote_addr
 
 
 def load_users() -> dict:
@@ -41,6 +58,9 @@ def load_users() -> dict:
                     info.setdefault('enabled', True)
                     info.setdefault('source', 'add')
                     info.setdefault('price', 0)
+                    info.setdefault('ip_address', '')
+                    info.setdefault('location', '')
+                    info.setdefault('remark', '')
                 return users
             except Exception:
                 return {}
@@ -104,7 +124,10 @@ def login():
         user = users.get(username)
         if user and user.get('password') == password and user.get('is_admin'):
             session['admin'] = username
+            client_ip = get_client_ip()
             user['last_login'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            user['ip_address'] = client_ip
+            user['location'] = get_location_from_ip(client_ip)
             users[username] = user
             save_users(users)
             return redirect(url_for('user_list'))
@@ -198,7 +221,7 @@ def user_list():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
     page = int(request.args.get('page', 1))
-    per_page = 15
+    per_page = 10
     users = load_users()
     if query:
         users = {k: v for k, v in users.items() if query.lower() in k.lower()}
@@ -249,7 +272,10 @@ def add_user():
         'price': price,
         'product': product,
         'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'last_login': None
+        'last_login': None,
+        'ip_address': '',
+        'location': '',
+        'remark': ''
     }
     save_users(users)
     # ledger
@@ -283,6 +309,9 @@ def toggle_user(name):
     if name in users:
         users[name]['enabled'] = not users[name].get('enabled', True)
         save_users(users)
+        # 支持AJAX请求
+        if request.is_json or request.headers.get('Content-Type') == 'application/json':
+            return jsonify({'success': True, 'enabled': users[name]['enabled']})
     return redirect(url_for('user_list'))
 
 
@@ -305,7 +334,7 @@ def batch_action():
     return redirect(url_for('user_list'))
 
 
-@app.route('/users/<name>/update', methods=['POST'])
+@app.route('/users/<n>/update', methods=['POST'])
 @admin_required
 def update_user(name):
     new_name = request.form.get('username')
@@ -314,6 +343,7 @@ def update_user(name):
     is_admin = bool(request.form.get('is_admin'))
     enabled = bool(request.form.get('enabled'))
     product = request.form.get('product')
+    remark = request.form.get('remark', '')
     users = load_users()
     if name in users:
         user = users[name]
@@ -329,6 +359,7 @@ def update_user(name):
         users[name]['enabled'] = enabled
         if product is not None:
             users[name]['product'] = product
+        users[name]['remark'] = remark
         save_users(users)
     return redirect(url_for('user_list'))
 
@@ -367,7 +398,9 @@ def import_users():
                 'product': product,
                 'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'last_login': None,
-                'price': price
+                'price': price,
+                'ip_address': '',
+                'location': ''
             }
             count += 1
     save_users(users)
@@ -393,7 +426,7 @@ def export_users():
     ws = wb.active
     ws.append([
         '用户名', '密码', '昵称', '是否管理员',
-        '启用', '来源', '创建时间', '最后登录', '产品'
+        '启用', '来源', '创建时间', '最后登录', '产品', 'IP地址', '位置'
     ])
     for name, info in users.items():
         ws.append([
@@ -405,7 +438,9 @@ def export_users():
             info.get('source'),
             info.get('created_at'),
             info.get('last_login'),
-            info.get('product','')
+            info.get('product',''),
+            info.get('ip_address', ''),
+            info.get('location', '')
         ])
     bio = BytesIO()
     wb.save(bio)
@@ -502,7 +537,9 @@ def bulk_create():
             'product': product,
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'last_login': None,
-            'price': price
+            'price': price,
+            'ip_address': '',
+            'location': ''
         }
         new_accounts.append({'username': uname, 'password': pwd})
     save_users(users)
@@ -531,33 +568,47 @@ def bulk_create():
 @admin_required
 def ledger_view():
     records = load_ledger()
-    product = request.args.get('product', '')
-    admin = request.args.get('admin', '')
+    product_filter = request.args.get('product', '')
+    admin_filter = request.args.get('admin', '')
     start = request.args.get('start', '')
     end = request.args.get('end', '')
-    if product:
-        records = [r for r in records if r.get('product') == product]
-    if admin:
-        records = [r for r in records if r.get('admin') == admin]
+    
+    # 过滤记录
+    filtered_records = records[:]
+    if product_filter:
+        filtered_records = [r for r in filtered_records if r.get('product') == product_filter]
+    if admin_filter:
+        filtered_records = [r for r in filtered_records if r.get('admin') == admin_filter]
     if start:
-        records = [r for r in records if r['time'] >= start]
+        filtered_records = [r for r in filtered_records if r.get('time', '') >= start]
     if end:
-        records = [r for r in records if r['time'] <= end]
-    total = sum(r.get('revenue', 0) for r in records)
+        filtered_records = [r for r in filtered_records if r.get('time', '') <= end]
+    
+    # 计算统计数据
+    from datetime import datetime
     today = datetime.now().strftime('%Y-%m-%d')
-    month = datetime.now().strftime('%Y-%m')
-    year = datetime.now().strftime('%Y')
-    daily = sum(r['revenue'] for r in records if r['time'].startswith(today))
-    monthly = sum(r['revenue'] for r in records if r['time'].startswith(month))
-    yearly = sum(r['revenue'] for r in records if r['time'].startswith(year))
+    this_month = datetime.now().strftime('%Y-%m')
+    this_year = datetime.now().strftime('%Y')
+    
+    # 计算各时间段收入
+    daily = sum(r.get('revenue', 0) for r in records if r.get('time', '').startswith(today))
+    monthly = sum(r.get('revenue', 0) for r in records if r.get('time', '').startswith(this_month))
+    yearly = sum(r.get('revenue', 0) for r in records if r.get('time', '').startswith(this_year))
+    total = sum(r.get('revenue', 0) for r in records)
+    
     products = load_products()
     return render_template(
-        'ledger.html', records=records, daily=daily,
-        monthly=monthly, yearly=yearly, total=total,
-        product_filter=product, admin_filter=admin,
-        start=start, end=end, products=products
+        'ledger.html', records=filtered_records, 
+        product_filter=product_filter, admin_filter=admin_filter,
+        start=start, end=end, products=products,
+        daily=daily, monthly=monthly, yearly=yearly, total=total
     )
 
 
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=args.port, debug=False)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, default=5001, help='Port to run the server on')
+    args = parser.parse_args()
+    app.run(host='0.0.0.0', port=args.port, debug=True)
+

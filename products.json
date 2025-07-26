@@ -1,0 +1,18 @@
+{
+    "products": {
+        "绘影AI": {
+            "name": "绘影AI-sdppp版",
+            "version": "1.8.3",
+            "type": "标准版",
+            "price": 199,
+            "default": false
+        },
+        "绘影新版2.5": {
+            "name": "绘影新版AIGC",
+            "version": "2.5",
+            "type": "ps插件",
+            "price": 398.0,
+            "default": true
+        }
+    }
+}
