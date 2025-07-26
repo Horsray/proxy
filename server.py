@@ -80,7 +80,10 @@ def load_ledger() -> list:
     if os.path.exists(LEDGER_FILE):
         with open(LEDGER_FILE, 'r', encoding='utf-8') as f:
             try:
-                return json.load(f).get('records', [])
+                records = json.load(f).get('records', [])
+                for r in records:
+                    r.setdefault('role', 'admin')
+                return records
             except Exception:
                 return []
     return []
@@ -345,6 +348,7 @@ def add_user():
     records.append({
         'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'admin': session.get('admin'),
+        'role': 'admin',
         'product': product,
         'price': price,
         'count': 1,
@@ -400,6 +404,7 @@ def mark_sold(name):
         records.append({
             'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'admin': current,
+            'role': 'agent',
             'product': users[name].get('product', ''),
             'price': price,
             'count': 1,
@@ -428,6 +433,7 @@ def batch_sold():
             records.append({
                 'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'admin': current,
+                'role': 'agent',
                 'product': users[name].get('product', ''),
                 'price': price,
                 'count': 1,
@@ -607,6 +613,7 @@ def import_users():
         records.append({
             'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'admin': session.get('admin'),
+            'role': 'admin',
             'product': product,
             'price': price,
             'count': count,
@@ -789,10 +796,19 @@ def ledger_view():
     this_year = datetime.now().strftime('%Y')
     
     # 计算各时间段收入
-    daily = sum(r.get('revenue', 0) for r in records if r.get('time', '').startswith(today))
-    monthly = sum(r.get('revenue', 0) for r in records if r.get('time', '').startswith(this_month))
-    yearly = sum(r.get('revenue', 0) for r in records if r.get('time', '').startswith(this_year))
-    total = sum(r.get('revenue', 0) for r in records)
+    daily = sum(
+        r.get('revenue', 0) for r in records
+        if r.get('role') == 'admin' and r.get('time', '').startswith(today)
+    )
+    monthly = sum(
+        r.get('revenue', 0) for r in records
+        if r.get('role') == 'admin' and r.get('time', '').startswith(this_month)
+    )
+    yearly = sum(
+        r.get('revenue', 0) for r in records
+        if r.get('role') == 'admin' and r.get('time', '').startswith(this_year)
+    )
+    total = sum(r.get('revenue', 0) for r in records if r.get('role') == 'admin')
     
     products = load_products()
     return render_template(
@@ -844,7 +860,10 @@ def agent_users():
 @app.route('/sales/ledger')
 @agent_required
 def agent_ledger():
-    records = [r for r in load_ledger() if r.get('admin') == session.get('agent')]
+    records = [
+        r for r in load_ledger()
+        if r.get('admin') == session.get('agent') and r.get('role') == 'agent'
+    ]
     from datetime import datetime
     today = datetime.now().strftime('%Y-%m-%d')
     this_month = datetime.now().strftime('%Y-%m')
@@ -928,7 +947,9 @@ def _approve_application(app_record):
     records = load_ledger()
     records.append({
         'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'admin': app_record['agent'],
+        'admin': session.get('admin'),
+        'agent': app_record['agent'],
+        'role': 'admin',
         'product': app_record['product'],
         'price': app_record['price'],
         'count': app_record['count'],
