@@ -259,7 +259,7 @@ def user_list():
     start = request.args.get('start', '')
     end = request.args.get('end', '')
     page = int(request.args.get('page', 1))
-    per_page = 10
+    per_page = max(int(request.args.get('per_page', 10)), 1)
     users = load_users()
     if query:
         users = {k: v for k, v in users.items() if query.lower() in k.lower()}
