@@ -293,10 +293,12 @@
                   </button>
                   {% if session.get('admin') %}
                   <button type="submit" class="btn btn-sm btn-outline-danger" title="删除用户"
-                          formaction="{{ url_for('delete_user', name=name) }}" formmethod="post"
+                          form="delete-form-{{ name | replace("'", "\\'") }}"
                           onclick="return confirm('确定删除用户 {{ name }} 吗？')">
                     <i class="fas fa-trash"></i>
                   </button>
+                  <form id="delete-form-{{ name | replace("'", "\\'") }}" method="post"
+                        action="{{ url_for('delete_user', name=name) }}"></form>
                   {% endif %}
                 </div>
               </td>
