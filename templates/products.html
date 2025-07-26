@@ -21,11 +21,9 @@
     <td>{{ p.price }}</td>
     <td>{% if p.default %}✓{% endif %}</td>
     <td>
-      <form method="post" action="{{ url_for('delete_product', name=key) }}" class="d-inline" onsubmit="return confirm('确定删除?')">
-        <button class="btn btn-sm btn-danger">删除</button>
-      </form>
-      <form method="post" action="{{ url_for('set_default_product', name=key) }}" class="d-inline ms-1">
-        <button class="btn btn-sm btn-secondary">设为默认</button>
+      <form method="post" class="d-inline">
+        <button class="btn btn-sm btn-danger" formaction="{{ url_for('delete_product', name=key) }}" onclick="return confirm('确定删除?')">删除</button>
+        <button class="btn btn-sm btn-secondary ms-1" formaction="{{ url_for('set_default_product', name=key) }}">设为默认</button>
       </form>
     </td>
   </tr>

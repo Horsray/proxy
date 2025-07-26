@@ -272,7 +272,7 @@
                 <div class="d-flex align-items-center">
                   <span class="text-muted" id="remark-display-{{ name | replace("'", "\\'") }}">{{ info.remark or '无备注' }}</span>
                   <input type="text" class="form-control form-control-sm d-none ms-2" id="remark-input-{{ name | replace("'", "\\'") }}" value="{{ info.remark }}" style="max-width:150px;">
-                  <button type="button" class="btn btn-link p-0 ms-2" id="remark-btn-{{ name | replace("'", "\\'") }}" onclick="toggleRemark('{{ name | replace("'", "\\'") }}')">编辑</button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary ms-2" id="remark-btn-{{ name | replace("'", "\\'") }}" onclick="toggleRemark('{{ name | replace("'", "\\'") }}')">编辑</button>
                 </div>
               </td>
               <td>
