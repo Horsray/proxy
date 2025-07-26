@@ -26,8 +26,26 @@ app.secret_key = os.environ.get('SECRET_KEY', 'huiying-secret')
 def get_location_from_ip(ip_address):
     """根据IP地址获取地理位置信息
 
-    由于外部网络请求会导致登录缓慢，这里直接返回 IP 地址。
+    首先尝试调用公共接口解析 IP 所在地区，若失败则返回原始 IP。
     """
+    if not ip_address:
+        return ''
+    try:
+        resp = requests.get(
+            f"http://ip-api.com/json/{ip_address}?lang=zh-CN",
+            timeout=3,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            if data.get('status') == 'success':
+                country = data.get('country', '')
+                region = data.get('regionName', '')
+                city = data.get('city', '')
+                location_parts = [p for p in [country, region, city] if p]
+                if location_parts:
+                    return '-'.join(location_parts)
+    except Exception:
+        pass
     return ip_address
 
 
@@ -47,6 +65,7 @@ def load_users() -> dict:
             try:
                 users = json.load(f).get('users', {})
                 # ensure default fields
+                updated = False
                 for name, info in users.items():
                     info.setdefault('nickname', '')
                     info.setdefault('enabled', True)
@@ -58,6 +77,11 @@ def load_users() -> dict:
                     info.setdefault('is_agent', False)
                     info.setdefault('owner', '')
                     info.setdefault('forsale', False)
+                    if info.get('ip_address') and not info.get('location'):
+                        info['location'] = get_location_from_ip(info['ip_address'])
+                        updated = True
+                if updated:
+                    save_users(users)
                 return users
             except Exception:
                 return {}
