@@ -343,16 +343,25 @@ def delete_user(name):
 
 
 @app.route('/users/<name>/toggle', methods=['POST'])
-@admin_required
 def toggle_user(name):
+    """Toggle user enabled status for admins or the owning agent."""
     users = load_users()
-    if name in users:
-        users[name]['enabled'] = not users[name].get('enabled', True)
+    user = users.get(name)
+    permitted = False
+    if session.get('admin') == 'horsray':
+        permitted = True
+    elif session.get('agent') and user and user.get('owner') == session.get('agent'):
+        permitted = True
+    if not permitted:
+        return redirect(url_for('login'))
+    if user:
+        user['enabled'] = not user.get('enabled', True)
         save_users(users)
-        # 支持AJAX请求
         if request.is_json or request.headers.get('Content-Type') == 'application/json':
-            return jsonify({'success': True, 'enabled': users[name]['enabled']})
-    return redirect(url_for('user_list'))
+            return jsonify({'success': True, 'enabled': user['enabled']})
+    if request.is_json or request.headers.get('Content-Type') == 'application/json':
+        return jsonify({'success': False}), 404
+    return redirect(url_for('user_list') if session.get('admin') else url_for('agent_users'))
 
 
 @app.route('/sales/users/<name>/sold', methods=['POST'])
@@ -367,6 +376,61 @@ def mark_sold(name):
             return jsonify({'success': True})
     if request.is_json:
         return jsonify({'success': False}), 404
+    return redirect(url_for('agent_users'))
+
+
+@app.route('/sales/batch_sold', methods=['POST'])
+@agent_required
+def batch_sold():
+    names = request.form.getlist('names')
+    users = load_users()
+    current = session.get('agent')
+    for name in names:
+        if name in users and users[name].get('owner') == current and users[name].get('forsale'):
+            users[name]['forsale'] = False
+    save_users(users)
+    return redirect(url_for('agent_users'))
+
+
+@app.route('/sales/users/<name>/update', methods=['POST'])
+@agent_required
+def agent_update_user(name):
+    """Allow agents to update their own users or remarks."""
+    users = load_users()
+    current = session.get('agent')
+    user = users.get(name)
+    if not user or user.get('owner') != current:
+        if request.is_json:
+            return jsonify({'success': False}), 404
+        return redirect(url_for('agent_users'))
+    if request.is_json:
+        data = request.get_json(silent=True) or {}
+        remark = data.get('remark')
+        if remark is not None:
+            user['remark'] = remark
+            save_users(users)
+            return jsonify({'success': True})
+        return jsonify({'success': False}), 400
+    new_name = request.form.get('username')
+    password = request.form.get('password')
+    nickname = request.form.get('nickname')
+    enabled = bool(request.form.get('enabled'))
+    product = request.form.get('product')
+    remark = request.form.get('remark', '')
+    if new_name and new_name != name and new_name not in users:
+        users[new_name] = user
+        users.pop(name)
+        name = new_name
+        user = users[name]
+    if password:
+        user['password'] = password
+    if nickname is not None:
+        user['nickname'] = nickname
+    user['enabled'] = enabled
+    if product is not None:
+        user['product'] = product
+    user['remark'] = remark
+    save_users(users)
     return redirect(url_for('agent_users'))
 
 
@@ -387,6 +451,26 @@ def batch_action():
             users[name]['enabled'] = False
     save_users(users)
     return redirect(url_for('user_list'))
+
+
+@app.route('/sales/batch_action', methods=['POST'])
+@agent_required
+def agent_batch_action():
+    action = request.form.get('action')
+    names = request.form.getlist('names')
+    users = load_users()
+    current = session.get('agent')
+    for name in names:
+        if name not in users or users[name].get('owner') != current:
+            continue
+        if action == 'enable':
+            users[name]['enabled'] = True
+        elif action == 'disable':
+            users[name]['enabled'] = False
+        elif action == 'sold' and users[name].get('forsale'):
+            users[name]['forsale'] = False
+    save_users(users)
+    return redirect(url_for('agent_users'))
 
 
 @app.route('/users/<name>/update', methods=['POST'])
