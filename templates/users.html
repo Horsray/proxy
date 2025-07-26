@@ -292,11 +292,11 @@
                     <i class="fas fa-edit"></i>
                   </button>
                   {% if session.get('admin') %}
-                  <form method="post" action="{{ url_for('delete_user', name=name) }}" class="d-inline" onsubmit="return confirm('确定删除用户 {{ name }} 吗？')">
-                    <button class="btn btn-sm btn-outline-danger" title="删除用户">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </form>
+                  <button type="submit" class="btn btn-sm btn-outline-danger" title="删除用户"
+                          formaction="{{ url_for('delete_user', name=name) }}" formmethod="post"
+                          onclick="return confirm('确定删除用户 {{ name }} 吗？')">
+                    <i class="fas fa-trash"></i>
+                  </button>
                   {% endif %}
                 </div>
               </td>
