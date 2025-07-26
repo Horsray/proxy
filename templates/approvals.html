@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+{% block title %}订单审批{% endblock %}
+{% block content %}
+<h4 class="mb-3">待审批申请</h4>
+<div class="table-responsive">
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>代理</th><th>产品</th><th>数量</th><th>单价</th><th>时间</th><th>状态</th><th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for a in apps %}
+  <tr>
+    <form method="post">
+      <input type="hidden" name="id" value="{{ a.id }}">
+      <td>{{ a.agent }}</td>
+      <td>
+        <select name="product" class="form-select form-select-sm">
+          {% for p in products.values() %}
+          <option value="{{ p.name }}" {% if p.name==a.product %}selected{% endif %}>{{ p.name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+      <td><input name="count" type="number" class="form-control form-control-sm" value="{{ a.count }}"></td>
+      <td><input name="price" type="number" step="0.01" class="form-control form-control-sm" value="{{ a.price }}"></td>
+      <td>{{ a.created_at }}</td>
+      <td>{{ a.status }}</td>
+      <td>
+        {% if a.status=='pending' %}
+        <button name="action" value="approve" class="btn btn-sm btn-success">通过</button>
+        <button name="action" value="reject" class="btn btn-sm btn-danger">拒绝</button>
+        {% else %}
+        <span class="badge bg-secondary">已处理</span>
+        {% endif %}
+      </td>
+    </form>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

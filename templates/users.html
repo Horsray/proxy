@@ -141,6 +141,9 @@
               <th>创建时间</th>
               <th>来源</th>
               <th>产品</th>
+              {% if role == 'agent' %}
+              <th>待售状态</th>
+              {% endif %}
               <th>备注</th>
               <th style="width: 200px;">操作</th>
             </tr>
@@ -248,6 +251,17 @@
                   <span class="text-muted">未设置</span>
                 {% endif %}
               </td>
+              {% if role == 'agent' %}
+              <td>
+                {% if info.for_sale %}
+                  <form method="post" action="{{ url_for('mark_sold', name=name) }}" onsubmit="return confirm('标记为已售?')">
+                    <button class="btn btn-sm btn-warning">待售</button>
+                  </form>
+                {% else %}
+                  <span class="badge bg-success">已售</span>
+                {% endif %}
+              </td>
+              {% endif %}
               <td>
                 <div class="d-flex align-items-center">
                   <span class="text-muted me-2" id="remark-display-{{ name | replace("'", "\\'") }}">
@@ -500,6 +514,20 @@
       if(p!==undefined && (priceInput.value=='' || priceInput.value=='0')){priceInput.value=p;}
     }
     prodSel.addEventListener('change',setPrice);setPrice();
+  }
+
+  // 编辑备注
+  function editRemark(username){
+    const span=document.getElementById(`remark-display-${username}`);
+    const current=span.textContent.trim();
+    const remark=prompt('请输入备注', current==='无备注'? '' : current);
+    if(remark===null){return;}
+    const fd=new FormData();
+    fd.append('remark', remark);
+    fetch(`/users/${encodeURIComponent(username)}/remark`,{method:'POST', body:fd})
+      .then(r=>r.json()).then(d=>{
+        if(d.success){span.textContent=remark||'无备注';}
+      });
   }
 </script>
 

@@ -545,6 +545,7 @@
     <!-- 左侧菜单 -->
     <div class="sidebar">
       <div class="list-group list-group-flush">
+        {% if session.get('role') == 'admin' %}
         <a href="{{ url_for('bulk_manage') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/bulk') %}active{% endif %}">
           <i class="fas fa-users-cog"></i>批量用户管理
         </a>
@@ -554,9 +555,23 @@
         <a href="{{ url_for('ledger_view') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/ledger') %}active{% endif %}">
           <i class="fas fa-chart-line"></i>台账管理
         </a>
+        <a href="{{ url_for('approvals') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/approvals') %}active{% endif %}">
+          <i class="fas fa-clipboard-check"></i>订单审批
+        </a>
         <a href="{{ url_for('products') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/products') %}active{% endif %}">
           <i class="fas fa-box"></i>产品维护
         </a>
+        {% elif session.get('role') == 'agent' %}
+        <a href="{{ url_for('agent_apply') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/agent/apply') %}active{% endif %}">
+          <i class="fas fa-paper-plane"></i>批量开通申请
+        </a>
+        <a href="{{ url_for('agent_user_list') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/agent/users') %}active{% endif %}">
+          <i class="fas fa-users"></i>我的用户
+        </a>
+        <a href="{{ url_for('agent_ledger') }}" class="list-group-item list-group-item-action {% if request.path.startswith('/agent/ledger') %}active{% endif %}">
+          <i class="fas fa-chart-line"></i>我的台账
+        </a>
+        {% endif %}
       </div>
     </div>
 
