@@ -255,6 +255,7 @@ def user_list():
     query = request.args.get('q', '')
     source = request.args.get('source', '')
     status = request.args.get('status', '')
+    sale = request.args.get('sale', '')
     sort = request.args.get('sort', 'desc')
     start = request.args.get('start', '')
     end = request.args.get('end', '')
@@ -268,6 +269,9 @@ def user_list():
     if status:
         flag = status == 'enabled'
         users = {k: v for k, v in users.items() if v.get('enabled', True) == flag}
+    if sale:
+        flag = sale == 'forsale'
+        users = {k: v for k, v in users.items() if v.get('forsale', False) == flag}
     if start:
         users = {k: v for k, v in users.items() if v.get('created_at', '') >= start}
     if end:
@@ -283,7 +287,8 @@ def user_list():
     return render_template(
         'users.html', users=dict(page_items), total=total,
         page=page, per_page=per_page, query=query, source=source,
-        status=status, sort=sort, start=start, end=end, products=products
+        status=status, sale=sale, sort=sort, start=start, end=end,
+        products=products
     )
 
 
@@ -787,16 +792,31 @@ def agent_users():
     users = load_users()
     current = session.get('agent')
     my_users = {k: v for k, v in users.items() if v.get('owner') == current}
+
+    query = request.args.get('q', '')
+    sale = request.args.get('sale', '')
+    status = request.args.get('status', '')
     per_page = max(int(request.args.get('per_page', 20)), 1)
+
+    if query:
+        my_users = {k: v for k, v in my_users.items() if query.lower() in k.lower()}
+    if status:
+        flag = status == 'enabled'
+        my_users = {k: v for k, v in my_users.items() if v.get('enabled', True) == flag}
+    if sale:
+        flag = sale == 'forsale'
+        my_users = {k: v for k, v in my_users.items() if v.get('forsale', False) == flag}
+
     return render_template(
         'users.html',
         users=my_users,
         total=len(my_users),
         page=1,
         per_page=per_page,
-        query='',
+        query=query,
         source='',
-        status='',
+        status=status,
+        sale=sale,
         sort='desc',
         start='',
         end='',
@@ -808,8 +828,22 @@ def agent_users():
 @agent_required
 def agent_ledger():
     records = [r for r in load_ledger() if r.get('admin') == session.get('agent')]
+    from datetime import datetime
+    today = datetime.now().strftime('%Y-%m-%d')
+    this_month = datetime.now().strftime('%Y-%m')
+    this_year = datetime.now().strftime('%Y')
+
+    daily = sum(r.get('revenue', 0) for r in records if r.get('time', '').startswith(today))
+    monthly = sum(r.get('revenue', 0) for r in records if r.get('time', '').startswith(this_month))
+    yearly = sum(r.get('revenue', 0) for r in records if r.get('time', '').startswith(this_year))
+    total = sum(r.get('revenue', 0) for r in records)
+
     products = load_products()
-    return render_template('ledger.html', records=records, product_filter='', admin_filter=session.get('agent'), start='', end='', products=products, daily=0, monthly=0, yearly=0, total=0)
+    return render_template(
+        'ledger.html', records=records, product_filter='',
+        admin_filter=session.get('agent'), start='', end='', products=products,
+        daily=daily, monthly=monthly, yearly=yearly, total=total
+    )
 
 
 @app.route('/sales/apply', methods=['GET', 'POST'])

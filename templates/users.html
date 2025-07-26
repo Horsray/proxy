@@ -38,14 +38,23 @@
           <option value="add" {% if source=='add' %}selected{% endif %}>手动录入</option>
           <option value="batch" {% if source=='batch' %}selected{% endif %}>批量生成</option>
           <option value="import" {% if source=='import' %}selected{% endif %}>文件导入</option>
+          <option value="agent" {% if source=='agent' %}selected{% endif %}>代理</option>
         </select>
       </div>
       <div class="col-md-2">
-        <label class="form-label">状态</label>
+        <label class="form-label">账户状态</label>
         <select name="status" class="form-select">
           <option value="">全部状态</option>
           <option value="enabled" {% if status=='enabled' %}selected{% endif %}>已启用</option>
           <option value="disabled" {% if status=='disabled' %}selected{% endif %}>已停用</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">售出状态</label>
+        <select name="sale" class="form-select">
+          <option value="">全部</option>
+          <option value="forsale" {% if sale=='forsale' %}selected{% endif %}>未售</option>
+          <option value="sold" {% if sale=='sold' %}selected{% endif %}>已售</option>
         </select>
       </div>
       <div class="col-md-2">
@@ -143,7 +152,7 @@
               <th>用户名</th>
               <th>昵称</th>
               <th>类型</th>
-              <th>状态</th>
+              <th>账户状态</th>
               <th>IP地址</th>
               <th>最后登录</th>
               <th>创建时间</th>
