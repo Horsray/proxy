@@ -779,7 +779,8 @@ def ledger_view():
     end = request.args.get('end', '')
     
     # 过滤记录
-    filtered_records = records[:]
+    # Only show admin role records to avoid counting agent sales
+    filtered_records = [r for r in records if r.get('role') == 'admin']
     if product_filter:
         filtered_records = [r for r in filtered_records if r.get('product') == product_filter]
     if admin_filter:

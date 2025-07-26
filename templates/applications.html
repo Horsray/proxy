@@ -78,5 +78,14 @@
     document.getElementById('edit-app-product').value=product;
     new bootstrap.Modal(document.getElementById('edit-app-modal')).show();
   }
+  document.getElementById('batch-app-form').addEventListener('submit',function(e){
+    const action = e.submitter ? e.submitter.value : '';
+    if(action==='approve' || action==='reject'){
+      if(!this.querySelector('input[name="ids"]:checked')){
+        e.preventDefault();
+        alert('请选择要操作的申请');
+      }
+    }
+  });
 </script>
 {% endblock %}

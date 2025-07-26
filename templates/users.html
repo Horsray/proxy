@@ -270,12 +270,9 @@
               </td>
               <td>
                 <div class="d-flex align-items-center">
-                  <span class="text-muted me-2" id="remark-display-{{ name | replace("'", "\\'") }}">
-                    {{ info.remark or '无备注' }}
-                  </span>
-                  <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editRemark('{{ name | replace("'", "\\'") }}')" title="编辑备注">
-                    <i class="fas fa-edit"></i>
-                  </button>
+                  <span class="text-muted" id="remark-display-{{ name | replace("'", "\\'") }}">{{ info.remark or '无备注' }}</span>
+                  <input type="text" class="form-control form-control-sm d-none ms-2" id="remark-input-{{ name | replace("'", "\\'") }}" value="{{ info.remark }}" style="max-width:150px;">
+                  <button type="button" class="btn btn-link p-0 ms-2" id="remark-btn-{{ name | replace("'", "\\'") }}" onclick="toggleRemark('{{ name | replace("'", "\\'") }}')">编辑</button>
                 </div>
               </td>
               <td>
@@ -578,20 +575,29 @@
     prodSel.addEventListener('change',setPrice);setPrice();
   }
 
-  function editRemark(username){
-    const current=document.getElementById(`remark-display-${username}`);
-    const value=prompt('输入备注', current.textContent.trim());
-    if(value===null) return;
-    const base = isAgent ? '/sales/users/' : '/users/';
-    fetch(`${base}${encodeURIComponent(username)}/update`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({remark:value})
-    }).then(r=>r.json()).then(d=>{
-      if(d.success){
-        current.textContent=value||'无备注';
-      }else{alert('保存失败');}
-    });
+  function toggleRemark(username){
+    const display = document.getElementById(`remark-display-${username}`);
+    const input = document.getElementById(`remark-input-${username}`);
+    const btn = document.getElementById(`remark-btn-${username}`);
+    if(input.classList.contains('d-none')){
+      input.classList.remove('d-none');
+      btn.textContent='保存';
+      input.focus();
+    }else{
+      const value = input.value;
+      const base = isAgent ? '/sales/users/' : '/users/';
+      fetch(`${base}${encodeURIComponent(username)}/update`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({remark:value})
+      }).then(r=>r.json()).then(d=>{
+        if(d.success){
+          display.textContent=value||'无备注';
+          input.classList.add('d-none');
+          btn.textContent='编辑';
+        }else{alert('保存失败');}
+      });
+    }
   }
 
   function markSold(username){
