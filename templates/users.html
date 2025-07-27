@@ -146,7 +146,7 @@
                   <label class="form-check-label" for="check-all"></label>
                 </div>
               </th>
-              <th>编号</th>
+              <th>用户编号</th>
               <th>用户名</th>
               <th>昵称</th>
               <th>类型</th>
@@ -171,7 +171,7 @@
                 </div>
               </td>
               <td>
-                <span class="badge bg-light text-dark">{{ loop.index + (page-1)*per_page }}</span>
+                <span class="badge bg-light text-dark">{{ info.user_id }}</span>
               </td>
               <td>
                 <div class="d-flex align-items-center">
@@ -519,6 +519,7 @@
     {% for name, info in users.items() %}
     '{{ name | replace("'", "\\'") }}': {
       username: '{{ name | replace("'", "\\'") }}',
+      user_id: '{{ info.user_id }}',
       nickname: '{{ info.nickname | replace("'", "\\'") }}',
       is_admin: {{ 'true' if info.is_admin else 'false' }},
       is_agent: {{ 'true' if info.is_agent else 'false' }},

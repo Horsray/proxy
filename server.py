@@ -59,6 +59,21 @@ def get_client_ip():
         return request.remote_addr
 
 
+def generate_user_id(users: dict) -> str:
+    ts = datetime.now().strftime('%Y%m%d%H%M%S')
+    seq = 1
+    for u in users.values():
+        uid = str(u.get('user_id', ''))
+        if uid.startswith(ts):
+            try:
+                num = int(uid[len(ts):])
+                if num >= seq:
+                    seq = num + 1
+            except Exception:
+                continue
+    return f"{ts}{seq:03d}"
+
+
 def load_users() -> dict:
     if os.path.exists(USERS_FILE):
         with open(USERS_FILE, 'r', encoding='utf-8') as f:
@@ -77,6 +92,9 @@ def load_users() -> dict:
                     info.setdefault('is_agent', False)
                     info.setdefault('owner', '')
                     info.setdefault('forsale', False)
+                    if 'user_id' not in info:
+                        info['user_id'] = generate_user_id(users)
+                        updated = True
                     if info.get('ip_address') and not info.get('location'):
                         info['location'] = get_location_from_ip(info['ip_address'])
                         updated = True
@@ -345,6 +363,7 @@ def add_user():
     if username in users:
         return redirect(url_for('user_list'))
     users[username] = {
+        'user_id': generate_user_id(users),
         'password': password,
         'nickname': nickname,
         'is_admin': is_admin,
@@ -623,6 +642,7 @@ def import_users():
         is_admin = bool(row[3]) if row and len(row) > 3 else False
         if username and password:
             users[username] = {
+                'user_id': generate_user_id(users),
                 'password': password,
                 'nickname': nickname,
                 'is_admin': is_admin,
@@ -659,11 +679,12 @@ def export_users():
     wb = Workbook()
     ws = wb.active
     ws.append([
-        '用户名', '密码', '昵称', '是否管理员',
+        '用户编号', '用户名', '密码', '昵称', '是否管理员',
         '启用', '来源', '创建时间', '最后登录', '产品', 'IP地址', '位置'
     ])
     for name, info in users.items():
         ws.append([
+            info.get('user_id', ''),
             name,
             info.get('password'),
             info.get('nickname'),
@@ -763,6 +784,7 @@ def bulk_create():
                 break
         pwd = os.urandom(4).hex()
         users[uname] = {
+            'user_id': generate_user_id(users),
             'password': pwd,
             'nickname': '',
             'is_admin': False,
@@ -983,6 +1005,7 @@ def _approve_application(app_record):
                 break
         pwd = os.urandom(4).hex()
         users[uname] = {
+            'user_id': generate_user_id(users),
             'password': pwd,
             'nickname': '',
             'is_admin': False,
