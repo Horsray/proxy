@@ -12,6 +12,7 @@ import requests
 from datetime import datetime
 from io import BytesIO
 from functools import wraps
+from db_utils import init_db, load_users, save_users, db_lock
 
 # 导入Flask及相关工具
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify
@@ -22,7 +23,7 @@ from openpyxl import Workbook, load_workbook
 # 变量定义
 # 基础目录及数据文件路径
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-USERS_FILE = os.path.join(BASE_DIR, 'users.json')          # 用户数据文件
+init_db()
 LEDGER_FILE = os.path.join(BASE_DIR, 'ledger.json')        # 台账数据文件
 PRODUCTS_FILE = os.path.join(BASE_DIR, 'products.json')    # 产品数据文件
 APPLICATIONS_FILE = os.path.join(BASE_DIR, 'applications.json') # 审批数据文件
@@ -32,21 +33,15 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'huiying-secret')  # 用户身份码，生产环境请设置环境变量
 
 
-import json
-import os
 
-USERS_FILE = 'users.json'
 
 def get_location_from_ip(ip_address, username=None):
     """根据IP地址获取地理位置信息（带 users.json 自动判断与写入）"""
     if not ip_address or not username:
         return ip_address  # 不处理匿名或空IP情况
 
-    # 尝试读取本地 users.json
-    users = {}
-    if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, 'r', encoding='utf-8') as f:
-            users = json.load(f).get('users', {})
+    # 从数据库读取用户信息
+    users = load_users()
 
     user = users.get(username, {})
     current_ip = user.get("ip_address")
@@ -71,8 +66,7 @@ def get_location_from_ip(ip_address, username=None):
                     user['ip_address'] = ip_address
                     user['location'] = location
                     users[username] = user
-                    with open(USERS_FILE, 'w', encoding='utf-8') as f:
-                        json.dump({'users': users}, f, ensure_ascii=False, indent=2)
+                    save_users(users)
                     return location
     except Exception:
         pass
@@ -80,8 +74,7 @@ def get_location_from_ip(ip_address, username=None):
     # fallback：失败时也更新IP，但保留旧location或空
     user['ip_address'] = ip_address
     users[username] = user
-    with open(USERS_FILE, 'w', encoding='utf-8') as f:
-        json.dump({'users': users}, f, ensure_ascii=False, indent=2)
+    save_users(users)
 
     return current_loc or ip_address
 
@@ -120,51 +113,7 @@ def generate_user_id(users: dict) -> str:
     return f"{ts}{seq:03d}"
 
 
-def load_users() -> dict:
-    """
-    加载用户数据文件，若缺省字段则自动补全，必要时回写文件。
-    用途：全局用户数据读取与字段规范化。
-    异常：文件不存在或格式错误时返回空字典。
-    """
-    if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, 'r', encoding='utf-8') as f:
-            try:
-                users = json.load(f).get('users', {})
-                # 确保每个用户字段齐全
-                updated = False
-                for name, info in users.items():
-                    info.setdefault('nickname', '')
-                    info.setdefault('enabled', True)
-                    info.setdefault('source', 'add')
-                    info.setdefault('price', 0)
-                    info.setdefault('ip_address', '')
-                    info.setdefault('location', '')
-                    info.setdefault('remark', '')
-                    info.setdefault('is_agent', False)
-                    info.setdefault('owner', '')
-                    info.setdefault('forsale', False)
-                    if 'user_id' not in info:
-                        info['user_id'] = generate_user_id(users)
-                        updated = True
-                    # 若有IP但无地理位置则补全
-                    if info.get('ip_address') and not info.get('location'):
-                        info['location'] = get_location_from_ip(info['ip_address'])
-                        updated = True
-                if updated:
-                    save_users(users)
-                return users
-            except Exception:
-                return {}
-    return {}
-
-
-def save_users(users: dict) -> None:
-    """
-    保存用户数据到文件。
-    用途：对用户信息的持久化。
-    """
-    with open(USERS_FILE, 'w', encoding='utf-8') as f:
-        json.dump({'users': users}, f, indent=4, ensure_ascii=False)
+# 用户数据的读写由 db_utils 提供
 
 
 def load_ledger() -> list:
