@@ -8,6 +8,7 @@ from gevent import monkey
 monkey.patch_all()
 
 import os
+import sys
 import json
 import requests
 import time
@@ -19,6 +20,9 @@ from threading import Thread, Lock
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from collections import defaultdict, deque
+
+# Adjust path to import shared utilities
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from db_utils import init_db, load_users, save_users, db_lock
 
 

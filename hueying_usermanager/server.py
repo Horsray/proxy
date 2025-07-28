@@ -5,6 +5,7 @@
 # 各部分函数均有详细注释，说明用途、流程、交互及异常处理。
 # 导入标准库及所需第三方库
 import os
+import sys
 import json
 import inspect
 import argparse
@@ -12,6 +13,9 @@ import requests
 from datetime import datetime
 from io import BytesIO
 from functools import wraps
+
+# Allow importing shared utilities from parent directory
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from db_utils import init_db, load_users, save_users, db_lock
 
 # 导入Flask及相关工具
