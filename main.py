@@ -19,6 +19,7 @@ from threading import Thread, Lock
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from collections import defaultdict, deque
+from db_utils import init_db, load_users, save_users, db_lock
 
 
 # 设置日志等级，隐藏 websocket 与 urllib3 的重复警告
@@ -26,8 +27,29 @@ logging.getLogger("geventwebsocket").setLevel(logging.ERROR)
 logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
 
 # 用户认证与状态缓存路径
-USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
+SESSIONS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sessions.json")
 sessions = {}
+init_db()
+
+# 会话持久化
+session_lock = Lock()
+
+def load_sessions():
+    if os.path.exists(SESSIONS_FILE):
+        try:
+            with open(SESSIONS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def save_sessions(data):
+    with session_lock:
+        with open(SESSIONS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+# 初始化会话数据
+sessions.update(load_sessions())
 
 # 云端接口地址
 
@@ -39,23 +61,9 @@ CLOUD_AUTH_URL = f"{CLOUD_BASE_URL}/auth/login"
 CLOUD_LOGOUT_URL = f"{CLOUD_BASE_URL}/auth/logout"
 CLOUD_CHECK_URL = f"{CLOUD_BASE_URL}/psPlus/workflow/checkOnline"
 
-#数据初始化
+# 数据初始化函数（兼容旧实现）
 def load_local_users():
-    """从users.json获取用户数据."""
-    if os.path.exists(USERS_FILE):
-        try:
-            with open(USERS_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            #logging.info(f"🔐 已加载本地用户文件: {USERS_FILE}")
-            #logging.debug(f"本地用户列表: {list(data.get('users', {}).keys())}")
-            return data.get("users", {})
-        except Exception as e:
-            logging.error(f"❌ 本地用户文件加载失败: {e}")
-    else:
-        logging.warning(f"⚠️ 未找到本地用户文件: {USERS_FILE}")
-    return {}
-
-
+    return load_users()
 # 前端获取ComfyUI地址，自动重置
 COMFYUI_URL = ""
 
@@ -90,21 +98,14 @@ def extract_client_ip(req):
     )
 
 #获取客户端归属地
-import json
-import os
-
-USERS_FILE = 'users.json'
 
 def get_location_from_ip(ip_address, username=None):
     """根据IP地址获取地理位置信息（带 users.json 自动判断与写入）"""
     if not ip_address or not username:
         return ip_address  # 不处理匿名或空IP情况
 
-    # 尝试读取本地 users.json
-    users = {}
-    if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, 'r', encoding='utf-8') as f:
-            users = json.load(f).get('users', {})
+    # 从数据库读取用户信息
+    users = load_local_users()
 
     user = users.get(username, {})
     current_ip = user.get("ip_address")
@@ -129,8 +130,7 @@ def get_location_from_ip(ip_address, username=None):
                     user['ip_address'] = ip_address
                     user['location'] = location
                     users[username] = user
-                    with open(USERS_FILE, 'w', encoding='utf-8') as f:
-                        json.dump({'users': users}, f, ensure_ascii=False, indent=2)
+                    save_users(users)
                     return location
     except Exception:
         pass
@@ -138,8 +138,7 @@ def get_location_from_ip(ip_address, username=None):
     # fallback：失败时也更新IP，但保留旧location或空
     user['ip_address'] = ip_address
     users[username] = user
-    with open(USERS_FILE, 'w', encoding='utf-8') as f:
-        json.dump({'users': users}, f, ensure_ascii=False, indent=2)
+    save_users(users)
 
     return current_loc or ip_address
 #获取实时comfyui地址
@@ -1211,26 +1210,20 @@ def login_compatible():
             "username": username,
             "login_time": time.time()
         }
-    
-        with open("users.json", "r", encoding="utf-8") as f:
-            users_data = json.load(f).get("users", {})
+        save_sessions(sessions)
+
+        users_data = load_local_users()
         nickname = users_data.get(username, {}).get("nickname", "")
     
         logger.info(f"👤 用户: {username}-「{nickname}」登录成功")
         # 更新 last_login 字段
         try:
-            with open("users.json", "r", encoding="utf-8") as f:
-                user_data = json.load(f)
-                users_json = user_data.get("users", {})
+            users_json = load_local_users()
             if username in users_json:
-                #写入最后登录时间
                 users_json[username]["last_login"] = time.strftime("%Y-%m-%d %H:%M:%S")
-                #写入最后登录IP
                 users_json[username]["ip_address"] = extract_client_ip(request)
-                #写入最后登录ip的归属地
                 users_json[username]["location"] = get_location_from_ip(users_json[username]["ip_address"], username)
-                with open("users.json", "w", encoding="utf-8") as f:
-                    json.dump({"users": users_json}, f, ensure_ascii=False, indent=4)
+                save_users(users_json)
         except Exception as e:
             logger.warning(f"[Login] 无法写入最后登录时间: {e}")
         return jsonify({
@@ -1283,6 +1276,7 @@ session.mount("http://", adapter)
 def logout():
     token = request.headers.get("Authorization", "").replace("Bearer ", "")
     session_obj = sessions.pop(token, None)
+    save_sessions(sessions)
     if session_obj:
         username = session_obj.get("username", "")
         nickname = session_obj.get("nickname", "")
@@ -1313,6 +1307,8 @@ def session_cleaner():
         for token in to_remove:
             logger.info(f"🧹 清理过期会话: {sessions[token]}")
             del sessions[token]
+        if to_remove:
+            save_sessions(sessions)
 
         time.sleep(7200)  # 每2小时检查一次
 
@@ -1350,11 +1346,3 @@ if __name__ == '__main__':
 
     server.serve_forever()
 
-
-def load_local_users():
-    try:
-        with open('users.json', 'r', encoding='utf-8') as f:
-            return json.load(f).get("users", {})
-    except Exception as e:
-        logger.error(f"❌ 读取本地用户失败: {e}")
-        return {}
