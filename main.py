@@ -80,7 +80,68 @@ def sanitize_url(url: str) -> str:
     if not url:
         return url
     return url.replace("\\", "/").rstrip('/')
+#获取客户端IP地址    
+def extract_client_ip(req):
+    return (
+        req.headers.get("X-Forwarded-For")
+        or req.headers.get("X-Real-Ip")
+        or req.headers.get("Remote-Host")
+        or req.remote_addr
+    )
 
+#获取客户端归属地
+import json
+import os
+
+USERS_FILE = 'users.json'
+
+def get_location_from_ip(ip_address, username=None):
+    """根据IP地址获取地理位置信息（带 users.json 自动判断与写入）"""
+    if not ip_address or not username:
+        return ip_address  # 不处理匿名或空IP情况
+
+    # 尝试读取本地 users.json
+    users = {}
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE, 'r', encoding='utf-8') as f:
+            users = json.load(f).get('users', {})
+
+    user = users.get(username, {})
+    current_ip = user.get("ip_address")
+    current_loc = user.get("location", "")
+
+    # ✅ 如果 IP 未变化且 location 存在，直接返回缓存的
+    if current_ip == ip_address and current_loc:
+        return current_loc
+
+    # 🌐 否则调用外部 API 查询
+    try:
+        resp = requests.get(f"http://ip-api.com/json/{ip_address}?lang=zh-CN", timeout=3)
+        if resp.status_code == 200:
+            data = resp.json()
+            if data.get('status') == 'success':
+                country = data.get('country', '')
+                region = data.get('regionName', '')
+                city = data.get('city', '')
+                location = '-'.join([p for p in [country, region, city] if p])
+                if location:
+                    # 📝 写入用户信息并保存
+                    user['ip_address'] = ip_address
+                    user['location'] = location
+                    users[username] = user
+                    with open(USERS_FILE, 'w', encoding='utf-8') as f:
+                        json.dump({'users': users}, f, ensure_ascii=False, indent=2)
+                    return location
+    except Exception:
+        pass
+
+    # fallback：失败时也更新IP，但保留旧location或空
+    user['ip_address'] = ip_address
+    users[username] = user
+    with open(USERS_FILE, 'w', encoding='utf-8') as f:
+        json.dump({'users': users}, f, ensure_ascii=False, indent=2)
+
+    return current_loc or ip_address
 #获取实时comfyui地址
 def is_remote_url(url: str) -> bool:
     """Return True if the given URL points to a public (non-local) address."""
@@ -1122,6 +1183,7 @@ def health_check():
 # 登录接口
 @app.route('/auth/login', methods=['POST'])
 def login_compatible():
+    #logger.debug(f"[Login Proxy] 请求头: {json.dumps(dict(request.headers), indent=2)}")
     data = request.get_json(silent=True)
     if data is None:
         data = request.form.to_dict()
@@ -1149,15 +1211,24 @@ def login_compatible():
             "username": username,
             "login_time": time.time()
         }
-        
-        logger.info(f"👤 用户: {username}-登录成功")
+    
+        with open("users.json", "r", encoding="utf-8") as f:
+            users_data = json.load(f).get("users", {})
+        nickname = users_data.get(username, {}).get("nickname", "")
+    
+        logger.info(f"👤 用户: {username}-「{nickname}」登录成功")
         # 更新 last_login 字段
         try:
             with open("users.json", "r", encoding="utf-8") as f:
                 user_data = json.load(f)
                 users_json = user_data.get("users", {})
             if username in users_json:
+                #写入最后登录时间
                 users_json[username]["last_login"] = time.strftime("%Y-%m-%d %H:%M:%S")
+                #写入最后登录IP
+                users_json[username]["ip_address"] = extract_client_ip(request)
+                #写入最后登录ip的归属地
+                users_json[username]["location"] = get_location_from_ip(users_json[username]["ip_address"], username)
                 with open("users.json", "w", encoding="utf-8") as f:
                     json.dump({"users": users_json}, f, ensure_ascii=False, indent=4)
         except Exception as e:
@@ -1180,7 +1251,7 @@ def login_compatible():
         logger.warning("[Login] 本地密码不匹配")
         return jsonify({"code": 401, "msg": "用户名或密码错误"}), 401
     else:
-        logger.info("[Login] 本地用户不存在，尝试云端登录")
+        logger.info("👤 用户: {username}是lightcc用户，转发登录验证")
 
     try:
         response = requests.post(
@@ -1209,60 +1280,18 @@ session.mount("https://", adapter)
 session.mount("http://", adapter)
 # 代理登出接口
 @app.route('/auth/logout', methods=['POST'])
-def logout_proxy():
-    start_time = time.time()
-
-    # 获取 token
-    token = request.headers.get('Authorization', '').replace('Bearer ', '')
-
-    # 从 token 中获取用户名
-    username = None
-    if token in sessions:
-        username = sessions[token].get("username")  # 获取字典中的 "username"
-        # logger.info(f"🔑 [Logout] 收到用户：{username}退出请求")
-
-    if token in sessions:
-        user = sessions.pop(token)
-        logger.info("🚪 [Logout] 用户退出: %s", username)  # 使用 username，而不是 user（全字典）
-        return jsonify({"code": 200, "msg": "操作成功", "data": None}), 200
+def logout():
+    token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    session_obj = sessions.pop(token, None)
+    if session_obj:
+        username = session_obj.get("username", "")
+        nickname = session_obj.get("nickname", "")
+        msg = f"用户 {username}（{nickname}）退出成功"
+        logger.info(f"👋 {msg}")
     else:
-        logger.info("[Logout] 本地会话不存在，尝试云端登出")
-
-    try:
-        payload = request.get_data()
-        headers = {
-            key: value for key, value in request.headers.items()
-            if key.lower() != 'host'
-        }
-
-        # ✅ 使用复用连接 session.post
-        response = session.post(
-            CLOUD_LOGOUT_URL,
-            headers=headers,
-            data=payload,
-            timeout=proxy.config.get("timeout", 10)
-        )
-
-        #logger.info("[Logout] 云端返回状态码: %s", response.status_code)
-        #logger.debug("[Logout] 云端返回内容: %s", response.text)
-
-        try:
-            result = response.json()
-        except Exception:
-            result = {"code": 500, "msg": "云端响应格式错误", "raw": response.text}
-
-        if response.status_code == 200:
-            logger.info("✅ [Logout] 退出成功 - by cloud")
-        else:
-            logger.warning("❌ [Logout] 退出失败 - by cloud")
-
-        #logger.info("⏱️ [Logout] 云端登出耗时: %.3f 秒", time.time() - start_time)
-        return jsonify(result), response.status_code
-
-    except Exception as e:
-        logger.error("[Logout] 云端请求异常: %s", str(e))
-        #logger.info("⏱️ [Logout] 云端登出异常耗时: %.3f 秒", time.time() - start_time)
-        return jsonify({"code": 500, "msg": "代理登出失败", "error": str(e)}), 500
+        msg = "无会话，允许退出"
+        logger.info(f"ℹ️ {msg}")
+    return jsonify({"code": 200, "msg": msg})
 
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler

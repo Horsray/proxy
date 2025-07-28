@@ -1,0 +1,27 @@
+cd /root/home/hueying_poxy && /home/miniconda3/envs/proxyenv/bin/python main.py         #nginx -t  查找反向代理  sudo nano /etc/nginx/conf.d/hueying_proxy.conf  打开编辑  sudo nginx -t #重置
+sudo systemctl reload nginx#重启
+ps -ef|grep main.py
+##后台守护启动
+nohup /home/miniconda3/envs/proxyenv/bin/python /root/home/hueying_poxy/main.py > proxy.log 2>&1 &
+########商业部署，自动重启####打开这个程序的命令是nano /etc/systemd/system/hueying_proxy.service
+# 刷新 systemd +重启
+systemctl daemon-reload
+# 设置开机自动启动                             nano ~/.bashrc#快捷指令      source ~/.bashrc#快捷指令生效
+systemctl enable hueying_proxy
+# 启动服务
+systemctl start hueying_proxy
+# 查看输出日志
+cat /var/log/hueying_proxy.log
+#动态日志#########################
+multitail /var/log/hueying_proxy.err.log
+# 查看日志+重启
+cat /var/log/hueying_proxy.err.log
+systemctl restart hueying_proxy
+#查看状态
+systemctl status hueying_proxy
+#重启
+systemctl restart hueying_proxy
+#关闭
+systemctl stop hueying_proxy systemctl stop hueying-user.service
+
+#进入主nano#  source ~/.bashrc   #执行 nano# source ~/.bashrc

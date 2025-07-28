@@ -32,32 +32,58 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'huiying-secret')  # 用户身份码，生产环境请设置环境变量
 
 
-def get_location_from_ip(ip_address):
-    """根据IP地址获取地理位置信息
+import json
+import os
 
-    用途：通过公网API获取IP归属地信息（国家-省份-城市），失败时返回原始IP。
-    交互：对外部ip-api.com发起HTTP请求。
-    异常：任何异常（如网络、解析等）均忽略并返回原始IP。
-    """
-    if not ip_address:
-        return ''
+USERS_FILE = 'users.json'
+
+def get_location_from_ip(ip_address, username=None):
+    """根据IP地址获取地理位置信息（带 users.json 自动判断与写入）"""
+    if not ip_address or not username:
+        return ip_address  # 不处理匿名或空IP情况
+
+    # 尝试读取本地 users.json
+    users = {}
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE, 'r', encoding='utf-8') as f:
+            users = json.load(f).get('users', {})
+
+    user = users.get(username, {})
+    current_ip = user.get("ip_address")
+    current_loc = user.get("location", "")
+
+    # ✅ 如果 IP 未变化且 location 存在，直接返回缓存的
+    if current_ip == ip_address and current_loc:
+        return current_loc
+
+    # 🌐 否则调用外部 API 查询
     try:
-        resp = requests.get(
-            f"http://ip-api.com/json/{ip_address}?lang=zh-CN",
-            timeout=3,
-        )
+        resp = requests.get(f"http://ip-api.com/json/{ip_address}?lang=zh-CN", timeout=3)
         if resp.status_code == 200:
             data = resp.json()
             if data.get('status') == 'success':
                 country = data.get('country', '')
                 region = data.get('regionName', '')
                 city = data.get('city', '')
-                location_parts = [p for p in [country, region, city] if p]
-                if location_parts:
-                    return '-'.join(location_parts)
+                location = '-'.join([p for p in [country, region, city] if p])
+                if location:
+                    # 📝 写入用户信息并保存
+                    user['ip_address'] = ip_address
+                    user['location'] = location
+                    users[username] = user
+                    with open(USERS_FILE, 'w', encoding='utf-8') as f:
+                        json.dump({'users': users}, f, ensure_ascii=False, indent=2)
+                    return location
     except Exception:
         pass
-    return ip_address
+
+    # fallback：失败时也更新IP，但保留旧location或空
+    user['ip_address'] = ip_address
+    users[username] = user
+    with open(USERS_FILE, 'w', encoding='utf-8') as f:
+        json.dump({'users': users}, f, ensure_ascii=False, indent=2)
+
+    return current_loc or ip_address
 
 
 def get_client_ip():

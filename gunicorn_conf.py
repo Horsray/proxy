@@ -20,8 +20,8 @@ bind = '0.0.0.0:8080'
 pidfile = '/root/home/hueying_proxy/gunicorn.pid'
 
 # 设置访问日志和错误信息日志路径
-accesslog = '/www/wwwlogs/python/hueying_proxy/gunicorn_acess.log'
-errorlog = '/www/wwwlogs/python/hueying_proxy/gunicorn_error.log'
+accesslog = '/www/wwwlogs/python/绘影代理系统/gunicorn_acess.log'
+errorlog = '/www/wwwlogs/python/绘影代理系统/gunicorn_error.log'
 
 # 日志级别，这个日志级别指的是错误日志的级别，而访问日志的级别无法设置
 # debug:调试级别，记录的信息最多；
